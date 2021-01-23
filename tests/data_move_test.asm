@@ -1,0 +1,21 @@
+; Tests the data movement instructions
+
+
+; Notes:
+;
+
+
+;PREPROCESS TestLD
+;PREPROCESS TestLDD
+;PREPROCESS TestLDI
+;PREPROCESS TestLDS
+;PREPROCESS TestMOV
+;PREPROCESS TestST
+;PREPROCESS TestSTD
+;PREPROCESS TestSTS
+;PREPROCESS TestPOP
+;PREPROCESS TestPUSH
+
+    NOP;
+
+
