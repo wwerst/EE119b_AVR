@@ -610,7 +610,123 @@ test_bclr:
     ASSERT $00, $0100   ; Check value of shifted reg
 
 ;PREPROCESS TestBLD
+start_bld:
+    CLR_SREG
+test_bld:
+    ; Go through and write 1s and 0s from T flag to reg
+    ; Start with target bit as bit 0
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 0          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 0          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $01, $0100   ; Target bit should be 1
+    BLD r17, 0          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $01, $0100   ; Target bit should be 1
 
+    ; Now, we repeat the above for bits 1-7
+
+    ; Target bit 1
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 1          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 1          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $02, $0100   ; Target bit should be 1
+    BLD r17, 1          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $02, $0100   ; Target bit should be 1
+
+    ; Target bit 2
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 2          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 2          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $04, $0100   ; Target bit should be 1
+    BLD r17, 2          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $04, $0100   ; Target bit should be 1
+
+    ; Target bit 3
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 3          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 3          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $08, $0100   ; Target bit should be 1
+    BLD r17, 3          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $08, $0100   ; Target bit should be 1
+
+    ; Target bit 4
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 4          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 4          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $10, $0100   ; Target bit should be 1
+    BLD r17, 4          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $10, $0100   ; Target bit should be 1
+
+    ; Target bit 5
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 5          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 5          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $20, $0100   ; Target bit should be 1
+    BLD r17, 5          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $20, $0100   ; Target bit should be 1
+
+    ; Target bit 6
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 6          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 6          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $40, $0100   ; Target bit should be 1
+    BLD r17, 6          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $40, $0100   ; Target bit should be 1
+
+    ; Target bit 7
+    LDI r17, $00
+    BCLR SREG_T
+    BLD r17, 7          ; Write 0 to target bit
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Target bit should be 0
+    BSET SREG_T         ; Set the T bit
+    BLD r17, 7          ; Write 1 to target bit
+    STS $0100, r17      ;W
+    ASSERT $80, $0100   ; Target bit should be 1
+    BLD r17, 7          ; Write 1 again to make sure no toggle
+    STS $0100, r17      ;W
+    ASSERT $80, $0100   ; Target bit should be 1
 
 ;PREPROCESS TestBSET
 ;PREPROCESS TestBST
