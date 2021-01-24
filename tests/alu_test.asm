@@ -31,6 +31,9 @@
     BCLR 7
 .ENDMACRO
 
+
+.EQU SREG_ADDR = $3F
+
 .EQU SREG_C = 0
 .EQU SREG_Z = 1
 .EQU SREG_N = 2
@@ -39,6 +42,7 @@
 .EQU SREG_H = 5
 .EQU SREG_T = 6
 .EQU SREG_I = 7
+
 
 .CSEG ; Start code segment
 
@@ -548,6 +552,63 @@ test_asr_high_one:
     ASSERT $15, $0100 ; 
 
 ;PREPROCESS TestBCLR
+start_bclr:
+    CLR_SREG
+
+
+test_bclr:
+    ; Go in non-sequential order, clearing bits one-by-one
+    LDI r16, $FF
+    OUT SREG_ADDR, r16
+
+    ; Clear V -- bit 3
+    BCLR SREG_V
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $F7, $0100   ; Check value of shifted reg
+
+    ; Clear H -- bit 5
+    BCLR SREG_H
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $D7, $0100   ; Check value of shifted reg
+
+    ; Clear T -- bit 6
+    BCLR SREG_T
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $97, $0100   ; Check value of shifted reg
+
+    ; Clear Z -- bit 1
+    BCLR SREG_Z
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $95, $0100   ; Check value of shifted reg
+
+    ; Clear N -- bit 2
+    BCLR SREG_N
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $91, $0100   ; Check value of shifted reg
+
+    ; Clear C -- bit 0
+    BCLR SREG_C
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $90, $0100   ; Check value of shifted reg
+
+    ; Clear I -- bit 7
+    BCLR SREG_I
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $10, $0100   ; Check value of shifted reg
+
+    ; Clear S -- bit 4
+    BCLR SREG_S
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check value of shifted reg
+
 ;PREPROCESS TestBLD
 ;PREPROCESS TestBSET
 ;PREPROCESS TestBST
