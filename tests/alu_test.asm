@@ -897,6 +897,65 @@ test_bst:
     ASSERT $80, $0100   ; Input register should be unchanged
 
 ;PREPROCESS TestCOM
+start_com:
+    CLR_SREG
+
+; All of the following tests for COM start with
+; a value, check complement, and then take complement
+; back to original value, check that.
+test_com_zero:
+    LDI r22, $00        ;
+    MOV r6, r22
+    COM r6
+    ; Check result
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $FF, $0100
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; N=1, S=1,  C always 1
+    ; Complement back to original value
+    COM r6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $00, $0100
+    STS $0100, r18      ;W
+    ASSERT $03, $0100   ; Z=1, C always 1
+
+test_com_one:
+    LDI r22, $01        ;
+    MOV r6, r22
+    COM r6
+    ; Check result
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $FE, $0100   ; One's complement is 254
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; N=1, S=1,  C always 1
+    ; Complement back to original value
+    COM r6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $01, $0100
+    STS $0100, r18      ;W
+    ASSERT $01, $0100   ; Z=1, C always 1
+
+test_com_other:
+    LDI r22, $64        ; Value is 100
+    MOV r6, r22
+    COM r6
+    ; Check result
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $9B, $0100   ; One's complement is 254
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; N=1, S=1,  C always 1
+    ; Complement back to original value
+    COM r6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r6       ;W
+    ASSERT $64, $0100
+    STS $0100, r18      ;W
+    ASSERT $01, $0100   ; Z=1, C always 1
 ;PREPROCESS TestCP
 ;PREPROCESS TestCPC
 ;PREPROCESS TestCPI
