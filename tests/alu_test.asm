@@ -20,13 +20,30 @@
     POP r16
 .ENDMACRO
 
+.MACRO CLR_SREG
+    BCLR 0
+    BCLR 1
+    BCLR 2
+    BCLR 3
+    BCLR 4
+    BCLR 5
+    BCLR 6
+    BCLR 7
+.ENDMACRO
+
 .EQU SREG_C = 0
+.EQU SREG_Z = 1
+.EQU SREG_N = 2
+.EQU SREG_V = 3
+.EQU SREG_S = 4
+.EQU SREG_H = 5
+.EQU SREG_T = 6
+.EQU SREG_I = 7
 
 .CSEG ; Start code segment
 
 clear_sreg:
-    LDI r16, $00
-    OUT $3F, r16
+    CLR_SREG
 
 ;PREPROCESS TestAdd {r16=Rd, r17=Rd, r18=Rd, X={X, Y, Z}}
 test_add_to_zero:
@@ -224,7 +241,115 @@ test_adc_with_carry_overflow_to_zero:
     ASSERT $23, $0100
 
 ;PREPROCESS TestADIW
+; ADIW Instruction: 
+; Adds an immediate value (0-63) to a register pair and places the result in the register pair.
+; 
+
+start_test_adiw:
+    CLR_SREG
+
+test_adiw_zero:
+    BCLR SREG_H       ; Explicitly make clear H flag is clear, even though done above.
+    LDI r24, $00
+    LDI r25, $00
+    ADIW r25:r24, 0
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W 00 0101
+    ASSERT $00, $0101 ; The high register value should be zero
+    STS $0100, r24    ;W 00 0100
+    ASSERT $00, $0100 ; The low register value should be zero
+    STS $0100, r18    ;W 02 0100
+    ASSERT $02, $0100
+
+test_adiw_notouch_hflag:
+    ; Same test as above, but set the H flag before
+    BSET SREG_H
+    LDI r24, $00
+    LDI r25, $00
+    ADIW r25:r24, 0
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W 00 0101
+    ASSERT $00, $0101 ; The high register value should be zero
+    STS $0100, r24    ;W 00 0100
+    ASSERT $00, $0100 ; The low register value should be zero
+    STS $0100, r18    ;W 22 0100
+    ASSERT $22, $0100
+
+test_adiw_halfcarry_no_effect:
+    BCLR SREG_H
+    LDI r24, $0F
+    LDI r25, $00
+    ADIW r25:r24, 1
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W 00 0101
+    ASSERT $00, $0101 ; Check high register
+    STS $0100, r24    ;W 10 0100
+    ASSERT $10, $0100 ; Check low register
+    STS $0100, r18    ;W 00 0100
+    ASSERT $00, $0100
+
+test_adiw_lowcarry:
+    LDI r24, $FF
+    LDI r25, $00
+    ADIW r25:r24, 1
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W
+    ASSERT $01, $0101 ; The high register value should be 1
+    STS $0100, r24    ;W
+    ASSERT $00, $0100 ; The low register value should have all carried out and be zero
+    STS $0100, r18    ;W
+    ASSERT $00, $0100 ; There should be no carry and also no zero since high set
+
+test_adiw_typical:
+    LDI r24, 235
+    LDI r25, 127
+    ADIW r25:r24, 20  ; 127*256 + 235 + 20 = 127*256 + 255
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W
+    ASSERT $7F, $0101 ; The high register value should be 142 base 10
+    STS $0100, r24    ;W
+    ASSERT $FF, $0100 ; The low register value should be 14 base 10
+    STS $0100, r18    ;W
+    ASSERT $00, $0100 ; V=0, N=0, S=0
+
+test_adiw_signed_overflow:
+    LDI r24, 237
+    LDI r25, 127
+    ADIW r25:r24, 33  ; 127*256 + 237 + 33 = 128*256 + 14
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W
+    ASSERT $80, $0101 ; The high register value should be 142 base 10
+    STS $0100, r24    ;W
+    ASSERT $0E, $0100 ; The low register value should be 14 base 10
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ; V=1, N=1, S=N XOR V=0
+
+test_adiw_unsigned_overflow:
+    LDI r24, 195
+    LDI r25, 255
+    ADIW r25:r24, 63  ; 255*256 + 195 + 63 = 1*65536 + 0*256 + 2
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W
+    ASSERT $00, $0101 ; The high register value should be 142 base 10
+    STS $0100, r24    ;W
+    ASSERT $02, $0100 ; The low register value should be 14 base 10
+    STS $0100, r18    ;W
+    ASSERT $01, $0100 ; V=0, N=0, S=N XOR V=1, C=1
+
+test_adiw_unsigned_overflow_to_zero:
+    LDI r24, 206
+    LDI r25, 255
+    ADIW r25:r24, 50  ; 255*256 + 206 + 50 = 1*65536 + 0*256 + 0
+    IN  r18, $3F      ; Read the Status register
+    STS $0101, r25    ;W
+    ASSERT $00, $0101 ; The high register value should be 142 base 10
+    STS $0100, r24    ;W
+    ASSERT $00, $0100 ; The low register value should be 14 base 10
+    STS $0100, r18    ;W
+    ASSERT $03, $0100 ; V=0, N=0, S=N XOR V=0, C=1, Z=1
+
 ;PREPROCESS TestAND
+
 ;PREPROCESS TestANDI
 ;PREPROCESS TestASR
 ;PREPROCESS TestBCLR
