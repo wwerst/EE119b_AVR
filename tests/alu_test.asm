@@ -429,6 +429,124 @@ test_andi_n_flag:
     ASSERT $14, $0100 ; N=1, V=0, S=N XOR V=1
 
 ;PREPROCESS TestASR
+start_test_asr:
+    CLR_SREG
+
+test_asr_high_zero:
+    LDI r16, $6A
+    MOV r3, r16
+    ; Now, do 8 shifts and check the results regularly.
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $35, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $00, $0100 ; All flags clear
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $1A, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $19, $0100 ; C=1, N=0, V=N XOR C=1, S=N XOR V=1
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $0D, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $00, $0100 ; All flags clear
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $06, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $19, $0100 ; C=1, N=0, V=N XOR C=1, S=N XOR V=1
+
+    ; Shift twice in a row
+    ASR r3
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $01, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $19, $0100 ; C=1, N=0, V=N XOR C=1, S=N XOR V=1
+
+    ; Shift to zero
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $00, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $1B, $0100 ; C=1, N=0, V=N XOR C=1, S=N XOR V=1, Z=1
+
+    ; Shift at zero
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $00, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $02, $0100 ; C=0, N=0, V=N XOR C=0, S=N XOR V=0, Z=1
+
+
+test_asr_high_one:
+    LDI r16, $84
+    MOV r3, r16
+    ; Now, do 8 shifts and check the results regularly.
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $C2, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ; N=1, V=N XOR C=1, S=0 
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $E1, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ; 
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $F0, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $15, $0100 ; 
+
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3     ;W
+    ASSERT $F8, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ; 
+
+    ; Shift twice in a row
+    ASR r3
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $FE, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ; 
+
+    ; Shift to zero
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $FF, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $0C, $0100 ;
+
+    ; Shift at zero
+    ASR r3
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r3    ;W
+    ASSERT $FF, $0100 ; Check value of shifted reg
+    STS $0100, r18    ;W
+    ASSERT $15, $0100 ; 
+
 ;PREPROCESS TestBCLR
 ;PREPROCESS TestBLD
 ;PREPROCESS TestBSET
