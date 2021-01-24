@@ -565,49 +565,49 @@ test_bclr:
     BCLR SREG_V
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $F7, $0100   ; Check value of shifted reg
+    ASSERT $F7, $0100   ; Check SREG value for cleared bit
 
     ; Clear H -- bit 5
     BCLR SREG_H
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $D7, $0100   ; Check value of shifted reg
+    ASSERT $D7, $0100   ; Check SREG value for cleared bit
 
     ; Clear T -- bit 6
     BCLR SREG_T
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $97, $0100   ; Check value of shifted reg
+    ASSERT $97, $0100   ; Check SREG value for cleared bit
 
     ; Clear Z -- bit 1
     BCLR SREG_Z
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $95, $0100   ; Check value of shifted reg
+    ASSERT $95, $0100   ; Check SREG value for cleared bit
 
     ; Clear N -- bit 2
     BCLR SREG_N
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $91, $0100   ; Check value of shifted reg
+    ASSERT $91, $0100   ; Check SREG value for cleared bit
 
     ; Clear C -- bit 0
     BCLR SREG_C
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $90, $0100   ; Check value of shifted reg
+    ASSERT $90, $0100   ; Check SREG value for cleared bit
 
     ; Clear I -- bit 7
     BCLR SREG_I
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $10, $0100   ; Check value of shifted reg
+    ASSERT $10, $0100   ; Check SREG value for cleared bit
 
     ; Clear S -- bit 4
     BCLR SREG_S
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W
-    ASSERT $00, $0100   ; Check value of shifted reg
+    ASSERT $00, $0100   ; Check SREG value for cleared bit
 
 ;PREPROCESS TestBLD
 start_bld:
@@ -729,6 +729,63 @@ test_bld:
     ASSERT $80, $0100   ; Target bit should be 1
 
 ;PREPROCESS TestBSET
+
+; This implements testing for both BSET and BCLR
+start_bset:
+    CLR_SREG
+test_bset:
+    ; Go in non-sequential order, setting bits one-by-one
+    LDI r16, $00
+    OUT SREG_ADDR, r16
+
+    ; Clear V -- bit 3
+    BSET SREG_V
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $08, $0100   ; Check SREG value for set bit
+
+    ; Clear H -- bit 5
+    BSET SREG_H
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $28, $0100   ; Check SREG value for set bit
+
+    ; Clear T -- bit 6
+    BSET SREG_T
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $68, $0100   ; Check SREG value for set bit
+
+    ; Clear Z -- bit 1
+    BSET SREG_Z
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $6A, $0100   ; Check SREG value for set bit
+
+    ; Clear N -- bit 2
+    BSET SREG_N
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $6E, $0100   ; Check SREG value for set bit
+
+    ; Clear C -- bit 0
+    BSET SREG_C
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $6F, $0100   ; Check SREG value for set bit
+
+    ; Clear I -- bit 7
+    BSET SREG_I
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $EF, $0100   ; Check SREG value for set bit
+
+    ; Clear S -- bit 4
+    BSET SREG_S
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $FF, $0100   ; Check SREG value for set bit
+
 ;PREPROCESS TestBST
 start_bst:
     CLR_SREG
