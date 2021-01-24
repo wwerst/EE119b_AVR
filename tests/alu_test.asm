@@ -956,7 +956,55 @@ test_com_other:
     ASSERT $64, $0100
     STS $0100, r18      ;W
     ASSERT $01, $0100   ; Z=1, C always 1
+
 ;PREPROCESS TestCP
+start_cp:
+    CLR_SREG
+test_cp_no_mutate:
+    LDI r22, $80
+    MOV r4, r22
+    LDI r23, $A5
+    MOV r7, r23
+    CP r4, r7
+
+    STS $0100, r4       ;W
+    ASSERT $80, $0100   ; Check register unchanged
+    STS $0100, r7       ;W
+    ASSERT $A5, $0100   ; Check register unchanged
+
+test_cp_greater:
+    LDI r22, $C8
+    MOV r4, r22
+    LDI r23, $46
+    MOV r7, r23
+    CP r4, r7           ; Compare 200 - 70
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; Result is 130
+
+test_cp_less:
+    LDI r22, $0A
+    MOV r4, r22
+    LDI r23, $7F
+    MOV r7, r23
+    CP r4, r7           ; Compare 10 - 127
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Result is -117
+
+test_cp_equal:
+    LDI r22, $1F
+    MOV r4, r22
+    LDI r23, $1F
+    MOV r7, r23
+    CP r4, r7           ; Compare 31 - 31
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Result is 0
+
 ;PREPROCESS TestCPC
 ;PREPROCESS TestCPI
 ;PREPROCESS TestDEC
