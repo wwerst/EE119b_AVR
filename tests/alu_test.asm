@@ -378,7 +378,7 @@ test_and_result_zero:
     STS $0100, r20    ;W
     ASSERT $A9, $0100 ; Original contents should still be there 
     STS $0100, r21    ;W
-    ASSERT $00, $0100 ; 0xA9 & 0x45 = 0x00
+    ASSERT $00, $0100 ; 0xA9 & 0x46 = 0x00
     STS $0100, r18    ;W
     ASSERT $02, $0100 ; Z=1
 
@@ -396,6 +396,38 @@ test_and_n_flag:
     ASSERT $14, $0100 ; N=1, V=0, S=N XOR V=1
 
 ;PREPROCESS TestANDI
+start_test_andi:
+    CLR_SREG
+
+test_andi_with_zero:
+    LDI r21, $00
+    ANDI r21, $F1
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r21    ;W
+    ASSERT $00, $0100 ; ANDing with zero should give zero
+    STS $0100, r18    ;W
+    ASSERT $02, $0100 ; Z=1
+
+test_andi_result_zero:
+    BSET SREG_V       ; AND should clear V flag always
+    LDI r21, $46
+    ANDI r21, $A9
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r21    ;W
+    ASSERT $00, $0100 ; 0xA9 & 0x46 = 0x00
+    STS $0100, r18    ;W
+    ASSERT $02, $0100 ; Z=1
+
+test_andi_n_flag:
+    BSET SREG_V       ; AND should clear V flag always
+    LDI r21, $85
+    ANDI r21, $F9
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r21    ;W
+    ASSERT $81, $0100 ; 0xF9 & 0x85 = 0x81
+    STS $0100, r18    ;W
+    ASSERT $14, $0100 ; N=1, V=0, S=N XOR V=1
+
 ;PREPROCESS TestASR
 ;PREPROCESS TestBCLR
 ;PREPROCESS TestBLD
