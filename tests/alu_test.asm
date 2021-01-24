@@ -610,8 +610,119 @@ test_bclr:
     ASSERT $00, $0100   ; Check value of shifted reg
 
 ;PREPROCESS TestBLD
+
+
 ;PREPROCESS TestBSET
 ;PREPROCESS TestBST
+start_bst:
+    CLR_SREG
+
+test_bst:
+    ; Go through and read 1s and 0s into T flag
+    LDI r20, $01
+    BCLR SREG_T
+    BST r20, 1          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 0          ; One bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $01, $0100   ; Input register should be unchanged
+
+    LDI r20, $02
+    BCLR SREG_T
+    BST r20, 0          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 1
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $02, $0100   ; Input register should be unchanged
+
+    LDI r20, $04
+    BCLR SREG_T
+    BST r20, 7          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 2
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $04, $0100   ; Input register should be unchanged
+
+    LDI r20, $08
+    BCLR SREG_T
+    BST r20, 6          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 3
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $08, $0100   ; Input register should be unchanged
+
+    LDI r20, $10
+    BCLR SREG_T
+    BST r20, 5          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 4
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $10, $0100   ; Input register should be unchanged
+
+    LDI r20, $20
+    BCLR SREG_T
+    BST r20, 4          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 5
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $20, $0100   ; Input register should be unchanged
+
+    LDI r20, $40
+    BCLR SREG_T
+    BST r20, 3          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $40, $0100   ; Input register should be unchanged
+
+    LDI r20, $80
+    BCLR SREG_T
+    BST r20, 2          ; Zero bit read in
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; T flag clear
+    BST r20, 7
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $40, $0100   ; T flag set
+    STS $0100, r20      ;W
+    ASSERT $80, $0100   ; Input register should be unchanged
+
 ;PREPROCESS TestCOM
 ;PREPROCESS TestCP
 ;PREPROCESS TestCPC
