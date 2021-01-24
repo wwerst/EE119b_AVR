@@ -42,6 +42,11 @@
 
 .CSEG ; Start code segment
 
+; TODO for better testing:
+; - Randomize some Status register flags to be 1 instead of 0,
+;   and then make sure that instructions don't modify
+;   flags they are supposed to leave untouched.
+
 clear_sreg:
     CLR_SREG
 
@@ -349,6 +354,46 @@ test_adiw_unsigned_overflow_to_zero:
     ASSERT $03, $0100 ; V=0, N=0, S=N XOR V=0, C=1, Z=1
 
 ;PREPROCESS TestAND
+start_test_and:
+    CLR_SREG
+
+test_and_with_zero:
+    LDI r20, $F1
+    LDI r21, $00
+    AND r21, r20
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r20    ;W
+    ASSERT $F1, $0100 ; Original contents should still be there 
+    STS $0100, r21    ;W
+    ASSERT $00, $0100 ; ANDing with zero should give zero
+    STS $0100, r18    ;W
+    ASSERT $02, $0100 ; Z=1
+
+test_and_result_zero:
+    BSET SREG_V       ; AND should clear V flag always
+    LDI r20, $A9
+    LDI r21, $46
+    AND r21, r20
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r20    ;W
+    ASSERT $A9, $0100 ; Original contents should still be there 
+    STS $0100, r21    ;W
+    ASSERT $00, $0100 ; 0xA9 & 0x45 = 0x00
+    STS $0100, r18    ;W
+    ASSERT $02, $0100 ; Z=1
+
+test_and_n_flag:
+    BSET SREG_V       ; AND should clear V flag always
+    LDI r20, $F9
+    LDI r21, $85
+    AND r21, r20
+    IN  r18, $3F      ; Read the Status register
+    STS $0100, r20    ;W
+    ASSERT $F9, $0100 ; Original contents should still be there 
+    STS $0100, r21    ;W
+    ASSERT $81, $0100 ; 0xF9 & 0x85 = 0x81
+    STS $0100, r18    ;W
+    ASSERT $14, $0100 ; N=1, V=0, S=N XOR V=1
 
 ;PREPROCESS TestANDI
 ;PREPROCESS TestASR
