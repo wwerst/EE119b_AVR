@@ -1,13 +1,122 @@
 ; Tests the data movement instructions
 
+Note, we attempt to verify the behavior of the load instructions
+by writing registers out with STS-
+the load tests assume STS is functional.
 
-; Notes:
-;
+
+
+;PREPROCESS TestLDI
+; do a few simple LDIs
+LDI r16, $00;
+STS $0000, r16;W 00 0000
+LDI r17, $FF;
+STS $0000, r17;W FF 0000
+LDI r18, $0F;
+STS $0000, r18;W 0F 0000
+; do a fixed LDI into all 16 upper registers
+LDI r16, $EC;
+LDI r17, $EC;
+LDI r18, $EC;
+LDI r19, $EC;
+LDI r20, $EC;
+LDI r21, $EC;
+LDI r22, $EC;
+LDI r23, $EC;
+LDI r24, $EC;
+LDI r25, $EC;
+LDI r26, $EC;
+LDI r27, $EC;
+LDI r28, $EC;
+LDI r29, $EC;
+LDI r30, $EC;
+LDI r31, $EC;
+STS $0000, r16;W EC 0000
+STS $0000, r17;W EC 0000
+STS $0000, r18;W EC 0000
+STS $0000, r19;W EC 0000
+STS $0000, r20;W EC 0000
+STS $0000, r21;W EC 0000
+STS $0000, r22;W EC 0000
+STS $0000, r23;W EC 0000
+STS $0000, r24;W EC 0000
+STS $0000, r25;W EC 0000
+STS $0000, r26;W EC 0000
+STS $0000, r27;W EC 0000
+STS $0000, r28;W EC 0000
+STS $0000, r29;W EC 0000
+STS $0000, r30;W EC 0000
+STS $0000, r31;W EC 0000
+; do some random LDIs
+LDI r28, $39;
+LDI r25, $CF;
+LDI r21, $A8;
+LDI r31, $59;
+LDI r18, $C8;
+LDI r20, $48;
+LDI r16, $EE;
+LDI r30, $46;
+LDI r23, $E8;
+LDI r19, $14;
+STS $0000, r28;W 39 0000
+STS $0000, r25;W CF 0000
+STS $0000, r21;W A8 0000
+STS $0000, r31;W 59 0000
+STS $0000, r18;W C8 0000
+STS $0000, r20;W 48 0000
+STS $0000, r16;W EE 0000
+STS $0000, r30;W 46 0000
+STS $0000, r23;W E8 0000
+STS $0000, r19;W 14 0000
 
 
 ;PREPROCESS TestLD
+; do a few simple LDs from X register
+LDI r27, HIGH($0004); set X register to 0x0004
+LDI r26, LOW($0004);
+LD r0, X;R EC 0004
+STS $0004, r0;W EC 0004
+LD r8, X;R EC 0004
+STS $0004, r8;W EC 0004
+LD r31, X;R EC 0004
+STS $0004, r31;W EC 0004
+; load with pre decrement through zero
+LD r29, -X;R 65 0003
+LD r20, -X;R B7 0002
+LD r22, -X;R 97 0001
+LD r3, -X;R F5 0000
+LD r18, -X;R 74 FFFF
+LD r28, -X;R 13 FFFE
+LD r31, -X;R 52 FFFD
+LD r23, -X;R BB FFFC
+STS $0003, r29;W 65 0003
+STS $0002, r20;W B7 0002
+STS $0001, r22;W 97 0001
+STS $0000, r3;W F5 0000
+STS $FFFF, r18;W 74 FFFF
+STS $FFFE, r28;W 13 FFFE
+STS $FFFD, r31;W 52 FFFD
+STS $FFFC, r23;W BB FFFC
+; load with post increment through zero
+LD r18, X+;R A7 FFFC
+LD r0, X+;R 9A FFFD
+LD r6, X+;R 2E FFFE
+LD r14, X+;R C1 FFFF
+LD r12, X+;R 06 0000
+LD r19, X+;R AC 0001
+LD r30, X+;R 92 0002
+LD r20, X+;R 13 0003
+STS $FFFC, r18;W A7 FFFC
+STS $FFFD, r0;W 9A FFFD
+STS $FFFE, r6;W 2E FFFE
+STS $FFFF, r14;W C1 FFFF
+STS $0000, r12;W 06 0000
+STS $0001, r19;W AC 0001
+STS $0002, r30;W 92 0002
+STS $0003, r20;W 13 0003
+
+
 ;PREPROCESS TestLDD
-;PREPROCESS TestLDI
 ;PREPROCESS TestLDS
 ;PREPROCESS TestMOV
 ;PREPROCESS TestST
@@ -15,7 +124,4 @@
 ;PREPROCESS TestSTS
 ;PREPROCESS TestPOP
 ;PREPROCESS TestPUSH
-
-    NOP;
-
-
+        NOP;
