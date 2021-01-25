@@ -1,8 +1,8 @@
 ; Tests the data movement instructions
 
-Note, we attempt to verify the behavior of the load instructions
-by writing registers out with STS-
-the load tests assume STS is functional.
+; Note, we attempt to verify the behavior of the load instructions
+; by writing registers out with STS-
+; the load tests assume STS is functional.
 
 
 
@@ -48,29 +48,30 @@ STS $0000, r29;W EC 0000
 STS $0000, r30;W EC 0000
 STS $0000, r31;W EC 0000
 ; do some random LDIs
-LDI r28, $39;
-LDI r25, $CF;
-LDI r21, $A8;
-LDI r31, $59;
-LDI r18, $C8;
-LDI r20, $48;
-LDI r16, $EE;
-LDI r30, $46;
-LDI r23, $E8;
-LDI r19, $14;
-STS $0000, r28;W 39 0000
-STS $0000, r25;W CF 0000
-STS $0000, r21;W A8 0000
-STS $0000, r31;W 59 0000
-STS $0000, r18;W C8 0000
-STS $0000, r20;W 48 0000
-STS $0000, r16;W EE 0000
-STS $0000, r30;W 46 0000
-STS $0000, r23;W E8 0000
-STS $0000, r19;W 14 0000
+LDI r21, $E2;
+LDI r16, $01;
+LDI r25, $37;
+LDI r23, $F5;
+LDI r26, $56;
+LDI r27, $1C;
+LDI r18, $DF;
+LDI r19, $8D;
+LDI r17, $67;
+LDI r22, $AD;
+STS $0000, r21;W E2 0000
+STS $0000, r16;W 01 0000
+STS $0000, r25;W 37 0000
+STS $0000, r23;W F5 0000
+STS $0000, r26;W 56 0000
+STS $0000, r27;W 1C 0000
+STS $0000, r18;W DF 0000
+STS $0000, r19;W 8D 0000
+STS $0000, r17;W 67 0000
+STS $0000, r22;W AD 0000
 
 
 ;PREPROCESS TestLD
+
 ; do a few simple LDs from X register
 LDI r27, HIGH($0004); set X register to 0x0004
 LDI r26, LOW($0004);
@@ -81,39 +82,125 @@ STS $0004, r8;W EC 0004
 LD r31, X;R EC 0004
 STS $0004, r31;W EC 0004
 ; load with pre decrement through zero
-LD r29, -X;R 65 0003
-LD r20, -X;R B7 0002
-LD r22, -X;R 97 0001
-LD r3, -X;R F5 0000
-LD r18, -X;R 74 FFFF
-LD r28, -X;R 13 FFFE
-LD r31, -X;R 52 FFFD
-LD r23, -X;R BB FFFC
-STS $0003, r29;W 65 0003
-STS $0002, r20;W B7 0002
-STS $0001, r22;W 97 0001
-STS $0000, r3;W F5 0000
-STS $FFFF, r18;W 74 FFFF
-STS $FFFE, r28;W 13 FFFE
-STS $FFFD, r31;W 52 FFFD
-STS $FFFC, r23;W BB FFFC
+LD r10, -X;R 3A 0003
+LD r22, -X;R E1 0002
+LD r3, -X;R 08 0001
+LD r24, -X;R C2 0000
+LD r19, -X;R 6D FFFF
+LD r17, -X;R 3D FFFE
+LD r13, -X;R 9F FFFD
+LD r25, -X;R 68 FFFC
+STS $0003, r10;W 3A 0003
+STS $0002, r22;W E1 0002
+STS $0001, r3;W 08 0001
+STS $0000, r24;W C2 0000
+STS $FFFF, r19;W 6D FFFF
+STS $FFFE, r17;W 3D FFFE
+STS $FFFD, r13;W 9F FFFD
+STS $FFFC, r25;W 68 FFFC
 ; load with post increment through zero
-LD r18, X+;R A7 FFFC
-LD r0, X+;R 9A FFFD
-LD r6, X+;R 2E FFFE
-LD r14, X+;R C1 FFFF
-LD r12, X+;R 06 0000
-LD r19, X+;R AC 0001
-LD r30, X+;R 92 0002
-LD r20, X+;R 13 0003
-STS $FFFC, r18;W A7 FFFC
-STS $FFFD, r0;W 9A FFFD
-STS $FFFE, r6;W 2E FFFE
-STS $FFFF, r14;W C1 FFFF
-STS $0000, r12;W 06 0000
-STS $0001, r19;W AC 0001
-STS $0002, r30;W 92 0002
-STS $0003, r20;W 13 0003
+LD r19, X+;R EB FFFC
+LD r23, X+;R 60 FFFD
+LD r21, X+;R EF FFFE
+LD r29, X+;R 63 FFFF
+LD r0, X+;R 33 0000
+LD r9, X+;R 19 0001
+LD r24, X+;R 33 0002
+LD r7, X+;R 87 0003
+STS $FFFC, r19;W EB FFFC
+STS $FFFD, r23;W 60 FFFD
+STS $FFFE, r21;W EF FFFE
+STS $FFFF, r29;W 63 FFFF
+STS $0000, r0;W 33 0000
+STS $0001, r9;W 19 0001
+STS $0002, r24;W 33 0002
+STS $0003, r7;W 87 0003
+; do a few simple LDs from Y register
+LDI r29, HIGH($0004); set Y register to 0x0004
+LDI r28, LOW($0004);
+LD r0, Y;R EC 0004
+STS $0004, r0;W EC 0004
+LD r8, Y;R EC 0004
+STS $0004, r8;W EC 0004
+LD r31, Y;R EC 0004
+STS $0004, r31;W EC 0004
+; load with pre decrement through zero
+LD r6, -Y;R E5 0003
+LD r15, -Y;R 0B 0002
+LD r26, -Y;R 05 0001
+LD r21, -Y;R 7E 0000
+LD r13, -Y;R E1 FFFF
+LD r4, -Y;R 3A FFFE
+LD r12, -Y;R 9D FFFD
+LD r24, -Y;R A2 FFFC
+STS $0003, r6;W E5 0003
+STS $0002, r15;W 0B 0002
+STS $0001, r26;W 05 0001
+STS $0000, r21;W 7E 0000
+STS $FFFF, r13;W E1 FFFF
+STS $FFFE, r4;W 3A FFFE
+STS $FFFD, r12;W 9D FFFD
+STS $FFFC, r24;W A2 FFFC
+; load with post increment through zero
+LD r16, Y+;R 6C FFFC
+LD r2, Y+;R B5 FFFD
+LD r26, Y+;R 52 FFFE
+LD r20, Y+;R 8A FFFF
+LD r27, Y+;R C5 0000
+LD r6, Y+;R 31 0001
+LD r19, Y+;R 04 0002
+LD r12, Y+;R B0 0003
+STS $FFFC, r16;W 6C FFFC
+STS $FFFD, r2;W B5 FFFD
+STS $FFFE, r26;W 52 FFFE
+STS $FFFF, r20;W 8A FFFF
+STS $0000, r27;W C5 0000
+STS $0001, r6;W 31 0001
+STS $0002, r19;W 04 0002
+STS $0003, r12;W B0 0003
+; do a few simple LDs from Z register
+LDI r31, HIGH($0004); set Z register to 0x0004
+LDI r30, LOW($0004);
+LD r0, Z;R EC 0004
+STS $0004, r0;W EC 0004
+LD r8, Z;R EC 0004
+STS $0004, r8;W EC 0004
+LD r31, Z;R EC 0004
+STS $0004, r31;W EC 0004
+; load with pre decrement through zero
+LD r24, -Z;R 8E 0003
+LD r1, -Z;R 02 0002
+LD r28, -Z;R E9 0001
+LD r19, -Z;R 49 0000
+LD r0, -Z;R 88 FFFF
+LD r25, -Z;R BE FFFE
+LD r9, -Z;R 12 FFFD
+LD r18, -Z;R F0 FFFC
+STS $0003, r24;W 8E 0003
+STS $0002, r1;W 02 0002
+STS $0001, r28;W E9 0001
+STS $0000, r19;W 49 0000
+STS $FFFF, r0;W 88 FFFF
+STS $FFFE, r25;W BE FFFE
+STS $FFFD, r9;W 12 FFFD
+STS $FFFC, r18;W F0 FFFC
+; load with post increment through zero
+LD r18, Z+;R 82 FFFC
+LD r16, Z+;R CB FFFD
+LD r8, Z+;R 1F FFFE
+LD r4, Z+;R AA FFFF
+LD r17, Z+;R 7B 0000
+LD r15, Z+;R 8E 0001
+LD r12, Z+;R 50 0002
+LD r13, Z+;R DF 0003
+STS $FFFC, r18;W 82 FFFC
+STS $FFFD, r16;W CB FFFD
+STS $FFFE, r8;W 1F FFFE
+STS $FFFF, r4;W AA FFFF
+STS $0000, r17;W 7B 0000
+STS $0001, r15;W 8E 0001
+STS $0002, r12;W 50 0002
+STS $0003, r13;W DF 0003
 
 
 ;PREPROCESS TestLDD
