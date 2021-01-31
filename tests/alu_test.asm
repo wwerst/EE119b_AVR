@@ -1205,6 +1205,60 @@ test_eor_random:
 ;PREPROCESS TestINC
 start_inc:
     CLR_SREG
+test_inc_unsigned:
+    LDI r27, $FE        ; Initialize to 254
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r27      ;W
+    ASSERT $FF, $0100   ; Increment to 255
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Z=1
+    STS $0100, r27      ;W
+    ASSERT $00, $0100   ; Increment to 0
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; All flags 0
+    STS $0100, r27      ;W
+    ASSERT $01, $0100   ; Increment to 1
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; All flags 0
+    STS $0100, r27      ;W
+    ASSERT $02, $0100   ; Increment to 2
+
+test_inc_signed:
+    LDI r27, $7E        ; Initialize to 126
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r27      ;W
+    ASSERT $7F, $0100   ; Increment to 127
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $0C, $0100   ; Check flags
+    STS $0100, r27      ;W
+    ASSERT $80, $0100   ; Overflow to -128
+
+    INC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; Check flags
+    STS $0100, r27      ;W
+    ASSERT $81, $0100   ; Overflow to -127
 ;PREPROCESS TestLSR
 start_lsr:
     CLR_SREG
