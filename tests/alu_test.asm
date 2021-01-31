@@ -1006,7 +1006,84 @@ test_cp_equal:
     ASSERT $02, $0100   ; Result is 0
 
 ;PREPROCESS TestCPC
+start_cpc:
+    CLR_SREG
+
+test_cpc_no_carry_equal:
+    BCLR SREG_C
+    BSET SREG_Z
+    LDI r19, $3F
+    LDI r20, $3F
+    CPC r19, r20
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Result should be equal
+
+test_cpc_no_carry_not_equal:
+    BCLR SREG_C
+    BSET SREG_Z
+    LDI r19, $40
+    LDI r20, $3F
+    CPC r19, r20
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $20, $0100   ; Result should not be equal
+
+test_cpc_carry_equal:
+    BSET SREG_C
+    BSET SREG_Z
+    LDI r19, $40
+    LDI r20, $3F
+    CPC r19, r20
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $22, $0100   ; Result should be equal
+
+test_cpc_carry_not_equal:
+    BSET SREG_C
+    BSET SREG_Z
+    LDI r19, $3F
+    LDI r20, $3F
+    CPC r19, r20
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Result should not be equal
+
 ;PREPROCESS TestCPI
+
+; Similar test sequence to CP instruction
+start_cpi:
+    CLR_SREG
+test_cpi_no_mutate:
+    LDI r24, $80
+    CPI r24, $A5
+
+    STS $0100, r24       ;W
+    ASSERT $80, $0100   ; Check register unchanged
+
+test_cpi_greater:
+    LDI r24, $C8
+    CPI r24, $46           ; Compare 200 - 70
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; Result is 130
+
+test_cpi_less:
+    LDI r24, $0A
+    CPI r24, $7F           ; Compare 10 - 127
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Result is -117
+
+test_cpi_equal:
+    LDI r24, $1F
+    CPI r24, $1F           ; Compare 31 - 31
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Result is 0
 ;PREPROCESS TestDEC
 ;PREPROCESS TestEOR
 ;PREPROCESS TestINC
