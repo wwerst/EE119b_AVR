@@ -361,6 +361,74 @@ test_ror_to_zero:
 ;PREPROCESS TestSBC
 start_sbc:
     CLR_SREG
+test_sbc_nocarry_to_zero:
+    BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+    ldi r16, $AF        ; 
+    ldi r17, $AF        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $AF, $0100   ; Check that Rr is unchanged
+
+ test_sbc_nocarry_of_zero:
+    BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                        ; the result is zero, the flag shouldn't be
+                        ; set at end of this test.
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+ test_sbc_withcarry_to_zero:
+    BSET SREG_Z
+    BSET SREG_C
+    ldi r16, $F1        ; 
+    ldi r17, $F0        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $F0, $0100   ; Check that Rr is unchanged
+
+ test_sbc_carry_underflow_of_zero:
+    BSET SREG_C
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SBC r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FF, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+ test_sbc_carry_underflow_rand:
+    BSET SREG_C
+    ldi r16, $34        ; 
+    ldi r17, $70        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C3, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $70, $0100   ; Check that Rr is unchanged
+
 ;PREPROCESS TestSBCI
 start_sbci:
     CLR_SREG

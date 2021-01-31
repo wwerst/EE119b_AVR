@@ -17,6 +17,7 @@ apt update
 apt install -y gnat
 git clone git@github.com:ghdl/ghdl
 cd ghdl
+git checkout v0.37.0
 ./configure --prefix=/usr/local
 make
 ```
