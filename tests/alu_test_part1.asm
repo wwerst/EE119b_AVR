@@ -53,10 +53,11 @@
 ;   and then make sure that instructions don't modify
 ;   flags they are supposed to leave untouched.
 
-clear_sreg:
-    CLR_SREG
+
 
 ;PREPROCESS TestAdd {r16=Rd, r17=Rd, r18=Rd, X={X, Y, Z}}
+start_test_add:
+    CLR_SREG
 test_add_to_zero:
     ldi r16, $00    ; 
     ldi r17, $AF    ;
@@ -128,6 +129,8 @@ test_add_zeros:
     ASSERT $02, $0100
 
 ;PREPROCESS TestADC
+start_test_adc:
+    CLR_SREG
 test_adc_to_zero:
     BCLR SREG_C     ; Clear carry flag
     ldi r16, $00    ; 

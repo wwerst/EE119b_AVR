@@ -361,21 +361,315 @@ test_ror_to_zero:
 ;PREPROCESS TestSBC
 start_sbc:
     CLR_SREG
+test_sbc_nocarry_to_zero:
+    BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+    ldi r16, $AF        ; 
+    ldi r17, $AF        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $AF, $0100   ; Check that Rr is unchanged
+
+ test_sbc_nocarry_of_zero:
+    BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                        ; the result is zero, the flag shouldn't be
+                        ; set at end of this test.
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+ test_sbc_withcarry_to_zero:
+    BSET SREG_Z
+    BSET SREG_C
+    ldi r16, $F1        ; 
+    ldi r17, $F0        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $F0, $0100   ; Check that Rr is unchanged
+
+ test_sbc_carry_underflow_of_zero:
+    BSET SREG_C
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SBC r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FF, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+ test_sbc_carry_underflow_rand:
+    BSET SREG_C
+    ldi r16, $34        ; 
+    ldi r17, $70        ;
+    SBC r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C3, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $70, $0100   ; Check that Rr is unchanged
+
 ;PREPROCESS TestSBCI
 start_sbci:
     CLR_SREG
+test_sbci_nocarry_to_zero:
+    BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+    ldi r16, $AF        ;
+    SBCI r16, $AF       ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_nocarry_of_zero:
+    BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                        ; the result is zero, the flag shouldn't be
+                        ; set at end of this test.
+    ldi r16, $00        ;
+    SBCI r16, $00        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_withcarry_to_zero:
+    BSET SREG_Z
+    BSET SREG_C
+    ldi r16, $F1        ;
+    SBCI r16, $F0        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_carry_underflow_of_zero:
+    BSET SREG_C
+    ldi r16, $00        ;
+    SBCI r16, $00        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FF, $0100   ; Check the result
+
+ test_sbci_carry_underflow_rand:
+    BSET SREG_C
+    ldi r16, $34        ;
+    SBCI r16, $70        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C3, $0100   ; Check the result
 ;PREPROCESS TestSBIW
 start_sbiw:
     CLR_SREG
+test_sbiw_normal:
+    LDI r25, $03
+    LDI r24, $36        ; r25:r24 = 0x0336
+
+    SBIW r25:r24, $39   ; Result = 0x02FD
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $02, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $FD, $0100   ; Check the result
+
+test_sbiw_to_zero:
+    LDI r25, $00
+    LDI r24, $2F        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $2F   ; Result = 0x0000
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_sbiw_signed_underflow:
+    LDI r25, $80
+    LDI r24, $05        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $10   ; Result = 0x7FF5
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $7F, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $F5, $0100   ; Check the result
+
+test_sbiw_underflow:
+    LDI r25, $00
+    LDI r24, $2F        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $39   ; Result = 0xFFF6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $FF, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $F6, $0100   ; Check the result
+
+
+
+
 ;PREPROCESS TestSUB
 start_sub:
     CLR_SREG
+
+test_sub_to_zero:
+    ldi r16, $AF        ; 
+    ldi r17, $AF        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $AF, $0100   ; Check that Rr is unchanged
+
+test_sub_of_zero:
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+test_sub_underflow_of_zero:
+    ldi r16, $00        ; 
+    ldi r17, $05        ;
+    SUB r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FB, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $05, $0100   ; Check that Rr is unchanged
+
+test_sub_normal:
+    ldi r16, $83        ; 
+    ldi r17, $61        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $22, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $61, $0100   ; Check that Rr is unchanged
+
+test_sub_underflow_rand:
+    ldi r16, $34        ; 
+    ldi r17, $70        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C4, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $70, $0100   ; Check that Rr is unchanged
+
 ;PREPROCESS TestSUBI
 start_subi:
     CLR_SREG
+
+test_subi_to_zero:
+    ldi r16, $AF        ;
+    SUBI r16, $AF        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_subi_of_zero:
+    ldi r16, $00        ;
+    SUBI r16, $00        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_subi_underflow_of_zero:
+    ldi r16, $00        ;
+    SUBI r16, $05        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FB, $0100   ; Check the result
+
+test_subi_normal:
+    ldi r16, $83        ;
+    SUBI r16, $61        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $22, $0100   ; Check the result
+
+test_subi_underflow_rand:
+    ldi r16, $34        ;
+    SUBI r16, $70        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C4, $0100   ; Check the result
+
 ;PREPROCESS TestSWAP
 start_swap:
     CLR_SREG
+test_swap:
+    LDI r17, $34
+    SWAP r17
+    STS $0100, r17      ;W
+    ASSERT $43, $0100
+
+    LDI r22, $7F
+    MOV r4, r22
+    SWAP r4
+    MOV r23, r4
+    STS $0100, r23      ;W
+    ASSERT $F7, $0100
 
 
 test_success:
