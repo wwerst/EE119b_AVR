@@ -1145,6 +1145,63 @@ test_dec_negative:
 ;PREPROCESS TestEOR
 start_eor:
     CLR_SREG
+test_eor_zeros:
+    LDI r20, $00
+    LDI r21, $00
+
+    EOR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Z=1
+    STS $0100, r20      ;W
+    ASSERT $00, $0100   ; Result is 0x00
+    STS $0100, r21      ;W
+    ASSERT $00, $0100   ; Rr is unchanged
+
+test_eor_rr_ones:
+    LDI r20, $00
+    LDI r21, $FF
+
+    EOR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $FF, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $FF, $0100   ; Rr is unchanged
+
+test_eor_rd_ones:
+    LDI r20, $FF
+    LDI r21, $00
+
+    EOR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $FF, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $00, $0100   ; Rr is unchanged
+
+test_eor_random:
+    LDI r20, $97        ; 10010111
+    LDI r21, $A4        ; 10100100
+                        ; 00110011
+
+    EOR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; S=0, N=0
+    STS $0100, r20      ;W
+    ASSERT $33, $0100   ; Result is 0x33
+    STS $0100, r21      ;W
+    ASSERT $A4, $0100   ; Rr is unchanged
+
 ;PREPROCESS TestINC
 start_inc:
     CLR_SREG
