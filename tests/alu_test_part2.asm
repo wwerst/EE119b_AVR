@@ -496,8 +496,18 @@ start_subi:
 ;PREPROCESS TestSWAP
 start_swap:
     CLR_SREG
+test_swap:
+    LDI r17, $34
+    SWAP r17
+    STS $0100, r17      ;W
+    ASSERT $43, $0100
 
-
+    LDI r22, $7F
+    MOV r4, r22
+    SWAP r4
+    MOV r23, r4
+    STS $0100, r23      ;W
+    ASSERT $F7, $0100
 test_success:
     NOP;
     NOP;
