@@ -1262,6 +1262,71 @@ test_inc_signed:
 ;PREPROCESS TestLSR
 start_lsr:
     CLR_SREG
+test_lsr:
+    LDI r22, $A5        ; 10100101
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $19, $0100   ; LSB=1 before
+    STS $0100, r22      ;W
+    ASSERT $52, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; LSB=0 before
+    STS $0100, r22      ;W
+    ASSERT $29, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $19, $0100   ; LSB=1 before
+    STS $0100, r22      ;W
+    ASSERT $14, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; LSB=0 before
+    STS $0100, r22      ;W
+    ASSERT $0A, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; LSB=0 before
+    STS $0100, r22      ;W
+    ASSERT $05, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $19, $0100   ; LSB=1 before
+    STS $0100, r22      ;W
+    ASSERT $02, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; LSB=0 before
+    STS $0100, r22      ;W
+    ASSERT $01, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $1B, $0100   ; LSB=1 before, Result=0
+    STS $0100, r22      ;W
+    ASSERT $00, $0100   ; Check the result
+
+    LSR r22
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; LSB=0 before, Result=0
+    STS $0100, r22      ;W
+    ASSERT $00, $0100   ; Check the result
 ;PREPROCESS TestNEG
 start_neg:
     CLR_SREG
