@@ -1,5 +1,7 @@
 
 ; Tests the data movement instructions
+; THIS FILE IS GENERATED
+; for explanations or modifications, see notebook datamove.ipynb
 
 ; Note, we attempt to verify the behavior of the load instructions
 ; by writing registers out with STS-

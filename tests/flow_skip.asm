@@ -1,5 +1,7 @@
 
 ; Tests the flow control skip instructions and NOP
+; THIS FILE IS GENERATED
+; for explanations or modifications, see notebook flowskip.ipynb
 
 
 
