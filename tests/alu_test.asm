@@ -1187,6 +1187,20 @@ test_eor_rd_ones:
     STS $0100, r21      ;W
     ASSERT $00, $0100   ; Rr is unchanged
 
+test_eor_both_ones:
+    LDI r20, $FF
+    LDI r21, $FF
+
+    EOR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $00, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $FF, $0100   ; Rr is unchanged
+
 test_eor_random:
     LDI r20, $97        ; 10010111
     LDI r21, $A4        ; 10100100
@@ -1330,9 +1344,118 @@ test_lsr:
 ;PREPROCESS TestNEG
 start_neg:
     CLR_SREG
+test_neg_zero:
+    LDI r24, $00
+
+    NEG r24
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check the flags
+    STS $0100, r24      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_neg_max:
+    LDI r24, $FF
+
+    NEG r24
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $21, $0100   ; Check the flags
+    STS $0100, r24      ;W
+    ASSERT $01, $0100   ; Check the result
+
+test_neg_sign_max:
+    LDI r24, $7F
+
+    NEG r24
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check the flags
+    STS $0100, r24      ;W
+    ASSERT $81, $0100   ; Check the result
+
+test_neg_sign_min:
+    LDI r24, $80
+
+    NEG r24
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $0D, $0100   ; Check the flags
+    STS $0100, r24      ;W
+    ASSERT $80, $0100   ; Check the result
 ;PREPROCESS TestOR
 start_or:
     CLR_SREG
+test_or_zeros:
+    LDI r20, $00
+    LDI r21, $00
+
+    OR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Z=1
+    STS $0100, r20      ;W
+    ASSERT $00, $0100   ; Result is 0x00
+    STS $0100, r21      ;W
+    ASSERT $00, $0100   ; Rr is unchanged
+
+test_or_rr_ones:
+    LDI r20, $00
+    LDI r21, $FF
+
+    OR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $FF, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $FF, $0100   ; Rr is unchanged
+
+test_or_rd_ones:
+    LDI r20, $FF
+    LDI r21, $00
+
+    OR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $FF, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $00, $0100   ; Rr is unchanged
+
+test_or_both_ones:
+    LDI r20, $FF
+    LDI r21, $FF
+
+    OR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $FF, $0100   ; Result is 0xFF
+    STS $0100, r21      ;W
+    ASSERT $FF, $0100   ; Rr is unchanged
+
+test_or_random:
+    LDI r20, $97        ; 10010111
+    LDI r21, $A4        ; 10100100
+                        ; 10110111
+
+    OR r20, r21
+
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r20      ;W
+    ASSERT $B7, $0100   ; Result is 0xC7
+    STS $0100, r21      ;W
+    ASSERT $A4, $0100   ; Rr is unchanged
 ;PREPROCESS TestORI
 start_ori:
     CLR_SREG
