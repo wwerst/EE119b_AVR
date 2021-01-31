@@ -1085,6 +1085,63 @@ test_cpi_equal:
     STS $0100, r18      ;W
     ASSERT $02, $0100   ; Result is 0
 ;PREPROCESS TestDEC
+start_dec:
+    CLR_SREG
+test_dec_positive:
+    LDI r27, $02        ; Initialize to 2
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; All flags are 0
+    STS $0100, r27      ;W
+    ASSERT $01, $0100   ; Decrement to 1
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Z=1
+    STS $0100, r27      ;W
+    ASSERT $00, $0100   ; Decrement to 0
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r27      ;W
+    ASSERT $FF, $0100   ; Decrement to -1
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r27      ;W
+    ASSERT $FE, $0100   ; Decrement to -2
+
+test_dec_negative:
+    LDI r27, $81        ; Initialize to -127
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $14, $0100   ; S=1, N=1
+    STS $0100, r27      ;W
+    ASSERT $80, $0100   ; Decrement to -128
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; S=N xor V=1, V=1, N=0
+    STS $0100, r27      ;W
+    ASSERT $7F, $0100   ; Underflow to 127
+
+    DEC r27
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; S=N xor V=0, V=0, N=0
+    STS $0100, r27      ;W
+    ASSERT $7E, $0100   ; Decrement to 126
+
 ;PREPROCESS TestEOR
 ;PREPROCESS TestINC
 ;PREPROCESS TestLSR
