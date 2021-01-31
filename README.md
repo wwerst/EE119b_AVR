@@ -28,3 +28,6 @@ You will also want to install gtkwave to visualize the tests:
 ```
 apt install gtkwave
 ```
+
+After doing all this, go through Quick Start Guide to learn basics: https://ghdl.readthedocs.io/en/stable/using/QuickStartGuide.html
+
