@@ -490,6 +490,67 @@ start_sbiw:
 ;PREPROCESS TestSUB
 start_sub:
     CLR_SREG
+
+test_sub_to_zero:
+    ldi r16, $AF        ; 
+    ldi r17, $AF        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $AF, $0100   ; Check that Rr is unchanged
+
+test_sub_of_zero:
+    ldi r16, $00        ; 
+    ldi r17, $00        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $00, $0100   ; Check that Rr is unchanged
+
+test_sub_underflow_of_zero:
+    ldi r16, $00        ; 
+    ldi r17, $05        ;
+    SUB r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FB, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $05, $0100   ; Check that Rr is unchanged
+
+test_sub_normal:
+    ldi r16, $83        ; 
+    ldi r17, $61        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $22, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $61, $0100   ; Check that Rr is unchanged
+
+test_sub_underflow_rand:
+    ldi r16, $34        ; 
+    ldi r17, $70        ;
+    SUB r16, r17        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C4, $0100   ; Check the result
+    STS $0100, r17      ;W
+    ASSERT $70, $0100   ; Check that Rr is unchanged
+
 ;PREPROCESS TestSUBI
 start_subi:
     CLR_SREG
@@ -508,6 +569,8 @@ test_swap:
     MOV r23, r4
     STS $0100, r23      ;W
     ASSERT $F7, $0100
+
+
 test_success:
     NOP;
     NOP;
