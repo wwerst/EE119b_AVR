@@ -432,6 +432,58 @@ test_sbc_nocarry_to_zero:
 ;PREPROCESS TestSBCI
 start_sbci:
     CLR_SREG
+test_sbci_nocarry_to_zero:
+    BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+    ldi r16, $AF        ;
+    SBCI r16, $AF       ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_nocarry_of_zero:
+    BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                        ; the result is zero, the flag shouldn't be
+                        ; set at end of this test.
+    ldi r16, $00        ;
+    SBCI r16, $00        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_withcarry_to_zero:
+    BSET SREG_Z
+    BSET SREG_C
+    ldi r16, $F1        ;
+    SBCI r16, $F0        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+ test_sbci_carry_underflow_of_zero:
+    BSET SREG_C
+    ldi r16, $00        ;
+    SBCI r16, $00        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FF, $0100   ; Check the result
+
+ test_sbci_carry_underflow_rand:
+    BSET SREG_C
+    ldi r16, $34        ;
+    SBCI r16, $70        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C3, $0100   ; Check the result
 ;PREPROCESS TestSBIW
 start_sbiw:
     CLR_SREG
