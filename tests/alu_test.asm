@@ -1143,18 +1143,44 @@ test_dec_negative:
     ASSERT $7E, $0100   ; Decrement to 126
 
 ;PREPROCESS TestEOR
+start_eor:
+    CLR_SREG
 ;PREPROCESS TestINC
+start_inc:
+    CLR_SREG
 ;PREPROCESS TestLSR
+start_lsr:
+    CLR_SREG
 ;PREPROCESS TestNEG
+start_neg:
+    CLR_SREG
 ;PREPROCESS TestOR
+start_or:
+    CLR_SREG
 ;PREPROCESS TestORI
+start_ori:
+    CLR_SREG
 ;PREPROCESS TestROR
+start_ror:
+    CLR_SREG
 ;PREPROCESS TestSBC
+start_sbc:
+    CLR_SREG
 ;PREPROCESS TestSBCI
+start_sbci:
+    CLR_SREG
 ;PREPROCESS TestSBIW
+start_sbiw:
+    CLR_SREG
 ;PREPROCESS TestSUB
+start_sub:
+    CLR_SREG
 ;PREPROCESS TestSUBI
+start_subi:
+    CLR_SREG
 ;PREPROCESS TestSWAP
+start_swap:
+    CLR_SREG
 
 
 test_success:
