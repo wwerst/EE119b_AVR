@@ -487,6 +487,61 @@ test_sbci_nocarry_to_zero:
 ;PREPROCESS TestSBIW
 start_sbiw:
     CLR_SREG
+test_sbiw_normal:
+    LDI r25, $03
+    LDI r24, $36        ; r25:r24 = 0x0336
+
+    SBIW r25:r24, $39   ; Result = 0x02FD
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $02, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $FD, $0100   ; Check the result
+
+test_sbiw_to_zero:
+    LDI r25, $00
+    LDI r24, $2F        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $2F   ; Result = 0x0000
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $00, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_sbiw_signed_underflow:
+    LDI r25, $80
+    LDI r24, $05        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $10   ; Result = 0x7FF5
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $7F, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $F5, $0100   ; Check the result
+
+test_sbiw_underflow:
+    LDI r25, $00
+    LDI r24, $2F        ; r25:r24 = 0x002F
+
+    SBIW r25:r24, $39   ; Result = 0xFFF6
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r25      ;W
+    ASSERT $FF, $0100   ; Check the result
+    STS $0100, r24      ;W
+    ASSERT $F6, $0100   ; Check the result
+
+
+
+
 ;PREPROCESS TestSUB
 start_sub:
     CLR_SREG
