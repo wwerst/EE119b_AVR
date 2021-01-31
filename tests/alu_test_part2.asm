@@ -554,6 +554,52 @@ test_sub_underflow_rand:
 ;PREPROCESS TestSUBI
 start_subi:
     CLR_SREG
+
+test_subi_to_zero:
+    ldi r16, $AF        ;
+    SUBI r16, $AF        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_subi_of_zero:
+    ldi r16, $00        ;
+    SUBI r16, $00        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $00, $0100   ; Check the result
+
+test_subi_underflow_of_zero:
+    ldi r16, $00        ;
+    SUBI r16, $05        ; 0 - 0 - 1 = -1 = 0xFF
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $35, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $FB, $0100   ; Check the result
+
+test_subi_normal:
+    ldi r16, $83        ;
+    SUBI r16, $61        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $18, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $22, $0100   ; Check the result
+
+test_subi_underflow_rand:
+    ldi r16, $34        ;
+    SUBI r16, $70        ;
+    IN  r18, SREG_ADDR  ; Read the Status register
+    STS $0100, r18      ;W
+    ASSERT $15, $0100   ; Check flags
+    STS $0100, r16      ;W
+    ASSERT $C4, $0100   ; Check the result
+
 ;PREPROCESS TestSWAP
 start_swap:
     CLR_SREG
