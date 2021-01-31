@@ -1,6 +1,8 @@
 
 ; Tests the flow control conditional branch instructions.
 ; These tests assume the BSET and BCLR instructions are functional.
+; THIS FILE IS GENERATED
+; for explanations or modifications, see notebook cond_branch.ipynb
 
 
 ;PREPROCESS TestBRBS
