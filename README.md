@@ -23,3 +23,8 @@ make
 
 Then, install the built code. I prefer to use checkinstall to wrap packages, but you can also just directly do `make install`.
 
+You will also want to install gtkwave to visualize the tests:
+
+```
+apt install gtkwave
+```
