@@ -17,9 +17,17 @@ end package AVR_REG_CONST;
 
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
 
 use work.AVR;
 use work.AVR_REG_CONST;
+
+
+
+-- AvrReg
+-- Implements the AvrReg unit
+--
+--
 
 entity AvrReg is
     port(
@@ -27,34 +35,36 @@ entity AvrReg is
         
         -- Single register input
         EnableInS   : in std_logic;
-        DataInS     : in reg_s_data_t;
-        SelInS      : in reg_s_sel_t;
+        DataInS     : in AVR.reg_s_data_t;
+        SelInS      : in AVR.reg_s_sel_t;
 
         -- Double register input
         EnableInD   : in std_logic;
-        DataInD     : in reg_d_data_t;
-        SelInD      : in reg_s_sel_t;
+        DataInD     : in AVR.reg_d_data_t;
+        SelInD      : in AVR.reg_s_sel_t;
 
         -- Single register A output
-        SelOutA     : out reg_s_sel_t;
-        DataOutA    : out reg_s_data_t;
+        SelOutA     : out AVR.reg_s_sel_t;
+        DataOutA    : out AVR.reg_s_data_t;
 
         -- Single register B output
-        SelOutB     : out reg_s_sel_t;
-        DataOutB    : out reg_s_data_t;
+        SelOutB     : out AVR.reg_s_sel_t;
+        DataOutB    : out AVR.reg_s_data_t;
 
         -- Double register output
-        SelOutD     : out reg_d_sel_t;
-        DataOutD    : out reg_d_data_t
+        SelOutD     : out AVR.reg_d_sel_t;
+        DataOutD    : out AVR.reg_d_data_t
     );
 end AvrReg;
 
 
 architecture dataflow of AvrReg is
-    component RegUnit
+    constant wordsize : integer := AVR_REG_CONST.REG_COUNT;
+    constant regcnt   : integer := AVR.WORDSIZE;
+    component RegArray
         generic (
-            regcnt   : integer := 32;    -- default number of registers is 32
-            wordsize : integer := 8      -- default width is 8-bits
+            regcnt   : integer := regcnt;
+            wordsize : integer := wordsize
         );
 
         port(
@@ -72,8 +82,61 @@ architecture dataflow of AvrReg is
             RegB      : out  std_logic_vector(wordsize - 1 downto 0);
             RegD      : out  std_logic_vector(2 * wordsize - 1 downto 0)
         );
-    end component RegUnit;
+    end component RegArray;
+
+    -- Internal signals for hooking up to RegArray
+    signal RA_RegIn     : std_logic_vector(wordsize - 1 downto 0);
+    signal RA_RegInSel  : integer  range regcnt - 1 downto 0;
+    signal RA_RegStore  : std_logic;
+    signal RA_RegASel   : integer  range regcnt - 1 downto 0;
+    signal RA_RegBSel   : integer  range regcnt - 1 downto 0;
+    signal RA_RegDIn    : std_logic_vector(2 * wordsize - 1 downto 0);
+    signal RA_RegDInSel : integer  range regcnt/2 - 1 downto 0;
+    signal RA_RegDStore : std_logic;
+    signal RA_RegDSel   : integer  range regcnt/2 - 1 downto 0;
+    signal RA_clock     : std_logic;
+    signal RA_RegA      : std_logic_vector(wordsize - 1 downto 0);
+    signal RA_RegB      : std_logic_vector(wordsize - 1 downto 0);
+    signal RA_RegD      : std_logic_vector(2 * wordsize - 1 downto 0);
 
 begin
+
+    RegArrayMap: RegArray port map (
+        RegIn     =>  RA_RegIn,
+        RegInSel  =>  RA_RegInSel,
+        RegStore  =>  RA_RegStore,
+        RegASel   =>  RA_RegASel,
+        RegBSel   =>  RA_RegBSel,
+        RegDIn    =>  RA_RegDIn,
+        RegDInSel =>  RA_RegDInSel,
+        RegDStore =>  RA_RegDStore,
+        RegDSel   =>  RA_RegDSel,
+        clock     =>  RA_clock,
+        RegA      =>  RA_RegA,
+        RegB      =>  RA_RegB,
+        RegD      =>  RA_RegD
+    );
+
+    -- Single register input connection
+    RA_RegIn <= DataInS;
+    RA_RegInSel <= to_integer(unsigned(SelInS));
+    RA_RegStore <= EnableInS;
+
+    -- Double Register Input connection
+    RA_RegDIn <= DataInD;
+    RA_RegDInSel <= to_integer("11" & unsigned(SelInD));
+    RA_RegDStore <= EnableInD;
+
+    -- Single Register A output
+    RA_RegASel <= to_integer(unsigned(SelOutA));
+    DataOutA <= RA_RegA;
+
+    -- Single Register B output
+    RA_RegBSel <= to_integer(unsigned(SelOutB));
+    DataOutB <= RA_RegB;
+
+    -- Double Register output
+    RA_RegDSel <= to_integer("11" & unsigned(SelOutD));
+    DataOutB <= RA_RegB;
 
 end dataflow;
