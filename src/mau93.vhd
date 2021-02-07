@@ -33,54 +33,16 @@ package MemUnitConstants is
 --  memory access unit constants for pre- and post- increment and decrement
 --     these constants may be freely changed
 
-   constant MemUnit_PRE  : std_logic := '0';        -- pre- inc/dec
-   constant MemUnit_POST : std_logic := '1';        -- post- inc/dec
-   constant MemUnit_INC  : std_logic := '0';        -- pre/post increment
-   constant MemUnit_DEC  : std_logic := '1';        -- pre/post decrement
+   constant MemUnit_PRE  : std_logic := '0';		-- pre- inc/dec
+   constant MemUnit_POST : std_logic := '1';		-- post- inc/dec
+   constant MemUnit_INC  : std_logic := '0';		-- pre/post increment
+   constant MemUnit_DEC  : std_logic := '1';		-- pre/post decrement
 
 
 end package;
 
 
 
---
---  AdderBit
---
---  This is a bit of the adder for doing addition in the ALU.
---
---  Inputs:
---    A  - first operand bit (bus A)
---    B  - second operand bit (bus B)
---    Ci - carry in (from previous bit)
---
---  Outputs:
---    S  - sum for this bit
---    Co - carry out for this bit
---
-
-library ieee;
-use ieee.std_logic_1164.all;
-
-entity  AdderBit  is
-
-    port(
-        A  : in   std_logic;        -- first operand
-        B  : in   std_logic;        -- second operand
-        Ci : in   std_logic;        -- carry in from previous bit
-        S  : out  std_logic;        -- sum (result)
-        Co : out  std_logic         -- carry out to next bit
-    );
-
-end  AdderBit;
-
-
-architecture  dataflow  of  AdderBit  is
-begin
-
-    S  <=  A  xor  B  xor  Ci;
-    Co <=  (A  and  B)  or  (A  and Ci)  or  (B  and  Ci);
-
-end  dataflow;
 
 
 
@@ -125,9 +87,9 @@ entity  MemUnit  is
     );
 
     port(
-        AddrSrc    : in   std_logic_vector(srccnt * wordsize - 1 downto 0);
-    SrcSel     : in   integer  range srccnt - 1 downto 0;
-    AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
+    	AddrSrc    : in   std_logic_vector(srccnt * wordsize - 1 downto 0);
+	SrcSel     : in   integer  range srccnt - 1 downto 0;
+	AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
         OffsetSel  : in   integer  range offsetcnt - 1 downto 0;
         IncDecSel  : in   std_logic;
         IncDecBit  : in   integer  range maxIncDecBit downto 0;
@@ -143,11 +105,11 @@ architecture  dataflow  of  MemUnit  is
 
     -- need adders for computing the address
     component  AdderBit  port(
-        A  : in   std_logic;        -- first operand
-    B  : in   std_logic;        -- second operand
-    Ci : in   std_logic;        -- carry in from previous bit
-    S  : out  std_logic;        -- sum (result)
-    Co : out  std_logic     -- carry out to next bit
+    	A  : in   std_logic;	    -- first operand
+	B  : in   std_logic;	    -- second operand
+	Ci : in   std_logic;	    -- carry in from previous bit
+	S  : out  std_logic;	    -- sum (result)
+	Co : out  std_logic	    -- carry out to next bit
     );
     end component;
 
@@ -180,7 +142,7 @@ begin
     --    when decrementing the input is 0's until the IncDecBit (the bit to
     --       start decrementing) and after that it is all 1's
     --    thus the IncDecBit is always a 1
-    IDin:  for  i  in  IncDecIn'Range  generate     -- generate the bits independently
+    IDin:  for  i  in  IncDecIn'Range  generate	    -- generate the bits independently
     begin
 
         -- if past the maximum allowable bit to increment/decrement use 0 when
