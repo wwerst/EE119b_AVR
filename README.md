@@ -32,3 +32,13 @@ apt install gtkwave
 
 After doing all this, go through Quick Start Guide to learn basics: https://ghdl.readthedocs.io/en/stable/using/QuickStartGuide.html
 
+# OSVVM Install
+
+See this link: https://ghdl.readthedocs.io/en/stable/building/PrecompileVendorPrimitives.html?highlight=osvvm
+
+Summary of instructions:
+- Clone osvvm repo to a folder on your computer
+- modify config.sh file of ghdl to point to this folder for osvvm source
+- run compile-osvvm script in ghdl
+
+See the above link for original source docs that will (hopefully) be kept up to date.
