@@ -10,6 +10,16 @@ package AVR is
     subtype word_t is std_logic_vector(WORDSIZE-1 downto 0);
     subtype addr_t is std_logic_vector(ADDRSIZE-1 downto 0);
 
+    -- Single register data bus type
+    subtype reg_s_data_t is word_t;
+    -- Single register select bus type
+    subtype reg_s_sel_t is std_logic_vector(4 downto 0);
+
+    -- Double register data bus type
+    subtype reg_d_data_t is std_logic_vector(2*WORDSIZE-1 downto 0);
+
+    subtype reg_d_sel_t is std_logic_vector(1 downto 0);
+
 end package;
 
 --
