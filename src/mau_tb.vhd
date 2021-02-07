@@ -36,11 +36,11 @@ begin
         crossBin.AddCross(GenBin(1,2), GenBin(3,4));
 
         while not crossBin.IsCovered loop
-            (test1, test2) <= crossBin.GetRandPoint;
+            (test1, test2) := crossBin.GetRandPoint;
 
             crossBin.ICover((test1, test2));
         end loop;
-        covBin.WriteBin;
+        crossBin.WriteBin;
 
         wait;
     end process;

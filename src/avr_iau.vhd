@@ -64,14 +64,18 @@ architecture  dataflow  of  AvrIau  is
     signal pc: AVR.addr_t;
     constant ZERO: AVR.addr_t := (others => '0');
     constant ONE: AVR.addr_t := (0 => '1', others => '0');
+    signal sources: std_logic_vector(IAU.SOURCES*AVR.ADDRSIZE - 1 downto 0);
+    signal offsets: std_logic_vector((IAU.OFFSETS+2)*AVR.ADDRSIZE - 1 downto 0);
 begin
+    sources <= (ZERO & pc);
+    offsets <= (ZERO & ONE & AddrOff);
 
     MU: MemUnit generic map (
         srcCnt => 2, offsetCnt => 6
     ) port map (
-        AddrSrc => (ZERO & pc),
+        AddrSrc => sources,
         SrcSel => SrcSel,
-        AddrOff => (ZERO & ONE & AddrOff),
+        AddrOff => offsets,
         OffsetSel => OffsetSel,
         IncDecSel => '0',
         IncDecBit => 0,
