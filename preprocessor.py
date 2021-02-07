@@ -60,14 +60,17 @@ class ASMFileReader(object):
             else:
                 output_lines.append(line)
 
-        with open('output_vectors.asm', 'w') as file:
+        file_name = self._input_filename.split('/')[-1]
+        with open(self._output_folder + '/' + file_name, 'w') as file:
             for line in output_lines:
                 file.write(line.__repr__() + '\n')
 
 
 
 def main():
-    reader = ASMFileReader('test_vectors.asm', 'output')
+    reader = ASMFileReader('tests/alu_test_part1.asm', 'glen_output_asm')
+    reader.convert_file()
+    reader = ASMFileReader('tests/alu_test_part2.asm', 'glen_output_asm')
     reader.convert_file()
 
 
