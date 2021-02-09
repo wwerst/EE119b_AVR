@@ -13,11 +13,12 @@
 --     MemUnitConstants - constants for the memory access unit
 --
 --  Entities included are:
---     AdderBit - one bit of an adder (a full adder)
 --     MemUnit  - generic memory access unit
 --
 --  Revision History:
 --     27 Jan 21  Glen George       Initial revision.
+--      4 Feb 21  Glen George       Added initialization of low bit of carry
+--                                  for the adder.
 --
 ----------------------------------------------------------------------------
 
@@ -25,6 +26,7 @@
 --
 --  Package containing the constants for the Memory Unit
 --
+
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -40,8 +42,6 @@ package MemUnitConstants is
 
 
 end package;
-
-
 
 
 
@@ -104,14 +104,14 @@ end  MemUnit;
 architecture  dataflow  of  MemUnit  is
 
     -- need adders for computing the address
-    component  AdderBit  port(
-    	A  : in   std_logic;	    -- first operand
-	B  : in   std_logic;	    -- second operand
-	Ci : in   std_logic;	    -- carry in from previous bit
-	S  : out  std_logic;	    -- sum (result)
-	Co : out  std_logic	    -- carry out to next bit
-    );
-    end component;
+    --component  AdderBit  port(
+    --	A  : in   std_logic;	    -- first operand
+	--B  : in   std_logic;	    -- second operand
+	--Ci : in   std_logic;	    -- carry in from previous bit
+	--S  : out  std_logic;	    -- sum (result)
+	--Co : out  std_logic	    -- carry out to next bit
+    --);
+    --end component;
 
     -- intermediate carry results
     --   for adder
@@ -175,9 +175,10 @@ begin
     -- adder for doing increment/decrement
     --    it adds the increment/decrement input to the selected source address
     --    to generate the source address to output (OutAddrSrc)
+    idcarry(0) <= '0';                              -- there is no carry in
     IDA1:  for  i  in  AddrSrcOut'Range  generate   -- make enough AdderBits
     begin
-        IDABx: AdderBit  port map  (SelSrcAddr(i), IncDecIn(i), idcarry(i),
+        IDABx: entity work.AdderBit  port map  (SelSrcAddr(i), IncDecIn(i), idcarry(i),
                                     OutSrcAddr(i), idcarry(i + 1));
     end generate;
 
@@ -191,9 +192,10 @@ begin
 
 
     -- adder for adding offset to the source address
+    acarry(0) <= '0';                               -- there is no carry in
     AA1:  for  i  in  Address'Range  generate      -- make enough AdderBits
     begin
-        AABx: AdderBit  port map  (SrcAddr(i), SelOffAddr(i), acarry(i),
+        AABx: entity work.AdderBit  port map  (SrcAddr(i), SelOffAddr(i), acarry(i),
                                    Address(i), acarry(i + 1));
     end generate;
 
