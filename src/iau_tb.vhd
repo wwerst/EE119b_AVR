@@ -9,10 +9,10 @@ use osvvm.AlertLogPkg.all;
 use osvvm.RandomPkg.all;
 use osvvm.CoveragePkg.all;
 
-entity mau_tb is
-end mau_tb;
+entity iau_tb is
+end iau_tb;
 
-architecture testbench of mau_tb is
+architecture testbench of iau_tb is
     --component AvrIau
     --    port(
     --        clk: in std_logic;

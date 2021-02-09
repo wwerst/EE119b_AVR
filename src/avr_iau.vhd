@@ -38,6 +38,7 @@ use ieee.std_logic_1164.all;
 
 use work.AVR;
 use work.IAU;
+use work.MemUnitConstants;
 
 
 entity  AvrIau  is
@@ -58,29 +59,6 @@ end  AvrIau;
 
 
 architecture  dataflow  of  AvrIau  is
-    --component MemUnit
-    --    generic (
-    --        srcCnt       : integer;
-    --        offsetCnt    : integer;
-    --        maxIncDecBit : integer := 0; -- default is only inc/dec bit 0
-    --        wordsize     : integer := 16 -- default address width is 16 bits
-    --    );
-
-    --    port(
-    --        AddrSrc    : in   std_logic_vector(srccnt * wordsize - 1 downto 0);
-    --        SrcSel     : in   integer  range srccnt - 1 downto 0;
-    --        AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
-    --        OffsetSel  : in   integer  range offsetcnt - 1 downto 0;
-    --        IncDecSel  : in   std_logic;
-    --        IncDecBit  : in   integer  range maxIncDecBit downto 0;
-    --        PrePostSel : in   std_logic;
-    --        Address    : out  std_logic_vector(wordsize - 1 downto 0);
-    --        AddrSrcOut : out  std_logic_vector(wordsize - 1 downto 0)
-    --    );
-    --end component;
-
-    --constant SOURCES: natural := 2;
-
     signal pc: AVR.addr_t;
     constant ZERO: AVR.addr_t := (others => '0');
     constant ONE: AVR.addr_t := (0 => '1', others => '0');
@@ -109,9 +87,9 @@ begin
         SrcSel => SrcSel,
         AddrOff => offsets,
         OffsetSel => OffsetSel,
-        IncDecSel => '0',
+        IncDecSel => MemUnitConstants.MemUnit_INC,
         IncDecBit => 0,
-        PrePostSel => '0',
+        PrePostSel => MemUnitConstants.MemUnit_PRE,
         Address => Address
     );
 
