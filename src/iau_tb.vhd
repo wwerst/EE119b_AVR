@@ -13,21 +13,6 @@ entity iau_tb is
 end iau_tb;
 
 architecture testbench of iau_tb is
-    --component AvrIau
-    --    port(
-    --        clk: in std_logic;
-    --        --SrcSel     : in   integer  range IAU.SOURCES-1 downto 0;
-    --        --AddrOff    : in   std_logic_vector(IAU.OFFSETS * AVR.ADDRSIZE - 1 downto 0);
-    --        branch: in std_logic_vector(6 downto 0);
-    --        jump: in std_logic_vector(11 downto 0);
-    --        PDB: in std_logic_vector(15 downto 0);
-    --        DDB: in std_logic_vector(7 downto 0);
-    --        Z: in std_logic_vector(15 downto 0);
-    --        OffsetSel  : in   IAU.offset_t;
-    --        Address    : out  AVR.addr_t
-    --    );
-    --end component;
-
     constant CLK_PERIOD: time := 1 ms;
     signal done: boolean := FALSE;
     signal clk: std_logic := '0';
@@ -54,15 +39,16 @@ architecture testbench of iau_tb is
     end function;
 
     shared variable covBin: CovPType;
-    constant BINS: CovMatrix2Type := (
-        GenCross(GenBin(IAU.OFF_ZERO), GenBin(0)) &
-        GenCross(GenBin(IAU.OFF_ONE), GenBin(1)) &
-        GenCross(GenBin(IAU.OFF_BRANCH), signedBin(branch)) &
-        GenCross(GenBin(IAU.OFF_JUMP), signedBin(jump)) &
-        GenCross(GenBin(IAU.OFF_PDB), unsignedBin(pdb)) &
-        GenCross(GenBin(IAU.OFF_Z), unsignedBin(z)) &
-        GenCross(GenBin(IAU.OFF_DDBLO), unsignedBin(ddb)) &
-        GenCross(GenBin(IAU.OFF_DDBHI), unsignedBin(ddb))
+    constant srcBins: CovBinType := GenBin(0,IAU.SOURCES-1);
+    constant BINS: CovMatrix3Type := (
+        GenCross(srcBins, GenBin(IAU.OFF_ZERO), GenBin(0)) &
+        GenCross(srcBins, GenBin(IAU.OFF_ONE), GenBin(1)) &
+        GenCross(srcBins, GenBin(IAU.OFF_BRANCH), signedBin(branch)) &
+        GenCross(srcBins, GenBin(IAU.OFF_JUMP), signedBin(jump)) &
+        GenCross(srcBins, GenBin(IAU.OFF_PDB), unsignedBin(pdb)) &
+        GenCross(srcBins, GenBin(IAU.OFF_Z), unsignedBin(z)) &
+        GenCross(srcBins, GenBin(IAU.OFF_DDBLO), unsignedBin(ddb)) &
+        GenCross(srcBins, GenBin(IAU.OFF_DDBHI), unsignedBin(ddb))
     );
 begin
     process begin
@@ -89,7 +75,7 @@ begin
 
     process
         variable rv: RandomPType;
-        variable off_v, off: integer;
+        variable src_v, off_v, off: integer;
         variable alertId: AlertLogIDType;
     begin
         covBin.AddBins(BINS);
@@ -104,8 +90,9 @@ begin
 
         while not covBin.IsCovered loop
             wait until rising_edge(clk);
-            (off_v, off) := covBin.GetRandPoint;
+            (src_v, off_v, off) := covBin.GetRandPoint;
 
+            srcSel <= src_v;
             branch <= rv.RandSlv(branch'LENGTH);
             jump <= rv.RandSlv(jump'LENGTH);
             pdb <= rv.RandSlv(pdb'LENGTH);
@@ -114,7 +101,7 @@ begin
             offsetsel <= off_v;
             offsetValue <= off;
 
-            covBin.ICover((off_v, off));
+            covBin.ICover((src_v, off_v, off));
             if off_v = IAU.OFF_BRANCH then
                 branch <= std_logic_vector(to_signed(off, branch'LENGTH));
             elsif off_v = IAU.OFF_JUMP then
@@ -138,21 +125,21 @@ begin
     process (clk)
         variable addr: integer := 0;
     begin
-            if srcSel = IAU.SRC_ZERO then
-                addr := 0;
-            else
-                addr := expected_pc;
-            end if;
-            if offsetSel = IAU.OFF_DDBHI then
-                addr := (addr + offsetValue*(2**DDB'LENGTH)) mod 2**AVR.ADDRSIZE;
-            else
-                addr := (addr + offsetValue) mod 2**AVR.ADDRSIZE;
-            end if;
+        if srcSel = IAU.SRC_ZERO then
+            addr := 0;
+        else
+            addr := expected_pc;
+        end if;
+        if offsetSel = IAU.OFF_DDBHI then
+            addr := (addr + offsetValue*(2**DDB'LENGTH)) mod 2**AVR.ADDRSIZE;
+        else
+            addr := (addr + offsetValue) mod 2**AVR.ADDRSIZE;
+        end if;
 
-            expected_address <= std_logic_vector(to_unsigned(addr, AVR.ADDRSIZE));
-            if rising_edge(clk) then
-                expected_pc <= addr;
-            end if;
+        expected_address <= std_logic_vector(to_unsigned(addr, AVR.ADDRSIZE));
+        if rising_edge(clk) then
+            expected_pc <= addr;
+        end if;
 
     end process;
 end architecture testbench;
