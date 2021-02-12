@@ -69,7 +69,7 @@ architecture  dataflow  of  AvrDau  is
     signal offsets: std_logic_vector(DAU.OFFSETS*AVR.ADDRSIZE - 1 downto 0);
 begin
     array_ext <= (array_off'RANGE => array_off, others => '0');
-    sources <= (Z & Y & Z & stack& pdb);
+    sources <= (Z & Y & X & stack& pdb);
     source_addr <= sources((srcSel+1)*AVR.ADDRSIZE-1 downto srcSel*AVR.ADDRSIZE);
     offsets <= (
        array_ext &
@@ -94,7 +94,11 @@ begin
     Update <= computed_addr when offsetSel = DAU.OFF_ONE or offsetSel = DAU.OFF_NEGONE
               else source_addr;
 
-    Address <= computed_addr when (srcSel = DAU.SRC_STACK and offsetSel = DAU.OFF_ONE) or (srcSel /= DAU.SRC_Stack and offsetSel = DAU.OFF_NEGONE) else  source_addr;
+    Address <= computed_addr when 
+                (srcSel = DAU.SRC_STACK and offsetSel = DAU.OFF_ONE) or 
+                ((srcSel = DAU.SRC_Y or srcSel = DAU.SRC_Z) and offsetSel = DAU.OFF_ARRAY) or 
+                (srcSel /= DAU.SRC_Stack and offsetSel = DAU.OFF_NEGONE) 
+        else  source_addr;
 
     process(clk) begin
         if rising_edge(clk) and srcSel = DAU.SRC_STACK then

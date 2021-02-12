@@ -99,6 +99,10 @@ begin
         covBin.AddBins(BINS);
         alertId := GetAlertLogID("AVRDAU", ALERTLOG_BASE_ID);
         --SetAlertStopCount(ERROR, 20);
+        srcSel <= DAU.SRC_PDB;
+        offsetSel <= DAU.OFF_ZERO;
+        pdb <= (others => '0');
+        wait until rising_edge(clk);
 
         while not covBin.IsCovered loop
             wait until rising_edge(clk);
