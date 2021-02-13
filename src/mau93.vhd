@@ -104,14 +104,14 @@ end  MemUnit;
 architecture  dataflow  of  MemUnit  is
 
     -- need adders for computing the address
-    --component  AdderBit  port(
-    --	A  : in   std_logic;	    -- first operand
-	--B  : in   std_logic;	    -- second operand
-	--Ci : in   std_logic;	    -- carry in from previous bit
-	--S  : out  std_logic;	    -- sum (result)
-	--Co : out  std_logic	    -- carry out to next bit
-    --);
-    --end component;
+    component  AdderBit  port(
+    	A  : in   std_logic;	    -- first operand
+	B  : in   std_logic;	    -- second operand
+	Ci : in   std_logic;	    -- carry in from previous bit
+	S  : out  std_logic;	    -- sum (result)
+	Co : out  std_logic	    -- carry out to next bit
+    );
+    end component;
 
     -- intermediate carry results
     --   for adder
@@ -178,7 +178,7 @@ begin
     idcarry(0) <= '0';                              -- there is no carry in
     IDA1:  for  i  in  AddrSrcOut'Range  generate   -- make enough AdderBits
     begin
-        IDABx: entity work.AdderBit  port map  (SelSrcAddr(i), IncDecIn(i), idcarry(i),
+        IDABx: AdderBit  port map  (SelSrcAddr(i), IncDecIn(i), idcarry(i),
                                     OutSrcAddr(i), idcarry(i + 1));
     end generate;
 
@@ -195,7 +195,7 @@ begin
     acarry(0) <= '0';                               -- there is no carry in
     AA1:  for  i  in  Address'Range  generate      -- make enough AdderBits
     begin
-        AABx: entity work.AdderBit  port map  (SrcAddr(i), SelOffAddr(i), acarry(i),
+        AABx: AdderBit  port map  (SrcAddr(i), SelOffAddr(i), acarry(i),
                                    Address(i), acarry(i + 1));
     end generate;
 
