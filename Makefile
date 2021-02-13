@@ -4,7 +4,7 @@ all:
 	sleep 1
 
 import:
-	mkdir work
+	mkdir -p work
 	ghdl -i --std=08 --workdir=work src/*.vhd
 
 alu_tests:
@@ -17,6 +17,10 @@ iau_tests:
 dau_tests:
 	ghdl -m --std=08 --workdir=work dau_tb
 	ghdl -r --std=08 --workdir=work dau_tb
+
+reg_tests:
+	ghdl -m --std=08 --workdir=work avr_reg_tb
+	ghdl -r --std=08 --workdir=work avr_reg_tb
 
 clean:
 	rm -r work
