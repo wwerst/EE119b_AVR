@@ -4,16 +4,19 @@ all:
 	sleep 1
 
 import:
-	ghdl -i --std=08 --workdir=work src/mau_tb.vhd
-	ghdl -i --std=08 --workdir=work src/common.vhd
-	ghdl -i --std=08 --workdir=work src/avr_iau.vhd
+	mkdir work
+	ghdl -i --std=08 --workdir=work src/*.vhd
 
 alu_tests:
-	ghdl -i --workdir=work src/alu.vhd src/alu_tb.vhd
+	ghdl -m --std=08 --workdir=work alu_tb
+	ghdl -r --std=08 --workdir=work alu_tb
 
-mau_tests:
-	ghdl -m --std=08 --workdir=work mau_tb
-	ghdl -r --std=08 --workdir=work mau_tb
+iau_tests:
+	ghdl -m --std=08 --workdir=work iau_tb
+	ghdl -r --std=08 --workdir=work iau_tb
+dau_tests:
+	ghdl -m --std=08 --workdir=work dau_tb
+	ghdl -r --std=08 --workdir=work dau_tb
 
 clean:
-	rm work/*.cf
+	rm -r work
