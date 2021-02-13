@@ -4,20 +4,33 @@ use ieee.std_logic_1164.all;
 package IAU is
 
     constant SOURCES: natural := 2;
-    constant SRC_ZERO: natural := 0;
-    constant SRC_PC: natural := 1;
+    subtype source_t is natural range SOURCES-1 downto 0;
+    constant SRC_ZERO: source_t := 0;
+    constant SRC_PC: source_t := 1;
 
-    constant OFFSETS: natural := 5;
-    constant OFF_ZERO: natural := 0;
-    constant OFF_ONE: natural := 1;
-    constant OFF_IR: natural := 2;
-    constant OFF_PROGDB: natural := 3;
-    constant OFF_Z: natural := 4;
-    constant OFF_DDBLO: natural := 5;
-    constant OFF_DDBHI: natural := 6;
+    constant OFFSETS: natural := 8;
+    subtype offset_t is natural range OFFSETS-1 downto 0;
+
+    constant OFF_ZERO: offset_t := 0;
+    constant OFF_ONE: offset_t := 1;
+    constant OFF_BRANCH: offset_t := 2;
+    constant OFF_JUMP: offset_t := 3;
+    constant OFF_PDB: offset_t := 4;
+    constant OFF_Z: offset_t := 5;
+    constant OFF_DDBLO: offset_t := 6;
+    constant OFF_DDBHI: offset_t := 7;
 
 end package;
 --
+-- The instructions requiring features of the IAU include
+-- branch- add signed 7 bit offset to PC
+-- JMP/CALL- load PC from program data bus
+-- RJMP/RCALL- add signed 12 bit offset to PC from IR
+-- IJMP/ICALL- load PC from Z register
+-- RET/RETI- load high and low bits of PC from data data bus
+-- in addition, be able to increment or hold the current PC
+
+-- These are all implemented as adding offsets to the PC (including 0 and 1).
 --
 
 library ieee;
@@ -25,14 +38,20 @@ use ieee.std_logic_1164.all;
 
 use work.AVR;
 use work.IAU;
+use work.MemUnitConstants;
 
 
 entity  AvrIau  is
     port(
         clk: in std_logic;
-        SrcSel     : in   integer  range IAU.SOURCES-1 downto 0;
-        AddrOff    : in   std_logic_vector(IAU.OFFSETS * AVR.ADDRSIZE - 1 downto 0);
-        OffsetSel  : in   integer  range IAU.OFFSETS+1 downto 0;
+        SrcSel     : in   IAU.source_t;
+        --AddrOff    : in   std_logic_vector(IAU.OFFSETS * AVR.ADDRSIZE - 1 downto 0);
+        branch: in std_logic_vector(6 downto 0);
+        jump: in std_logic_vector(11 downto 0);
+        PDB: in std_logic_vector(15 downto 0);
+        DDB: in std_logic_vector(7 downto 0);
+        Z: in std_logic_vector(15 downto 0);
+        OffsetSel  : in   IAU.offset_t;
         Address    : out  AVR.addr_t
     );
 
@@ -40,46 +59,37 @@ end  AvrIau;
 
 
 architecture  dataflow  of  AvrIau  is
-    component MemUnit
-        generic (
-            srcCnt       : integer;
-            offsetCnt    : integer;
-            maxIncDecBit : integer := 0; -- default is only inc/dec bit 0
-            wordsize     : integer := 16 -- default address width is 16 bits
-        );
-
-        port(
-            AddrSrc    : in   std_logic_vector(srccnt * wordsize - 1 downto 0);
-            SrcSel     : in   integer  range srccnt - 1 downto 0;
-            AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
-            OffsetSel  : in   integer  range offsetcnt - 1 downto 0;
-            IncDecSel  : in   std_logic;
-            IncDecBit  : in   integer  range maxIncDecBit downto 0;
-            PrePostSel : in   std_logic;
-            Address    : out  std_logic_vector(wordsize - 1 downto 0);
-            AddrSrcOut : out  std_logic_vector(wordsize - 1 downto 0)
-        );
-    end component;
-
     signal pc: AVR.addr_t;
     constant ZERO: AVR.addr_t := (others => '0');
     constant ONE: AVR.addr_t := (0 => '1', others => '0');
+    signal branch_ext, jump_ext: AVR.addr_t;
     signal sources: std_logic_vector(IAU.SOURCES*AVR.ADDRSIZE - 1 downto 0);
-    signal offsets: std_logic_vector((IAU.OFFSETS+2)*AVR.ADDRSIZE - 1 downto 0);
+    signal offsets: std_logic_vector(IAU.OFFSETS*AVR.ADDRSIZE - 1 downto 0);
 begin
-    sources <= (ZERO & pc);
-    offsets <= (ZERO & ONE & AddrOff);
+    branch_ext <= (branch'RANGE => branch, others => branch(branch'HIGH));
+    jump_ext <= (jump'RANGE => jump, others => jump(jump'HIGH));
+    sources <= (pc & ZERO);
+    offsets <= (
+        DDB & x"00" &
+        x"00" & DDB &
+        Z &
+        PDB &
+        jump_ext &
+        branch_ext &
+        ONE &
+        ZERO
+    );
 
-    MU: MemUnit generic map (
-        srcCnt => 2, offsetCnt => 6
+    MU: entity work.MemUnit generic map (
+        srcCnt => IAU.SOURCES, offsetCnt => IAU.OFFSETS
     ) port map (
         AddrSrc => sources,
         SrcSel => SrcSel,
         AddrOff => offsets,
         OffsetSel => OffsetSel,
-        IncDecSel => '0',
+        IncDecSel => MemUnitConstants.MemUnit_INC,
         IncDecBit => 0,
-        PrePostSel => '0',
+        PrePostSel => MemUnitConstants.MemUnit_PRE,
         Address => Address
     );
 
