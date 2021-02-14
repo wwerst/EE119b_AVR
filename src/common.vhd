@@ -20,6 +20,15 @@ package AVR is
 
     subtype reg_d_sel_t is std_logic_vector(1 downto 0);
 
+    constant STATUS_INT: integer := 7;
+    constant STATUS_TRANS: integer := 6;
+    constant STATUS_HCARRY: integer := 5;
+    constant STATUS_SIGN: integer := 4;
+    constant STATUS_OVER: integer := 3;
+    constant STATUS_NEG: integer := 2;
+    constant STATUS_ZERO: integer := 1;
+    constant STATUS_CARRY: integer := 0;
+
 end package;
 
 --
