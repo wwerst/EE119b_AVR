@@ -3,6 +3,9 @@
 osvvm/
 work/
 
+# VHDL wave files
+*.vcd
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
