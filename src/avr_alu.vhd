@@ -1,34 +1,50 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-package ALU is
-    -- more typing to do less typing?
-   constant Cin_ZERO   : std_logic_vector(1 downto 0) := "00";
-   constant Cin_ONE    : std_logic_vector(1 downto 0) := "01";
-   constant Cin_CIN    : std_logic_vector(1 downto 0) := "10";
-   constant Cin_CINBAR : std_logic_vector(1 downto 0) := "11";
+package ALUOp is
+
+    subtype ALUOP_t is std_logic_vector(6 downto 0);
+    -- AVR: ADIW, INC
+    -- Adder only
+    constant ADD : ALUOP_t := "0000000"; -- R = A + B
+    constant ADC : ALUOP_t := "0000000"; -- R = A + B + SREG.C
+
+    -- Adder with FBLOCK
+    -- AVR: CP (compare), CPI (compare with immediate), DEC, NEG, SBCI
+    constant SUB : ALUOP_t := "0000000";
+
+    -- AVR: CPC (compare with carry), SBCI
+    constant SBC : ALUOP_t := "0000000";
 
 
---  Shifter command constants
-   constant S_LEFT  : std_logic_vector(2 downto 0) := "0--";
-   constant S_LSL   : std_logic_vector(2 downto 0) := "000";
-   constant S_SWAP  : std_logic_vector(2 downto 0) := "001";
-   constant S_ROL   : std_logic_vector(2 downto 0) := "010";
-   constant S_RLC   : std_logic_vector(2 downto 0) := "011";
-   constant S_LSR   : std_logic_vector(2 downto 0) := "100";
-   constant S_ASR   : std_logic_vector(2 downto 0) := "101";
-   constant S_ROR   : std_logic_vector(2 downto 0) := "110";
-   constant S_RRC   : std_logic_vector(2 downto 0) := "111";
+    -- AVR: ANDI
+    -- FBLOCK only
+    constant AND : ALUOP_t := "0000000"; -- R = A & B
+
+    -- AVR: ORI
+    constant OR : ALUOP_t := "0000000"; -- R = A | B
+
+    -- BST is implemented using one of two below.
+    constant BCLR : ALUOP_t := "0000000"; -- Determine update bit by flag mask
+    constant BSET : ALUOP_t := "0000000";
+
+    -- AVR: BLD   . BLD is implemented as R = A xor B. Implementation is B has one bit hot if T should change, else all 0.
+    constant EOR : ALUOP_t := "0000000";
+
+    constant COM : ALUOP_t := "0000000"; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1
 
 
---  ALU command constants
---     may be freely changed
+    -- Shifter only
+    constant LSR : ALUOP_t := "0000000"; -- Logical shift right
 
-   constant Cmd_FBLOCK  : std_logic_vector(1 downto 0) := "00";
-   constant Cmd_ADDER   : std_logic_vector(1 downto 0) := "01";
-   constant Cmd_SHIFT   : std_logic_vector(1 downto 0) := "10";
+    constant ROR : ALUOP_t := "0000000"; -- Rotate right through carry
+
+    constant SWAP : ALUOP_t := "0000000"; -- Swap
+
+    constant ASR : ALUOP_t := "0000000"; -- R = A[7] concat A >> 1
 
 end package;
+
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -41,7 +57,7 @@ entity avr_alu is
             clk         : in   std_logic;
             ALUOpA      : in   AVR.word_t;   -- first operand
             ALUOpB      : in   AVR.word_t;   -- second operand
-            ALUOpSelect : in   std_logic_vector(6 downto 0);
+            ALUOpSelect : in   ALUOP_t;
             FlagMask    : in   AVR.word_t;   -- Flag mask. If 1, then update bit. If 0, leave bit unchanged.
             Status      : out  AVR.word_t;   -- Status register
             Result      : out  AVR.word_t    -- Output result
