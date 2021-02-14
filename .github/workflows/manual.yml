@@ -29,6 +29,24 @@ jobs:
         ./configure --prefix=/usr/local
         sudo make
         sudo make install
+        cd ..
     - name: GHDL version
       run: ghdl --version
-    - uses: actions/checkout@v2
+    - name: Prepare OSVVM
+      run: |
+        git clone https://github.com/osvvm/osvvm.git
+        cd osvvm
+        git checkout 2020.12a
+        cd ..
+        sed 's/InstallationDirectories[OSVVM]=""/InstallationDirectories[OSVVM]="/home/runner/work/EE119b_AVR/osvvm"/' /usr/local/lib/ghdl/vendors/config.sh
+    - name: Clone Code
+      uses: actions/checkout@v2
+    - name: Build OSVVM
+      run: |
+        git log -1
+        cd EE119b_AVR
+        git log -1
+        /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
+    - name: Run Tests
+      run: |
+        make reg_tests
