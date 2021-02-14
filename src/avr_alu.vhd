@@ -37,7 +37,6 @@ use work.AVR;
 
 entity avr_alu is
 
-    -- New interface
     port(
             clk         : in   std_logic;
             ALUOpA      : in   AVR.word_t;   -- first operand
