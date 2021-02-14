@@ -27,7 +27,7 @@ jobs:
         cd ghdl
         git checkout v0.37.0
         ./configure --prefix=/usr/local
-        make
-        make install
+        sudo make
+        sudo make install
     - name: GHDL version
       run: ghdl --version
