@@ -23,6 +23,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y gnat
+        cd ..
         git clone https://github.com/ghdl/ghdl.git
         cd ghdl
         git checkout v0.37.0
@@ -43,6 +44,7 @@ jobs:
       uses: actions/checkout@v2
     - name: Build OSVVM
       run: |
+        cd EE119b_AVR
         git log -1
         ls -la
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
