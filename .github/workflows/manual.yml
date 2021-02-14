@@ -19,7 +19,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     # Runs a single command using the runners shell
-    - name: Setup Environment
+    - name: Setup GHDL
       run: |
         sudo apt update
         sudo apt install -y gnat
@@ -31,3 +31,4 @@ jobs:
         sudo make install
     - name: GHDL version
       run: ghdl --version
+    - uses: actions/checkout@v2
