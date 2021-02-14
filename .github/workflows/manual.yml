@@ -1,0 +1,33 @@
+# This is a basic workflow that is manually triggered
+
+name: Manual workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  push:
+    branches:
+      - '*'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "greet"
+  greet:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Runs a single command using the runners shell
+    - name: Setup Environment
+      run: |
+        sudo apt update
+        sudo apt install -y gnat
+        git clone https://github.com/ghdl/ghdl.git
+        cd ghdl
+        git checkout v0.37.0
+        ./configure --prefix=/usr/local
+        make
+        make install
+    - name: GHDL version
+      run: ghdl --version
