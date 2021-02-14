@@ -21,6 +21,7 @@ jobs:
     # Runs a single command using the runners shell
     - name: Setup GHDL
       run: |
+        pwd
         sudo apt update
         sudo apt install -y gnat
         cd ..
@@ -35,6 +36,7 @@ jobs:
       run: ghdl --version
     - name: Prepare OSVVM
       run: |
+        pwd
         git clone https://github.com/osvvm/osvvm.git
         cd osvvm
         git checkout 2020.12a
@@ -44,9 +46,10 @@ jobs:
       uses: actions/checkout@v2
     - name: Build OSVVM
       run: |
+        pwd
+        ls -la
         cd EE119b_AVR
         git log -1
-        ls -la
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
     - name: Run Tests
       run: |
