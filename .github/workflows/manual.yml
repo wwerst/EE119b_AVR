@@ -44,8 +44,7 @@ jobs:
     - name: Build OSVVM
       run: |
         git log -1
-        cd EE119b_AVR
-        git log -1
+        ls -la
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
     - name: Run Tests
       run: |
