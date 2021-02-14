@@ -591,6 +591,3 @@ begin
     end process;
 
 end  behavioral;
-
-
-ADIW Implementation:

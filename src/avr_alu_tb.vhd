@@ -31,6 +31,4 @@ begin
         Result      => Result
     );
 
-    Cl
-
 end architecture testbench;

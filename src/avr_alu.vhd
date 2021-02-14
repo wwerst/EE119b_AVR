@@ -6,42 +6,42 @@ package ALUOp is
     subtype ALUOP_t is std_logic_vector(6 downto 0);
     -- AVR: ADIW, INC
     -- Adder only
-    constant ADD : ALUOP_t := "0000000"; -- R = A + B
-    constant ADC : ALUOP_t := "0000000"; -- R = A + B + SREG.C
+    constant ADD_Op : ALUOP_t := "0000000"; -- R = A + B
+    constant ADC_Op : ALUOP_t := "0000000"; -- R = A + B + SREG.C
 
     -- Adder with FBLOCK
     -- AVR: CP (compare), CPI (compare with immediate), DEC, NEG, SBCI
-    constant SUB : ALUOP_t := "0000000";
+    constant SUB_Op : ALUOP_t := "0000000";
 
     -- AVR: CPC (compare with carry), SBCI
-    constant SBC : ALUOP_t := "0000000";
+    constant SBC_Op : ALUOP_t := "0000000";
 
 
     -- AVR: ANDI
     -- FBLOCK only
-    constant AND : ALUOP_t := "0000000"; -- R = A & B
+    constant AND_Op : ALUOP_t := "0000000"; -- R = A & B
 
     -- AVR: ORI
-    constant OR : ALUOP_t := "0000000"; -- R = A | B
+    constant OR_Op : ALUOP_t := "0000000"; -- R = A | B
 
     -- BST is implemented using one of two below.
-    constant BCLR : ALUOP_t := "0000000"; -- Determine update bit by flag mask
-    constant BSET : ALUOP_t := "0000000";
+    constant BCLR_Op : ALUOP_t := "0000000"; -- Determine update bit by flag mask
+    constant BSET_Op : ALUOP_t := "0000000";
 
     -- AVR: BLD   . BLD is implemented as R = A xor B. Implementation is B has one bit hot if T should change, else all 0.
-    constant EOR : ALUOP_t := "0000000";
+    constant EOR_Op : ALUOP_t := "0000000";
 
-    constant COM : ALUOP_t := "0000000"; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1
+    constant COM_Op : ALUOP_t := "0000000"; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1
 
 
     -- Shifter only
-    constant LSR : ALUOP_t := "0000000"; -- Logical shift right
+    constant LSR_Op : ALUOP_t := "0000000"; -- Logical shift right
 
-    constant ROR : ALUOP_t := "0000000"; -- Rotate right through carry
+    constant ROR_Op : ALUOP_t := "0000000"; -- Rotate right through carry
 
-    constant SWAP : ALUOP_t := "0000000"; -- Swap
+    constant SWAP_Op : ALUOP_t := "0000000"; -- Swap
 
-    constant ASR : ALUOP_t := "0000000"; -- R = A[7] concat A >> 1
+    constant ASR_Op : ALUOP_t := "0000000"; -- R = A[7] concat A >> 1
 
 end package;
 
