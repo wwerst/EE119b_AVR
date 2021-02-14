@@ -1,8 +1,11 @@
 library ieee;
 use ieee.std_logic_1164.all;
 
-entity alu_tb is
 
+use work.AVR;
+use work.ALUOp.all;
+
+entity alu_tb is
 end alu_tb;
 
 architecture testbench of alu_tb is
@@ -18,7 +21,13 @@ architecture testbench of alu_tb is
         );
     end component avr_alu;
 
-
+    signal clk         : std_logic;
+    signal ALUOpA      : AVR.word_t;
+    signal ALUOpB      : AVR.word_t;
+    signal ALUOpSelect : ALUOP_t;
+    signal FlagMask    : AVR.word_t;
+    signal Status      : AVR.word_t;
+    signal Result      : AVR.word_t;
 
 begin
     UUT: avr_alu port map (

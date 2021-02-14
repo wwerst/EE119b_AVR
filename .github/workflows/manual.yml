@@ -60,3 +60,6 @@ jobs:
     - name: Run Iau Tests
       run: |
         make iau_tests
+    - name: Run ALU Tests
+      run: |
+        make alu_tests
