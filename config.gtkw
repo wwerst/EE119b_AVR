@@ -1,0 +1,24 @@
+[*]
+[*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
+[*] Sun Feb 14 04:48:57 2021
+[*]
+[dumpfile] "/home/wwerst/proj/EE119b_AVR/avr_reg_tb.vcd"
+[dumpfile_mtime] "Sun Feb 14 04:47:17 2021"
+[dumpfile_size] 41150
+[savefile] "/home/wwerst/proj/EE119b_AVR/config.gtkw"
+[timestart] 10850000000000
+[size] 2493 1385
+[pos] 2598 -2
+*-42.000000 32920000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[sst_width] 223
+[signals_width] 134
+[sst_expanded] 1
+[sst_vpaned_height] 428
+@22
+avr_reg_tb.datains[7:0]
+avr_reg_tb.selins[4:0]
+avr_reg_tb.dataouta[7:0]
+@23
+avr_reg_tb.selouta[4:0]
+[pattern_trace] 1
+[pattern_trace] 0

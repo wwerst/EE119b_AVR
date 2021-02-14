@@ -41,26 +41,26 @@ entity AvrReg is
         -- Double register input
         EnableInD   : in std_logic;
         DataInD     : in AVR.reg_d_data_t;
-        SelInD      : in AVR.reg_s_sel_t;
+        SelInD      : in AVR.reg_d_sel_t;
 
         -- Single register A output
-        SelOutA     : out AVR.reg_s_sel_t;
+        SelOutA     : in AVR.reg_s_sel_t;
         DataOutA    : out AVR.reg_s_data_t;
 
         -- Single register B output
-        SelOutB     : out AVR.reg_s_sel_t;
+        SelOutB     : in AVR.reg_s_sel_t;
         DataOutB    : out AVR.reg_s_data_t;
 
         -- Double register output
-        SelOutD     : out AVR.reg_d_sel_t;
+        SelOutD     : in AVR.reg_d_sel_t;
         DataOutD    : out AVR.reg_d_data_t
     );
 end AvrReg;
 
 
 architecture dataflow of AvrReg is
-    constant wordsize : integer := AVR_REG_CONST.REG_COUNT;
-    constant regcnt   : integer := AVR.WORDSIZE;
+    constant wordsize : integer := AVR.WORDSIZE;
+    constant regcnt   : integer := AVR_REG_CONST.REG_COUNT;
     component RegArray
         generic (
             regcnt   : integer := regcnt;
@@ -94,7 +94,6 @@ architecture dataflow of AvrReg is
     signal RA_RegDInSel : integer  range regcnt/2 - 1 downto 0;
     signal RA_RegDStore : std_logic;
     signal RA_RegDSel   : integer  range regcnt/2 - 1 downto 0;
-    signal RA_clock     : std_logic;
     signal RA_RegA      : std_logic_vector(wordsize - 1 downto 0);
     signal RA_RegB      : std_logic_vector(wordsize - 1 downto 0);
     signal RA_RegD      : std_logic_vector(2 * wordsize - 1 downto 0);
@@ -111,7 +110,7 @@ begin
         RegDInSel =>  RA_RegDInSel,
         RegDStore =>  RA_RegDStore,
         RegDSel   =>  RA_RegDSel,
-        clock     =>  RA_clock,
+        clock     =>  clk,
         RegA      =>  RA_RegA,
         RegB      =>  RA_RegB,
         RegD      =>  RA_RegD
@@ -137,6 +136,6 @@ begin
 
     -- Double Register output
     RA_RegDSel <= to_integer("11" & unsigned(SelOutD));
-    DataOutB <= RA_RegB;
+    DataOutD <= RA_RegD;
 
 end dataflow;
