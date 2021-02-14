@@ -18,7 +18,43 @@ architecture testbench of alu_tb is
         );
     end component avr_alu;
 
-    constant ADD : std_logic_vector(4 downto 0) := "110100";
+    -- AVR: ADIW, INC
+    -- Adder
+    constant ADD : std_logic_vector(4 downto 0) := "0000000"; -- R = A + B
+    constant ADC : std_logic_vector(4 downto 0) := "0000000"; -- R = A + B + SREG.C
+
+    -- AVR: ANDI
+    -- FBLOCK
+    constant AND : std_logic_vector(4 downto 0) := "0000000"; -- R = A & B
+
+    -- AVR: ORI
+    constant OR : std_logic_vector(4 downto 0) := "0000000"; -- R = A | B
+
+    -- Shifter
+    constant ASR : std_logic_vector(4 downto 0) := "0000000"; -- R = A[7] concat A >> 1
+
+    -- BST is implemented using one of two below.
+    constant BCLR : std_logic_vector(4 downto 0) := "0000000"; -- Determine update bit by flag mask
+    constant BSET : std_logic_vector(4 downto 0) := "0000000";
+
+    -- AVR: BLD   . BLD is implemented as R = A xor B. Implementation is B has one bit hot if T should change, else all 0.
+    constant EOR : std_logic_vector(4 downto 0) := "0000000";
+
+
+    constant COM : std_logic_vector(4 downto 0) := "0000000"; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1
+
+    -- AVR: CP (compare), CPI (compare with immediate), DEC, NEG, SBCI
+    constant SUB : std_logic_vector(4 downto 0) := "0000000";
+
+    -- AVR: CPC (compare with carry), SBCI
+    constant SBC : std_logic_vector(4 downto 0) := "0000000";
+
+    constant LSR : std_logic_vector(4 downto 0) := "0000000"; -- Logical shift right
+
+    constant ROR : std_logic_vector(4 downto 0) := "0000000"; -- Rotate right through carry
+
+    constant SWAP : std_logic_vector(4 downto 0) := "0000000"; -- Swap
+
 begin
     UUT: avr_alu port map (
         clk         => clk        ,
