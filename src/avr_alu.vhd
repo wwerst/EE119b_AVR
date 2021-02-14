@@ -37,18 +37,15 @@ use work.AVR;
 
 entity avr_alu is
 
+    -- New interface
     port(
-        clk: in std_logic;
-        ALUOpA   : in      AVR.word_t;   -- first operand
-        ALUOpB   : in      AVR.word_t;   -- second operand
-        FCmd     : in      std_logic_vector(3 downto 0);              -- F-Block operation
-        CinCmd   : in      std_logic_vector(1 downto 0);              -- carry in operation
-        SCmd     : in      std_logic_vector(2 downto 0);              -- shift operation
-        ALUCmd   : in      std_logic_vector(1 downto 0);              -- ALU result select
-        set_status: in std_logic;
-        mask: in AVR.word_t;
-        Result   : out  AVR.word_t;   -- ALU result
-        Status  : out AVR.word_t
+            clk         : in   std_logic;
+            ALUOpA      : in   AVR.word_t;   -- first operand
+            ALUOpB      : in   AVR.word_t;   -- second operand
+            ALUOpSelect : in   std_logic_vector(6 downto 0);
+            FlagMask    : in   AVR.word_t;   -- Flag mask. If 1, then update bit. If 0, leave bit unchanged.
+            Status      : out  AVR.word_t;   -- Status register
+            Result      : out  AVR.word_t    -- Output result
     );
 end avr_alu;
 
@@ -127,7 +124,7 @@ begin
     status_mux <= result_signal when set_status = '1' else status_computed;
     status_c: StatusReg generic map (wordsize => AVR.WORDSIZE)
         port map (
-            status_computed,
+            status_mux,
             mask,
             clk,
             status_signal
