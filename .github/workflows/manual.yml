@@ -37,6 +37,7 @@ jobs:
     - name: Prepare OSVVM
       run: |
         pwd
+        cd ..
         git clone https://github.com/osvvm/osvvm.git
         cd osvvm
         git checkout 2020.12a
@@ -48,7 +49,6 @@ jobs:
       run: |
         pwd
         ls -la
-        cd EE119b_AVR
         git log -1
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
     - name: Run Tests
