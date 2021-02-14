@@ -51,6 +51,12 @@ jobs:
         ls -la
         git log -1
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
-    - name: Run Tests
+    - name: Run Reg Tests
       run: |
         make reg_tests
+    - name: Run Dau Tests
+      run: |
+        make dau_tests
+    - name: Run Iau Tests
+      run: |
+        make iau_tests

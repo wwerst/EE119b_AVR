@@ -117,7 +117,7 @@ begin
             AffirmIf(alertId, address = expected_address, "mismatch");
         end loop;
         done <= TRUE;
-        covBin.WriteBin;
+        covBin.WriteBin(WritePassFail => TRUE);
 
         wait;
     end process;

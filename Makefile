@@ -6,8 +6,15 @@ all:
 
 import:
 	mkdir -p work
-	ghdl -i --std=08 --workdir=work src/*.vhd
-	ghdl -i --std=08 --workdir=work src/tb/*.vhd
+	ghdl -i --std=08 --workdir=work src/common.vhd
+	ghdl -i --std=08 --workdir=work src/reg.vhd
+	ghdl -i --std=08 --workdir=work src/avr_reg.vhd
+	ghdl -i --std=08 --workdir=work src/tb/avr_reg_tb.vhd
+	ghdl -i --std=08 --workdir=work src/mau93.vhd
+	ghdl -i --std=08 --workdir=work src/avr_dau.vhd
+	ghdl -i --std=08 --workdir=work src/dau_tb.vhd
+	ghdl -i --std=08 --workdir=work src/avr_iau.vhd
+	ghdl -i --std=08 --workdir=work src/iau_tb.vhd
 
 alu_tests: import
 	ghdl -m --std=08 --workdir=work alu_tb
