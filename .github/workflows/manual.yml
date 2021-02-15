@@ -54,16 +54,16 @@ jobs:
     - name: Run Reg Tests
       run: |
         make reg_tests | tee reg_test_result.txt
-        cat reg_test_result.txt | rep -c -i "Alert" | grep -q "^0$"
+        cat reg_test_result.txt | grep -c -i "Alert" | grep -q "^0$"
     - name: Run Dau Tests
       run: |
         make dau_tests | tee dau_test_result.txt
-        cat dau_test_result.txt | rep -c -i "Alert" | grep -q "^0$"
+        cat dau_test_result.txt | grep -c -i "Alert" | grep -q "^0$"
     - name: Run Iau Tests
       run: |
         make iau_tests | tee iau_test_result.txt
-        cat iau_test_result.txt | rep -c -i "Alert" | grep -q "^0$"
+        cat iau_test_result.txt | grep -c -i "Alert" | grep -q "^0$"
     - name: Run ALU Tests
       run: |
         make alu_tests | tee alu_test_result.txt
-        cat alu_test_result.txt | rep -c -i "Alert" | grep -q "^0$"
+        cat alu_test_result.txt | grep -c -i "Alert" | grep -q "^0$"
