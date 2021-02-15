@@ -44,7 +44,9 @@ architecture testbench of alu_tb is
 
     constant INPUT_BINS: CovMatrix3Type := (
         GenCross(GenBin(to_integer(unsigned(ALUOp.ADD_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.ADC_Op))), randomWordBin, randomWordBin) --&
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ADC_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.SUB_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.SBC_Op))), randomWordBin, randomWordBin)
     );
 
     shared variable AluCov : CovPType;
@@ -124,6 +126,15 @@ begin
                     expect_int := (expect_int + opa_int + opb_int) mod 256;
                     -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " Adc op incorrect");
+                when ALUOp.SUB_Op =>
+                    expect_int := (opa_int - opb_int) mod 256;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_int = res_int, " Sub op incorrect");
+                when ALUOp.SBC_Op =>
+                    expect_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    expect_int := (opa_int - opb_int - expect_int) mod 256;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_int = res_int, " SBC op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
