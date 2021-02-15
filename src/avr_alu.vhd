@@ -129,22 +129,24 @@ begin
     -- firstly, everything needs to get sent through a ALU
     alu_c: ALU generic map (wordsize => AVR.WORDSIZE)
         port map (
-            ALUOpA,
-            ALUOpB,
-            status_signal(AVR.STATUS_CARRY),
-            fcmd,
-            CinCmd,
-            SCmd,
-            ALUCmd,
-            result_signal,
-            carry,
-            hcarry,
-            over,
-            Zero,
-            Sign
+            ALUOpA   => ALUOpA,
+            ALUOpB   => ALUOpB,
+            Cin      => status_signal(AVR.STATUS_CARRY),
+            FCmd     => fcmd,
+            CinCmd   => CinCmd,
+            SCmd     => SCmd,
+            ALUCmd   => ALUCmd,
+            Result   => result_signal,
+            Cout     => carry,
+            HalfCout => hcarry,
+            Overflow => over,
+            Zero     => Zero,
+            Sign     => Sign
          );
     -- result and status from our computation
     result <= result_signal;
+
+    -- TODO(WHW): This should use constants for indexing ordering, not implicit ordering.
     status_computed <= (
         AVR.STATUS_INT => status_signal(AVR.STATUS_INT),
         AVR.STATUS_TRANS => status_signal(AVR.STATUS_TRANS),
@@ -166,5 +168,5 @@ begin
             status_signal
         );
     -- output the acutal status register
-    status <= status_signal;
+    Status <= status_signal;
 end architecture dataflow;

@@ -37,11 +37,14 @@ architecture testbench of alu_tb is
     signal UUT_Result      : AVR.word_t;
 
 
+    signal prev_Status     : AVR.word_t;
 
-    constant randomWordBin: CovBinType := GenBin(AtLeast => 100, Min => 0, Max => 255, NumBin => 1);
+
+    constant randomWordBin: CovBinType := GenBin(AtLeast => 10000, Min => 0, Max => 255, NumBin => 1);
 
     constant INPUT_BINS: CovMatrix3Type := (
-        GenCross(GenBin(to_integer(unsigned(ALUOp.ADD_Op))), randomWordBin, randomWordBin)
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ADD_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ADC_Op))), randomWordBin, randomWordBin) --&
     );
 
     shared variable AluCov : CovPType;
@@ -84,10 +87,15 @@ begin
             UUT_ALUOpA <= std_logic_vector(to_unsigned(tv_ALUOpA, UUT_ALUOpA'length));
             UUT_ALUOpB <= std_logic_vector(to_unsigned(tv_ALUOpB, UUT_ALUOpB'length));
 
+            -- TODO(WHW): Implement different flag masks for ops
+            UUT_FlagMask <= (others => '1');
+
+            prev_Status <= UUT_Status;
             wait until rising_edge(clk);
 
             AluCov.ICover((tv_ALUOpSelect, tv_ALUOpA, tv_ALUOpB));
         end loop;
+        AluCov.WriteBin;
 
         done <= TRUE;
         wait;
@@ -109,7 +117,13 @@ begin
             case UUT_ALUOpSelect is
                 when ALUOp.ADD_Op =>
                     expect_int := (opa_int + opb_int) mod 256;
+                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " Add op incorrect");
+                when ALUOp.ADC_Op =>
+                    expect_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    expect_int := (expect_int + opa_int + opb_int) mod 256;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_int = res_int, " Adc op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
