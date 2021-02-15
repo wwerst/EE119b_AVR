@@ -31,8 +31,8 @@ package ALUOp is
     -- AVR: ORI
     constant OR_Op : ALUOP_t := FBLOCK & "1110" & '0'; -- R = A | B
     -- BST is implemented using one of two below.
-    constant BCLR_Op : ALUOP_t := FBLOCK & "0000" & '1'; -- Determine update bit by flag mask
-    constant BSET_Op : ALUOP_t := FBLOCK & "1111" & '1';
+    constant BCLR_Op : ALUOP_t := FBLOCK & "0100" & '1'; -- Result = A and not B. Any bit that is 1 in B, will be 0 in result.
+    constant BSET_Op : ALUOP_t := FBLOCK & "1101" & '1'; -- Result = A or not B.
     -- AVR: BLD   . BLD is implemented as R = A xor B. Implementation is B has one bit hot if T should change, else all 0.
     constant EOR_Op : ALUOP_t := FBLOCK & "0110" & '0';
     constant COM_Op : ALUOP_t := FBLOCK & "0011" & '0'; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1

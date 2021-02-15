@@ -53,13 +53,13 @@ jobs:
         /usr/local/lib/ghdl/vendors/compile-osvvm.sh --all
     - name: Run Reg Tests
       run: |
-        make reg_tests
+        make reg_tests | tee "$(tty)" | grep -i "Alert" | grep "^0$"
     - name: Run Dau Tests
       run: |
-        make dau_tests
+        make dau_tests | tee "$(tty)" | grep -i "Alert" | grep "^0$"
     - name: Run Iau Tests
       run: |
-        make iau_tests
+        make iau_tests | tee "$(tty)" | grep -i "Alert" | grep "^0$"
     - name: Run ALU Tests
       run: |
-        make alu_tests
+        make alu_tests | tee "$(tty)" | grep -i "Alert" | grep "^0$"
