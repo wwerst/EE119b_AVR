@@ -46,7 +46,12 @@ architecture testbench of alu_tb is
         GenCross(GenBin(to_integer(unsigned(ALUOp.ADD_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.ADC_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.SUB_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.SBC_Op))), randomWordBin, randomWordBin)
+        GenCross(GenBin(to_integer(unsigned(ALUOp.SBC_Op))), randomWordBin, randomWordBin) &
+
+        GenCross(GenBin(to_integer(unsigned(ALUOp.AND_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.OR_Op))), randomWordBin, randomWordBin)  &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.EOR_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin)  
     );
 
     shared variable AluCov : CovPType;
@@ -109,6 +114,7 @@ begin
         variable opb_int : integer;
         variable res_int : integer;
         variable expect_int : integer;
+        variable expect_slv : AVR.word_t;
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
@@ -135,6 +141,22 @@ begin
                     expect_int := (opa_int - opb_int - expect_int) mod 256;
                     -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " SBC op incorrect");
+                when ALUOp.AND_Op =>
+                    expect_slv := (UUT_ALUOpA and UUT_ALUOpB);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " AND op incorrect");
+                when ALUOp.OR_Op =>
+                    expect_slv := (UUT_ALUOpA or UUT_ALUOpB);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " OR op incorrect");
+                when ALUOp.EOR_Op =>
+                    expect_slv := (UUT_ALUOpA xor UUT_ALUOpB);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " EOR op incorrect");
+                when ALUOp.COM_Op =>
+                    expect_slv := not UUT_ALUOpA;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " COM op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
