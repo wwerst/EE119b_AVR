@@ -101,50 +101,49 @@ architecture dataflow of avr_alu is
         );
     end component;
 
-    signal carry, zero, over, sign, hcarry : std_logic;
+    signal sreg_carry, sreg_zero, sreg_over, sreg_sign, sreg_hcarry : std_logic;
     signal status_signal, status_computed, status_mux: AVR.word_t;
-    signal result_signal: AVR.word_t;
 begin
 
-    ---- firstly, everything needs to get sent through a ALU
-    --alu_c: ALU generic map (wordsize => AVR.WORDSIZE)
-    --    port map (
-    --        ALUOpA,
-    --        ALUOpB,
-    --        status_signal(AVR.STATUS_CARRY),
-    --        FCmd,
-    --        CinCmd,
-    --        SCmd,
-    --        ALUCmd,
-    --        result_signal,
-    --        carry,
-    --        hcarry,
-    --        over,
-    --        Zero,
-    --        Sign
-    --     );
-    ---- result and status from our computation
-    --result <= result_signal;
-    --status_computed <= (
-    --    AVR.STATUS_INT => status_signal(AVR.STATUS_INT),
-    --    AVR.STATUS_TRANS => status_signal(AVR.STATUS_TRANS),
-    --    AVR.STATUS_HCARRY => hcarry,
-    --    AVR.STATUS_SIGN => sign,
-    --    AVR.STATUS_OVER => over,
-    --    AVR.STATUS_NEG => result_signal(result_signal'HIGH),
-    --    AVR.STATUS_ZERO => zero,
-    --    AVR.STATUS_CARRY => carry
-    --);
-    ---- we can set the status register from the ALU output,
-    ---- or the actual computed status.
-    --status_mux <= result_signal when set_status = '1' else status_computed;
-    --status_c: StatusReg generic map (wordsize => AVR.WORDSIZE)
-    --    port map (
-    --        status_mux,
-    --        mask,
-    --        clk,
-    --        status_signal
-    --    );
-    ---- output the acutal status register
-    --status <= status_signal;
+    -- firstly, everything needs to get sent through a ALU
+    alu_c: ALU generic map (wordsize => AVR.WORDSIZE)
+        port map (
+            ALUOpA   => ALUOpA,
+            ALUOpB   => ALUOpB,
+            Cin      => status_signal(AVR.STATUS_CARRY),
+            FCmd     => FCmd,
+            CinCmd   => CinCmd,
+            SCmd     => SCmd,
+            ALUCmd   => ALUCmd,
+            Result   => result_signal,
+            Cout     => carry,
+            HalfCout => hcarry,
+            Overflow => over,
+            Zero     => Zero,
+            Sign     => Sign
+         );
+    -- result and status from our computation
+    result <= result_signal;
+    status_computed <= (
+        AVR.STATUS_INT => status_signal(AVR.STATUS_INT),
+        AVR.STATUS_TRANS => status_signal(AVR.STATUS_TRANS),
+        AVR.STATUS_HCARRY => hcarry,
+        AVR.STATUS_SIGN => sign,
+        AVR.STATUS_OVER => over,
+        AVR.STATUS_NEG => result_signal(result_signal'HIGH),
+        AVR.STATUS_ZERO => zero,
+        AVR.STATUS_CARRY => carry
+    );
+    -- we can set the status register from the ALU output,
+    -- or the actual computed status.
+    status_mux <= result_signal when set_status = '1' else status_computed;
+    status_c: StatusReg generic map (wordsize => AVR.WORDSIZE)
+        port map (
+            status_mux,
+            mask,
+            clk,
+            status_signal
+        );
+    -- output the acutal status register
+    status <= status_signal;
 end architecture dataflow;

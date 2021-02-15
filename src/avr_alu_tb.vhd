@@ -29,6 +29,10 @@ architecture testbench of alu_tb is
     signal Status      : AVR.word_t;
     signal Result      : AVR.word_t;
 
+    constant CLK_PERIOD: time := 1 ms;
+    signal done : boolean := FALSE;
+    signal clk         : std_logic;
+
 begin
     UUT: avr_alu port map (
         clk         => clk        ,
@@ -39,5 +43,24 @@ begin
         Status      => Status     ,
         Result      => Result
     );
+
+    ClockProc: process
+    begin
+        while not done loop
+            clk <= '0';
+            wait for CLK_PERIOD/2;
+            clk <= '1';
+            wait for CLK_PERIOD/2;
+        end loop;
+        wait;
+    end process ClockProc;
+
+    StimulusProc: process
+    begin
+    end process StimulusProc;
+
+    CheckProc: process
+    begin
+    end process CheckProc;
 
 end architecture testbench;

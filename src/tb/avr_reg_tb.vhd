@@ -261,7 +261,7 @@ begin
         SetAlertStopCount(tb_id, ERROR, 50);
         wait until test_initialized = TRUE;
         while not done loop
-            wait until falling_edge(clk);
+            wait until rising_edge(clk);
             dreg_low_idx := to_integer(unsigned(SelOutD))*2 + 24;
             dreg_high_idx := to_integer(unsigned(SelOutD))*2 + 25;
             sreg_a_idx := to_integer(unsigned(SelOutA));
