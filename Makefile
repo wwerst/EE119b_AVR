@@ -11,7 +11,7 @@ import:
 
 alu_tests: import
 	ghdl -m --std=08 --workdir=work alu_tb
-	ghdl -r --std=08 --workdir=work alu_tb
+	ghdl -r --std=08 --workdir=work alu_tb --vcd=avr_alu_tb.vcd
 
 iau_tests: import
 	ghdl -m --std=08 --workdir=work iau_tb

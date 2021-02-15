@@ -6,8 +6,8 @@ use work.ALUConstants;
 package ALUOp is
     -- redefine a few things
     constant FBLOCK : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_FBLOCK;
-    constant ADDER : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_FBLOCK;
-    constant SHIFT : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_FBLOCK;
+    constant ADDER : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_ADDER;
+    constant SHIFT : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_SHIFT;
 
     subtype ALUOP_t is std_logic_vector(6 downto 0);
     --  |   6   5 | 4   3   2   1 | 0    |
@@ -116,7 +116,7 @@ begin
     alucmd <= aluopselect(6 downto 5);
 
     -- if doing a fblock op, use provided fcmd
-    fcmd <= aluopselect(4 downto 1) when aluopselect(6 downto 5)= ALUOp.ADDER else
+    fcmd <= aluopselect(4 downto 1) when aluopselect(6 downto 5)= ALUOp.FBLOCK else
     -- otherwise, only matters if we're doing an add.
     -- pass through second operand if adding, and invert second operand if subtrating
         "1010" when aluopselect(4) = '0' else "0101";
@@ -132,7 +132,7 @@ begin
             ALUOpA,
             ALUOpB,
             status_signal(AVR.STATUS_CARRY),
-            FCmd,
+            fcmd,
             CinCmd,
             SCmd,
             ALUCmd,
