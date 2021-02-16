@@ -39,7 +39,6 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
-
     constant randomWordBin: CovBinType := GenBin(AtLeast => 10000, Min => 0, Max => 255, NumBin => 1);
 
     constant AtMostOneHotBin: CovBinType := GenBin((0, 1, 2, 4, 8, 16, 32, 64, 128));
@@ -55,17 +54,17 @@ architecture testbench of alu_tb is
         GenCross(GenBin(to_integer(unsigned(ALUOp.AND_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.OR_Op))), randomWordBin, randomWordBin)  &
         GenCross(GenBin(to_integer(unsigned(ALUOp.EOR_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin) --&
+        GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin) &
 
         -- Status register manipulation
         --GenCross(GenBin(to_integer(unsigned(ALUOp.BCLR_Op))), randomWordBin, AtMostOneHotBin) &
         --GenCross(GenBin(to_integer(unsigned(ALUOp.BSET_Op))), randomWordBin, AtMostOneHotBin) &
 
         -- Shifter ops
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.ROR_Op))), randomWordBin, randomWordBin) &
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.SWAP_Op))), randomWordBin, randomWordBin) &
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin)
+        GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ROR_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.SWAP_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin)
     );
 
     shared variable AluCov : CovPType;
@@ -122,7 +121,7 @@ begin
         wait;
     end process StimulusProc;
 
-    CheckProc: process
+    CheckResultProc: process
         variable tb_id : integer;
         variable opa_int : integer;
         variable opb_int : integer;
@@ -139,7 +138,7 @@ begin
             case UUT_ALUOpSelect is
                 when ALUOp.ADD_Op =>
                     expect_int := (opa_int + opb_int) mod 256;
-                    -- TODO(WHW): Add flag checking
+                    -- TODO(WHW): Add flag checking on the status register
                     AffirmIf(tb_id, expect_int = res_int, " Add op incorrect");
                 when ALUOp.ADC_Op =>
                     expect_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
@@ -171,11 +170,37 @@ begin
                     expect_slv := not UUT_ALUOpA;
                     -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " COM op incorrect");
+                when ALUOp.LSR_Op =>
+                    expect_slv := '0' & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " LSR op incorrect");
+                when ALUOp.ROR_Op =>
+                    expect_slv := UUT_Status(AVR.STATUS_CARRY) & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " ROR op incorrect");
+                when ALUOp.SWAP_Op =>
+                    expect_slv := UUT_ALUOpA(3 downto 0) & UUT_ALUOpA(7 downto 4);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " SWAP op incorrect");
+                when ALUOp.ASR_Op =>
+                    expect_slv := UUT_ALUOpA(UUT_ALUOpA'high) & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " ASR op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
         end loop;
         wait;
-    end process CheckProc;
+    end process CheckResultProc;
+
+    CheckStatusRegProc: process
+        variable tb_id : integer;
+    begin
+        tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
+        while not done loop
+            wait until falling_edge(clk);
+        end loop;
+        wait;
+    end process CheckStatusRegProc;
 
 end architecture testbench;

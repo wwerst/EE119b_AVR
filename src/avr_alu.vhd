@@ -40,7 +40,7 @@ package ALUOp is
     -- Shifter sub-ops: |   4   3   2 | 1    |
     --                  |  SCMD       |unused|
     constant LSR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_LSR & "00"; -- Logical shift right
-    constant ROR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_ROR & "00"; -- Rotate right through carry
+    constant ROR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_RRC & "00"; -- Rotate right through carry. Note the AVR instruct ROR is RRC.
     constant SWAP_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_SWAP & "00"; -- Swap
     constant ASR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_ASR & "00"; -- R = A[7] concat A >> 1
 
