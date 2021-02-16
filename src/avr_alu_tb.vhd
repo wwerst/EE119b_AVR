@@ -57,8 +57,8 @@ architecture testbench of alu_tb is
         GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin) &
 
         -- Status register manipulation
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.BCLR_Op))), randomWordBin, AtMostOneHotBin) &
-        --GenCross(GenBin(to_integer(unsigned(ALUOp.BSET_Op))), randomWordBin, AtMostOneHotBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.BCLR_Op))), randomWordBin, AtMostOneHotBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.BSET_Op))), randomWordBin, AtMostOneHotBin) &
 
         -- Shifter ops
         GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
@@ -170,6 +170,26 @@ begin
                     expect_slv := not UUT_ALUOpA;
                     -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " COM op incorrect");
+                when ALUOp.BCLR_Op =>
+                    for i in UUT_ALUOpB'range loop
+                        if UUT_ALUOpB(i) = '1' then
+                            expect_slv(i) := '0';
+                        else
+                            expect_slv(i) := UUT_ALUOpA(i);
+                        end if;
+                    end loop;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " BCLR op incorrect");
+                when ALUOp.BSET_Op =>
+                    for i in UUT_ALUOpB'range loop
+                        if UUT_ALUOpB(i) = '1' then
+                            expect_slv(i) := '1';
+                        else
+                            expect_slv(i) := UUT_ALUOpA(i);
+                        end if;
+                    end loop;
+                    -- TODO(WHW): Add flag checking
+                    AffirmIf(tb_id, expect_slv = UUT_Result, " BSET op incorrect");
                 when ALUOp.LSR_Op =>
                     expect_slv := '0' & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
                     -- TODO(WHW): Add flag checking
