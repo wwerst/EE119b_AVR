@@ -55,17 +55,17 @@ architecture testbench of alu_tb is
         GenCross(GenBin(to_integer(unsigned(ALUOp.AND_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.OR_Op))), randomWordBin, randomWordBin)  &
         GenCross(GenBin(to_integer(unsigned(ALUOp.EOR_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin) &
+        GenCross(GenBin(to_integer(unsigned(ALUOp.COM_Op))), randomWordBin, randomWordBin) --&
 
         -- Status register manipulation
-        GenCross(GenBin(to_integer(unsigned(ALUOp.BCLR_Op))), randomWordBin, AtMostOneHotBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.BSET_Op))), randomWordBin, AtMostOneHotBin) &
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.BCLR_Op))), randomWordBin, AtMostOneHotBin) &
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.BSET_Op))), randomWordBin, AtMostOneHotBin) &
 
         -- Shifter ops
-        GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.ROR_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.SWAP_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin)
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.ROR_Op))), randomWordBin, randomWordBin) &
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.SWAP_Op))), randomWordBin, randomWordBin) &
+        --GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin)
     );
 
     shared variable AluCov : CovPType;
