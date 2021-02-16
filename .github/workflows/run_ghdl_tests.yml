@@ -12,7 +12,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  greet:
+  run_tests:
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
 
@@ -29,7 +29,7 @@ jobs:
         cd ghdl
         git checkout v0.37.0
         ./configure --prefix=/usr/local
-        sudo make
+        sudo make -j4
         sudo make install
         cd ..
     - name: GHDL version
