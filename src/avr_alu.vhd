@@ -1,3 +1,34 @@
+---------------------------------------------------------------------
+
+-- AVR ALU
+
+-- This is an implementation of an ALU for the AVR.
+-- I was convinced to make an interesting interface
+-- where only a fixed set of ops are exposed as constants:
+--      ADD, ADC, SUB, AND, OR, BCLR, BSET, XOR, COM, LSR, ROR, SWAP, ASR
+-- We might add more if it makes the control unit nicer.
+
+-- Packages included are:
+--      ALUOp: constants for all the above ALU ops
+
+-- Entities included are:
+--      avr_alu: the ALU itself
+
+-- Revision history:
+--      13 Feb 21   Eric Chen   Create ALU
+--      14 Feb 21   Will Werst  Create new interface
+--      15 Feb 21   Eric Chen   Set up ALU op constants
+--      15 Feb 21   Will Werst  Fix ALU op constants
+---------------------------------------------------------------------
+
+
+--
+-- Package defining constants for all supported ALU operations.
+-- These ALU ops are technically opaque to the user,
+-- but are of course designed to directly "decode"
+-- to the internal control signals.
+--
+
 library ieee;
 use ieee.std_logic_1164.all;
 
@@ -6,8 +37,8 @@ use work.ALUConstants;
 package ALUOp is
     -- redefine a few things
     constant FBLOCK : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_FBLOCK;
-    constant ADDER : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_ADDER;
-    constant SHIFT : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_SHIFT;
+    constant ADDER  : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_ADDER;
+    constant SHIFT  : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_SHIFT;
 
     subtype ALUOP_t is std_logic_vector(6 downto 0);
     --  |   6   5 | 4   3   2   1 | 0    |
@@ -16,12 +47,12 @@ package ALUOp is
     -- adder sub-ops:   |  4    | 3   2 | 1    |
     --                  |add/sub|cincmd |unused|
     -- AVR: ADIW, INC
-    constant ADD_Op : ALUOP_t := ADDER& '0'& ALUConstants.CinCmd_ZERO& "00"; -- R = A + B
-    constant ADC_Op : ALUOP_t := ADDER& '0'& ALUConstants.CinCmd_CIN& "00"; -- R = A + B + SREG.C
+    constant ADD_Op : ALUOP_t := ADDER  & '0' & ALUConstants.CinCmd_ZERO    & "00"; -- R = A + B
+    constant ADC_Op : ALUOP_t := ADDER  & '0' & ALUConstants.CinCmd_CIN     & "00"; -- R = A + B + SREG.C
     -- AVR: CP (compare), CPI (compare with immediate), DEC, NEG, SBCI
-    constant SUB_Op : ALUOP_t := ADDER& '1'& ALUConstants.CinCMD_ONE& "00";
+    constant SUB_Op : ALUOP_t := ADDER  & '1' & ALUConstants.CinCMD_ONE     & "00";
     -- AVR: CPC (compare with carry), SBCI
-    constant SBC_Op : ALUOP_t := ADDER& '1'& ALUConstants.CinCMD_CINBAR& "00";
+    constant SBC_Op : ALUOP_t := ADDER  & '1' & ALUConstants.CinCMD_CINBAR  & "00";
 
 
     -- fblock sub-ops:  |   4   3   2   1          |
@@ -29,23 +60,44 @@ package ALUOp is
     -- AVR: ANDI
     constant AND_Op : ALUOP_t := FBLOCK & "1000" & '0'; -- R = A & B
     -- AVR: ORI
-    constant OR_Op : ALUOP_t := FBLOCK & "1110" & '0'; -- R = A | B
+    constant OR_Op  : ALUOP_t := FBLOCK & "1110" & '0'; -- R = A | B
     -- BST is implemented using one of two below.
-    constant BCLR_Op : ALUOP_t := FBLOCK & "0100" & '1'; -- Result = A and not B. Any bit that is 1 in B, will be 0 in result.
-    constant BSET_Op : ALUOP_t := FBLOCK & "1110" & '1'; -- Result = A or B.
+    constant BCLR_Op: ALUOP_t := FBLOCK & "0100" & '1'; -- Result = A and not B. Any bit that is 1 in B, will be 0 in result.
+    constant BSET_Op: ALUOP_t := FBLOCK & "1110" & '1'; -- Result = A or B.
     -- AVR: BLD   . BLD is implemented as R = A xor B. Implementation is B has one bit hot if T should change, else all 0.
     constant EOR_Op : ALUOP_t := FBLOCK & "0110" & '0';
     constant COM_Op : ALUOP_t := FBLOCK & "0011" & '0'; -- Implemented using FBlock to negate. Note, will need to change the Fblock carry bit output to 1
 
     -- Shifter sub-ops: |   4   3   2 | 1    |
     --                  |  SCMD       |unused|
-    constant LSR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_LSR & "00"; -- Logical shift right
-    constant ROR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_RRC & "00"; -- Rotate right through carry. Note the AVR instruct ROR is RRC.
-    constant SWAP_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_SWAP & "00"; -- Swap
-    constant ASR_Op : ALUOP_t := SHIFT & ALUConstants.SCmd_ASR & "00"; -- R = A[7] concat A >> 1
+    constant LSR_Op : ALUOP_t := SHIFT  & ALUConstants.SCmd_LSR     & "00"; -- Logical shift right
+    constant ROR_Op : ALUOP_t := SHIFT  & ALUConstants.SCmd_RRC     & "00"; -- Rotate right through carry. Note the AVR instruct ROR is RRC.
+    constant SWAP_Op: ALUOP_t := SHIFT  & ALUConstants.SCmd_SWAP    & "00"; -- Swap
+    constant ASR_Op : ALUOP_t := SHIFT  & ALUConstants.SCmd_ASR     & "00"; -- R = A[7] concat A >> 1
 
 end package;
 
+
+--
+-- avr_alu
+--
+-- The ALU itself, including a status register.
+-- It calculates the operation result with combinatorial logic,
+-- and updates the status register (according to flag mask) every clock.
+--
+-- Inputs:
+--      clk     - to update status register on
+--      ALUOpA, ALUOpB  - word sized operands
+--      ALUOpSelect     - operation to perform, see ALUOp package
+--      FlagMask        - if mask is 1, corresponding bit is updated
+--                          in the status register.
+--                          otherwise, the bit is kept constant
+-- Outputs:
+--      Status          - Status register, consisting of
+--                          carry, zero, negative, overflow, sign, half carry, transfer bit (BLD/BST), and interrupt enable/disable
+--                          see AVR package.
+--      Result          - ALU operation result
+--
 
 library ieee;
 use ieee.std_logic_1164.all;

@@ -1,5 +1,29 @@
+---------------------------------------------------------------------
+
+-- Common stuff
+
+-- This file provides convenience things required in multiple other files,
+-- so we stop getting errors about things being defined twice.
+
+-- Packages included are
+--      AVR- general AVR constants
+
+-- Entities included are:
+--      AdderBit- single bit full adder
+
+-- Revision History:
+--      06 Feb 21   Eric Chen   Add word/address size constants
+--                              copy adderbit in from alu
+--      13 Feb 21   Eric Chen   Create status bit constants
+
+---------------------------------------------------------------------
+
 --
+-- Package defining constants and types for the AVR.
+-- This includes the word and address sizes,
+-- and constants for accessing the status bits.
 --
+
 library ieee;
 use ieee.std_logic_1164.all;
 
