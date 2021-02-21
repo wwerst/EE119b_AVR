@@ -1,4 +1,6 @@
 
+STACK_SIZE = $(shell ulimit -s)
+
 .PHONY: all import alu_tests iau_tests dau_tests reg_tests clean
 
 all:
@@ -23,7 +25,7 @@ dau_tests: import
 
 reg_tests: import
 	ghdl -m --std=08 --workdir=work avr_reg_tb
-	ghdl -r --std=08 --workdir=work avr_reg_tb --max-stack-alloc=16384 --vcd=avr_reg_tb.vcd
+	ghdl -r --std=08 --workdir=work avr_reg_tb --max-stack-alloc=$(STACK_SIZE) --vcd=avr_reg_tb.vcd
 
 clean:
 	rm -r work/*.cf
