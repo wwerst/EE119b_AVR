@@ -223,7 +223,8 @@ begin
         variable opb_uint : integer;
         variable opa_sint : integer;
         variable opb_sint : integer;
-        variable exp_res_int : integer;
+        variable exp_res_uint : integer;
+        variable exp_res_sint : integer;
         variable expect_sreg : AVR.word_t;
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
@@ -236,32 +237,48 @@ begin
             expect_sreg := "--------";
             case UUT_ALUOpSelect is
                 when ALUOp.ADD_Op =>
-                    -- Compute expected carry
-                    exp_res_int := opa_uint + opb_uint;
-                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_int >= 256 else '0';
-                    -- Compute expected half carry
-                    exp_res_int := (opa_uint mod 16) + (opb_uint mod 16);
-                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_int >= 16 else '0';
+                    -- Compute C and Z
+                    exp_res_uint := opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 256 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint mod 256 = 0 else '0';
+
+                    -- Compute H
+                    exp_res_uint := (opa_uint mod 16) + (opb_uint mod 16);
+                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_uint >= 16 else '0';
                     
                     -- Compute V = Two's complement overflow
                     expect_sreg(AVR.STATUS_OVER) := '1' when opa_sint + opb_sint > 127 or opa_sint + opb_sint < -128 else '0';
 
                     -- Compute N  = result is negative
-                    exp_res_int := opa_uint + opb_uint;
-                    --expect_sreg(AVR.STATUS_NEG) := ;
+                    exp_res_uint := opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_NEG) := to_unsigned(exp_res_uint, 16)(7); -- Convert to large unsigned number, pick out 7th bit
 
+                    -- Compute S
                     expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when ALUOp.ADC_Op =>
-                    -- Compute expected carry
-                    exp_res_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
-                    exp_res_int := exp_res_int + opa_uint + opb_uint;
-                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_int >= 256 else '0';
+                    -- Compute C and Z
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 256 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint mod 256 = 0 else '0';
 
-                    -- Compute expected half carry
-                    exp_res_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
-                    exp_res_int := exp_res_int + (opa_uint mod 16) + (opb_uint mod 16);
-                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_int >= 16 else '0';
-                    null;
+                    -- Compute H
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + (opa_uint mod 16) + (opb_uint mod 16);
+                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_uint >= 16 else '0';
+
+                    -- Compute V = Two's complement overflow
+                    exp_res_sint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_sint := exp_res_sint + opa_sint + opb_sint;
+                    expect_sreg(AVR.STATUS_OVER) := '1' when exp_res_sint > 127 or exp_res_sint < -128 else '0';
+
+                    -- Compute N  = result is negative
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_NEG) := to_unsigned(exp_res_uint, 16)(7); -- Convert to large unsigned number, pick out 7th bit
+
+                    -- Compute S
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when ALUOp.SUB_Op =>
                 when ALUOp.SBC_Op =>
                 when ALUOp.AND_Op =>
