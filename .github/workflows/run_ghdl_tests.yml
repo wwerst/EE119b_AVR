@@ -22,6 +22,7 @@ jobs:
     - name: Setup GHDL
       run: |
         pwd
+        cat /proc/cpuinfo
         sudo apt update
         sudo apt install -y gnat
         cd ..

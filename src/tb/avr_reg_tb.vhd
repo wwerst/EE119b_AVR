@@ -109,7 +109,7 @@ architecture testbench of avr_reg_tb is
 
     constant NUM_REG_TESTS: integer := 10;
     constant NUM_SREG_VAL_TESTS: integer := 100;
-    constant NUM_DREG_VAL_TESTS: integer := 1000;
+    constant NUM_DREG_VAL_TESTS: integer := 100;
     constant singleRegAddr: CovBinType := GenBin(AtLeast => NUM_REG_TESTS, Min => 0, Max => AVR_REG_CONST.REG_COUNT-1, NumBin => AVR_REG_CONST.REG_COUNT);
     constant doubleRegAddr: CovBinType := GenBin(AtLeast => NUM_REG_TESTS, Min => 0, Max => 3, NumBin => 4);
     constant singleRegData: CovBinType := GenBin(AtLeast => NUM_SREG_VAL_TESTS, Min => 0, Max => 255, NumBin => 1);
