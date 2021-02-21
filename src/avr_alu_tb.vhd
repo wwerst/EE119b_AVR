@@ -25,7 +25,7 @@ architecture testbench of alu_tb is
         );
     end component avr_alu;
 
-    constant CLK_PERIOD: time := 1 ms;
+    constant CLK_PERIOD: time := 1 us;
     signal done : boolean := FALSE;
     signal clk         : std_logic;
 
@@ -39,7 +39,11 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
-    constant randomWordBin: CovBinType := GenBin(AtLeast => 10000, Min => 0, Max => 255, NumBin => 1);
+    signal prev_expected_sreg : AVR.word_t := "--------";
+
+    constant NUM_TESTS_PER_OP : integer := 10000;
+
+    constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
 
     constant AtMostOneHotBin: CovBinType := GenBin((0, 1, 2, 4, 8, 16, 32, 64, 128));
 
@@ -131,7 +135,7 @@ begin
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
-            wait until falling_edge(clk);
+            wait until rising_edge(clk);
             opa_int := to_integer(unsigned(UUT_ALUOpA));
             opb_int := to_integer(unsigned(UUT_ALUOpB));
             res_int := to_integer(unsigned(UUT_Result));
@@ -213,14 +217,41 @@ begin
         wait;
     end process CheckResultProc;
 
-    CheckStatusRegProc: process
+    GenerateExpectedStatusRegProc: process
         variable tb_id : integer;
+        variable opa_int : integer;
+        variable opb_int : integer;
+        variable exp_res_int : integer;
+        variable res_int : integer;
+        variable expect_sreg : AVR.word_t;
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
-            wait until falling_edge(clk);
+            wait until rising_edge(clk);
+            opa_int := to_integer(unsigned(UUT_ALUOpA));
+            opb_int := to_integer(unsigned(UUT_ALUOpB));
+            res_int := to_integer(unsigned(UUT_Result));
+            expect_sreg := "--------";
+            case UUT_ALUOpSelect is
+                when ALUOp.ADD_Op =>
+                    exp_res_int := opa_int + opb_int;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_int >= 256 else '0';
+                    null;
+                when ALUOp.ADC_Op =>
+                    exp_res_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_int := exp_res_int + opa_int + opb_int;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_int >= 256 else '0';
+                    null;
+                when ALUOp.AND_Op =>
+                    expect_sreg(AVR.STATUS_OVER) := '0';
+                when others =>
+                    null;
+            end case;
+            -- Check the previous status register value
+            AffirmIf(tb_id, std_match(UUT_Status, prev_expected_sreg), " Status reg mismatch, expected " & to_string(prev_expected_sreg) & " but observed " & to_string(UUT_Status));
+            prev_expected_sreg <= expect_sreg;
         end loop;
         wait;
-    end process CheckStatusRegProc;
+    end process GenerateExpectedStatusRegProc;
 
 end architecture testbench;
