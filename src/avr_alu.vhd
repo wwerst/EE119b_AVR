@@ -158,6 +158,9 @@ architecture dataflow of avr_alu is
     signal cincmd: std_logic_vector(1 downto 0);
     signal scmd: std_logic_vector(2 downto 0);
     signal ALUCmd: std_logic_vector(1 downto 0);
+
+    signal adderSubCmd: std_logic;
+
     signal carry, zero, over, sign, hcarry : std_logic;
 
     -- These signals map the internal ALU signals to the AVR's interface for status register results
@@ -170,11 +173,13 @@ begin
     -- top 2 bits are alu command
     ALUCmd <= aluopselect(6 downto 5);
 
+    adderSubCmd <= aluopselect(4);
     -- if doing a fblock op, use provided fcmd
     fcmd <= aluopselect(4 downto 1) when ALUCmd = ALUOp.FBLOCK else
     -- otherwise, only matters if we're doing an add.
     -- pass through second operand if adding, and invert second operand if subtrating
-        "1010" when aluopselect(4) = '0' else "0101";
+        "1010" when adderSubCmd = '0' -- Pass through B unchanged
+        else "0101";                  -- Negate B
 
     -- only matters if using adder.
     cincmd <= aluopselect(3 downto 2);
@@ -209,13 +214,13 @@ begin
     neg_avr <= sign;
     sign_avr <= neg_avr xor over_avr;
 
-    hcarry_avr <= hcarry                when ALUCmd = ALUOp.Adder   else
-                  ALUOpA(3)             when ALUCmd = ALUOp.SHIFT   else
-                  '0'                   when ALUCmd = ALUOp.FBLOCK  else
+    hcarry_avr <= hcarry xor adderSubCmd when ALUCmd = ALUOp.Adder   else
+                  ALUOpA(3)              when ALUCmd = ALUOp.SHIFT   else
+                  '0'                    when ALUCmd = ALUOp.FBLOCK  else
                   hcarry;
 
     zero_avr <= zero;
-    carry_avr <= carry                 when ALUCmd = ALUOp.Adder   else
+    carry_avr <= carry xor adderSubCmd when ALUCmd = ALUOp.Adder   else
                  '1'                   when ALUCmd = ALUOp.FBLOCK  else   -- Needed for COM instruction
                  carry;
 
@@ -223,12 +228,12 @@ begin
     status_computed <= (
         status_signal(AVR.STATUS_INT),     -- AVR.STATUS_INT
         status_signal(AVR.STATUS_TRANS),   -- AVR.STATUS_TRANS
-        hcarry_avr,                            -- AVR.STATUS_HCARRY
+        hcarry_avr,                        -- AVR.STATUS_HCARRY
         sign_avr,                          -- AVR.STATUS_SIGN
         over_avr,                          -- AVR.STATUS_OVER
         neg_avr,                           -- AVR.STATUS_NEG   
-        zero_avr,                              -- AVR.STATUS_ZERO  
-        carry_avr                              -- AVR.STATUS_CARRY 
+        zero_avr,                          -- AVR.STATUS_ZERO  
+        carry_avr                          -- AVR.STATUS_CARRY 
     );
     -- we can set the status register from the ALU output,
     -- or the actual computed status.
