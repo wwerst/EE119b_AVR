@@ -108,10 +108,12 @@ architecture testbench of avr_reg_tb is
     end function;
 
     constant NUM_REG_TESTS: integer := 10;
+    constant NUM_SREG_VAL_TESTS: integer := 100;
+    constant NUM_DREG_VAL_TESTS: integer := 1000;
     constant singleRegAddr: CovBinType := GenBin(AtLeast => NUM_REG_TESTS, Min => 0, Max => AVR_REG_CONST.REG_COUNT-1, NumBin => AVR_REG_CONST.REG_COUNT);
     constant doubleRegAddr: CovBinType := GenBin(AtLeast => NUM_REG_TESTS, Min => 0, Max => 3, NumBin => 4);
-    constant singleRegData: CovBinType := GenBin(AtLeast => 1, Min => 0, Max => 255, NumBin => 256);
-    constant doubleRegData: CovBinType := GenBin(AtLeast => 100, Min => 0, Max => 65535, NumBin => 1);
+    constant singleRegData: CovBinType := GenBin(AtLeast => NUM_SREG_VAL_TESTS, Min => 0, Max => 255, NumBin => 1);
+    constant doubleRegData: CovBinType := GenBin(AtLeast => NUM_DREG_VAL_TESTS, Min => 0, Max => 65535, NumBin => 1);
     constant wordMaxBin: CovBinType := GenBin(255);
     constant dwordMaxBin: CovBinType := GenBin(65535);
     -- Vector elements are:
