@@ -159,7 +159,7 @@ architecture dataflow of avr_alu is
     signal scmd: std_logic_vector(2 downto 0);
     signal ALUCmd: std_logic_vector(1 downto 0);
     signal carry, zero, over, sign, hcarry : std_logic;
-    signal over_tmp : std_logic;
+    signal over_avr, sign_avr, neg_avr : std_logic;
     signal status_signal, status_computed, status_mux: AVR.word_t;
     signal result_signal: AVR.word_t;
 begin
@@ -199,16 +199,19 @@ begin
     -- result and status from our computation
     result <= result_signal;
 
-    over_tmp <= over when ALUCmd /= ALUOp.FBLOCK else '0';
+    over_avr <= over when ALUCmd /= ALUOp.FBLOCK else '0';
+
+    neg_avr <= sign;
+    sign_avr <= neg_avr xor over_avr;
 
     -- TODO(WHW): This should use constants for indexing ordering, not implicit ordering.
     status_computed <= (
         status_signal(AVR.STATUS_INT),     -- AVR.STATUS_INT
         status_signal(AVR.STATUS_TRANS),   -- AVR.STATUS_TRANS
         hcarry,                            -- AVR.STATUS_HCARRY
-        sign,                              -- AVR.STATUS_SIGN
-        over_tmp,                          -- AVR.STATUS_OVER
-        result_signal(result_signal'HIGH), -- AVR.STATUS_NEG   
+        sign_avr,                          -- AVR.STATUS_SIGN
+        over_avr,                          -- AVR.STATUS_OVER
+        neg_avr,                           -- AVR.STATUS_NEG   
         zero,                              -- AVR.STATUS_ZERO  
         carry                              -- AVR.STATUS_CARRY 
     );
