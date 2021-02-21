@@ -25,7 +25,7 @@ architecture testbench of alu_tb is
         );
     end component avr_alu;
 
-    constant CLK_PERIOD: time := 1 ms;
+    constant CLK_PERIOD: time := 1 us;
     signal done : boolean := FALSE;
     signal clk         : std_logic;
 
@@ -39,7 +39,11 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
-    constant randomWordBin: CovBinType := GenBin(AtLeast => 10000, Min => 0, Max => 255, NumBin => 1);
+    signal prev_expected_sreg : AVR.word_t := "--------";
+
+    constant NUM_TESTS_PER_OP : integer := 10000;
+
+    constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
 
     constant AtMostOneHotBin: CovBinType := GenBin((0, 1, 2, 4, 8, 16, 32, 64, 128));
 
@@ -131,7 +135,7 @@ begin
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
-            wait until falling_edge(clk);
+            wait until rising_edge(clk);
             opa_int := to_integer(unsigned(UUT_ALUOpA));
             opb_int := to_integer(unsigned(UUT_ALUOpB));
             res_int := to_integer(unsigned(UUT_Result));
@@ -213,14 +217,89 @@ begin
         wait;
     end process CheckResultProc;
 
-    CheckStatusRegProc: process
+    GenerateExpectedStatusRegProc: process
         variable tb_id : integer;
+        variable opa_uint : integer;
+        variable opb_uint : integer;
+        variable opa_sint : integer;
+        variable opb_sint : integer;
+        variable exp_res_uint : integer;
+        variable exp_res_sint : integer;
+        variable expect_sreg : AVR.word_t;
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
-            wait until falling_edge(clk);
+            wait until rising_edge(clk);
+            opa_uint := to_integer(unsigned(UUT_ALUOpA));
+            opb_uint := to_integer(unsigned(UUT_ALUOpB));
+            opa_sint := to_integer(signed(UUT_ALUOpA));
+            opb_sint := to_integer(signed(UUT_ALUOpB));
+            expect_sreg := "--------";
+            case UUT_ALUOpSelect is
+                when ALUOp.ADD_Op =>
+                    -- Compute C and Z
+                    exp_res_uint := opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 256 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint mod 256 = 0 else '0';
+
+                    -- Compute H
+                    exp_res_uint := (opa_uint mod 16) + (opb_uint mod 16);
+                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_uint >= 16 else '0';
+                    
+                    -- Compute V = Two's complement overflow
+                    expect_sreg(AVR.STATUS_OVER) := '1' when opa_sint + opb_sint > 127 or opa_sint + opb_sint < -128 else '0';
+
+                    -- Compute N  = result is negative
+                    exp_res_uint := opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_NEG) := to_unsigned(exp_res_uint, 16)(7); -- Convert to large unsigned number, pick out 7th bit
+
+                    -- Compute S
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
+                when ALUOp.ADC_Op =>
+                    -- Compute C and Z
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 256 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint mod 256 = 0 else '0';
+
+                    -- Compute H
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + (opa_uint mod 16) + (opb_uint mod 16);
+                    expect_sreg(AVR.STATUS_HCARRY) := '1' when exp_res_uint >= 16 else '0';
+
+                    -- Compute V = Two's complement overflow
+                    exp_res_sint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_sint := exp_res_sint + opa_sint + opb_sint;
+                    expect_sreg(AVR.STATUS_OVER) := '1' when exp_res_sint > 127 or exp_res_sint < -128 else '0';
+
+                    -- Compute N  = result is negative
+                    exp_res_uint := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
+                    exp_res_uint := exp_res_uint + opa_uint + opb_uint;
+                    expect_sreg(AVR.STATUS_NEG) := to_unsigned(exp_res_uint, 16)(7); -- Convert to large unsigned number, pick out 7th bit
+
+                    -- Compute S
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
+                when ALUOp.SUB_Op =>
+                when ALUOp.SBC_Op =>
+                when ALUOp.AND_Op =>
+                    expect_sreg(AVR.STATUS_OVER) := '0';
+                when ALUOp.OR_Op =>
+                when ALUOp.EOR_Op =>
+                when ALUOp.COM_Op =>
+                when ALUOp.BCLR_Op =>
+                when ALUOp.BSET_Op =>
+                when ALUOp.LSR_Op =>
+                when ALUOp.ROR_Op =>
+                when ALUOp.SWAP_Op =>
+                when ALUOp.ASR_Op =>
+                when others =>
+                    null;
+            end case;
+            -- Check the previous status register value
+            AffirmIf(tb_id, std_match(UUT_Status, prev_expected_sreg), " Status reg mismatch, expected " & to_string(prev_expected_sreg) & " but observed " & to_string(UUT_Status));
+            prev_expected_sreg <= expect_sreg;
         end loop;
         wait;
-    end process CheckStatusRegProc;
+    end process GenerateExpectedStatusRegProc;
 
 end architecture testbench;
