@@ -1,8 +1,20 @@
--- avr_reg
---
--- Implements AVR register unit
---
--- Author: Will Werst
+---------------------------------------------------------------------
+
+-- AVRReg
+
+-- This is an implementation of a register unit for the AVR
+-- It uses a general register unit, and provides both single and double
+-- word register access, according to the AVR spec. 
+
+-- Entities included are:
+--      AvrReg: Contains implementation of register unit
+
+-- Revision history:
+--      6  Feb 21   Will Werst  Initial implementation
+--      13 Feb 21   Will Werst  Fix issues found in testing
+--      20 Feb 21   Will Werst  Add additional documentation
+--      
+---------------------------------------------------------------------
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -24,10 +36,35 @@ use work.AVR_REG_CONST;
 
 
 
--- AvrReg
--- Implements the AvrReg unit
 --
+--  AvrReg
 --
+--  This is an implementation of a register unit for the AVR. It implements
+--  single register access for r0-r31, and double width register access for the
+--  double width groupings of r24-r31 (e.g. r25:r24, r27:r26, etc.)
+--
+--  Inputs:
+--    clk           - the system clock
+--    
+--    EnableInS   - Latch single register input on next clock
+--    DataInS     - Data for single register input
+--    SelInS      - Single register input address to load to
+--    
+--    EnableInD   - Latch double register input on next clock
+--    DataInD     - Data for double register input
+--    SelInD      - Select the address to load double register to. Range from 0 to 3.
+--                  Note that single register writes will overwrite double register writes
+--                  if both target the same address.
+--  Outputs:
+--    SelOutA     - Single reg A address select
+--    DataOutA    - Word that SelOutA points to.
+--    
+--    SelOutB     - Single reg B address select
+--    DataOutB    - Word that SelOutB points to.
+--    
+--    SelOutD     - Double reg D address select
+--    DataOutD    - Double word that SelOutD points to.
+--    
 
 entity AvrReg is
     port(
