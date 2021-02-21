@@ -14,6 +14,7 @@
 --      15 Feb 21   Eric Chen   Use component declaration
 --                              Comments and formatting
 --      17 Feb 21   Eric Chen   Add non-random tests
+--      20 Feb 21   Eric Chen   Set larger AtLeast on bins
 
 ---------------------------------------------------------------------
 
@@ -138,31 +139,35 @@ architecture testbench of dau_tb is
     constant BINS           : CovMatrix4Type := (
         -- all registers can be accessed, incremented, or decremented
         GenCross(
-            GenBin(DAU.SRC_X) & GenBin(DAU.SRC_Y) & GenBin(DAU.SRC_Z),
-            unsignedBin(PDB),
-            GenBin(DAU.OFF_ZERO) & GenBin(DAU.OFF_ONE) & GenBin(DAU.OFF_NEGONE),
-            unsignedBin(array_off)
+            AtLeast => 50,
+            Bin1 => GenBin(DAU.SRC_X) & GenBin(DAU.SRC_Y) & GenBin(DAU.SRC_Z),
+            Bin2 => unsignedBin(PDB),
+            Bin3 => GenBin(DAU.OFF_ZERO) & GenBin(DAU.OFF_ONE) & GenBin(DAU.OFF_NEGONE),
+            Bin4 => unsignedBin(array_off)
         ) &
         -- Y and Z registers additionally support array offsets
         GenCross(
-            GenBin(DAU.SRC_Y) & GenBin(DAU.SRC_Z),
-            unsignedBin(PDB),
-            GenBin(DAU.OFF_ARRAY),
-            unsignedBin(array_off)
+            AtLeast => 50,
+            Bin1 => GenBin(DAU.SRC_Y) & GenBin(DAU.SRC_Z),
+            Bin2 => unsignedBin(PDB),
+            Bin3 => GenBin(DAU.OFF_ARRAY),
+            Bin4 => unsignedBin(array_off)
         ) &
         -- stack supports push and pop
         GenCross(
-            GenBin(DAU.SRC_STACK),
-            unsignedBin(PDB),
-            GenBin(DAU.OFF_ONE) & GenBin(DAU.OFF_NEGONE),
-            unsignedBin(array_off)
+            AtLeast => 50,
+            Bin1 => GenBin(DAU.SRC_STACK),
+            Bin2 => unsignedBin(PDB),
+            Bin3 => GenBin(DAU.OFF_ONE) & GenBin(DAU.OFF_NEGONE),
+            Bin4 => unsignedBin(array_off)
         ) &
         -- PDB can only be used directly
         GenCross(
-            GenBin(DAU.SRC_PDB),
-            unsignedBin(PDB),
-            GenBin(DAU.OFF_ZERO),
-            unsignedBin(array_off)
+            AtLeast => 50,
+            Bin1 => GenBin(DAU.SRC_PDB),
+            Bin2 => unsignedBin(PDB),
+            Bin3 => GenBin(DAU.OFF_ZERO),
+            Bin4 => unsignedBin(array_off)
         )
     );
 begin
