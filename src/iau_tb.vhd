@@ -16,6 +16,7 @@
 --                              Comments and formatting
 --      17 Feb 21   Eric Chen   take far too long to figure out vhdl procedures
 --                              Add non-random tests
+--      20 Feb 21   Eric Chen   Set larger AtLeast on bins
 
 ---------------------------------------------------------------------
 
@@ -161,14 +162,14 @@ architecture testbench of iau_tb is
     constant srcBins: CovBinType := GenBin(0,IAU.SOURCES-1);
     -- Test combinations of sources, offsets, and values of the offset
     constant BINS: CovMatrix3Type := (
-        GenCross(srcBins, GenBin(IAU.OFF_ZERO)  , GenBin(0)         ) &
-        GenCross(srcBins, GenBin(IAU.OFF_ONE)   , GenBin(1)         ) &
-        GenCross(srcBins, GenBin(IAU.OFF_BRANCH), signedBin(branch) ) &
-        GenCross(srcBins, GenBin(IAU.OFF_JUMP)  , signedBin(jump)   ) &
-        GenCross(srcBins, GenBin(IAU.OFF_PDB)   , unsignedBin(pdb)  ) &
-        GenCross(srcBins, GenBin(IAU.OFF_Z)     , unsignedBin(z)    ) &
-        GenCross(srcBins, GenBin(IAU.OFF_DDBLO) , unsignedBin(ddb)  ) &
-        GenCross(srcBins, GenBin(IAU.OFF_DDBHI) , unsignedBin(ddb)  )
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ZERO)  , Bin3 => GenBin(0)         ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ONE)   , Bin3 => GenBin(1)         ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_BRANCH), Bin3 => signedBin(branch) ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_JUMP)  , Bin3 => signedBin(jump)   ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_PDB)   , Bin3 => unsignedBin(pdb)  ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_Z)     , Bin3 => unsignedBin(z)    ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBLO) , Bin3 => unsignedBin(ddb)  ) &
+        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBHI) , Bin3 => unsignedBin(ddb)  )
     );
 begin
     clock_p: process begin
