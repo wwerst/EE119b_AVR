@@ -212,7 +212,6 @@ begin
         -- Synchronize clock at beginning of test
         wait until rising_edge(clk);
 
-        -- TODO(WHW): Clear all the registers to begin with, and load the same to the scoreboard.
         for reg_idx in 0 to AVR_REG_CONST.REG_COUNT-1 loop
             SelInS <= std_logic_vector(to_unsigned(reg_idx, SelInS'length));
             EnableInS <= '1';
@@ -231,10 +230,6 @@ begin
             EnableInD <= to_std_logic(EnableInD_tv);
             DataInD <= std_logic_vector(to_unsigned(DataInD_tv, DataInD'length));
             SelInD <= std_logic_vector(to_unsigned(SelInD_tv, SelInD'length));
-
-            --RegScoreBoard.Push(to_string(SelInS_tv), DataInS);
-            --RegScoreBoard.Push(to_string(SelInD_tv*2 + 0 + 24), DataInD(AVR.WORDSIZE-1 downto 0));
-            --RegScoreBoard.Push(to_string(SelInD_tv*2 + 1 + 24), DataInD(2*AVR.WORDSIZE-1 downto AVR.WORDSIZE));
 
             (SelOutA_tv, SelOutB_tv, SelOutD_tv) := OutputRegCov.GetRandPoint;
             SelOutA <= std_logic_vector(to_unsigned(SelOutA_tv, SelOutA'length));
@@ -288,10 +283,6 @@ begin
             CheckTestResult(tb_id, dreg_high_idx,  DataOutD(2*AVR.WORDSIZE-1 downto AVR.WORDSIZE));
             CheckTestResult(tb_id, sreg_a_idx, DataOutA);
             CheckTestResult(tb_id, sreg_b_idx, DataOutB);
-            --RegScoreBoard.Check(to_string(dreg_low_idx), DataOutD(AVR.WORDSIZE-1 downto 0));
-            --RegScoreBoard.Check(to_string(dreg_high_idx), DataOutD(2*AVR.WORDSIZE-1 downto AVR.WORDSIZE));
-            --RegScoreBoard.Check(to_string(sreg_a_idx), DataOutA);
-            --RegScoreBoard.Check(to_string(sreg_b_idx), DataOutB);
         end loop;
     end process CheckProc;
 
