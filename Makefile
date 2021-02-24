@@ -9,7 +9,9 @@ all:
 import:
 	mkdir -p work
 	ghdl -i --std=08 --workdir=work src/*.vhd
-	ghdl -i --std=08 --workdir=work src/tb/*.vhd
+	ghdl -i --std=08 --workdir=work src/alu/*.vhd
+	ghdl -i --std=08 --workdir=work src/memunit/*.vhd
+	ghdl -i --std=08 --workdir=work src/registers/*.vhd
 
 alu_tests: import
 	ghdl -m --std=08 --workdir=work alu_tb
@@ -17,11 +19,11 @@ alu_tests: import
 
 iau_tests: import
 	ghdl -m --std=08 --workdir=work iau_tb
-	ghdl -r --std=08 --workdir=work iau_tb
+	ghdl -r --std=08 --workdir=work iau_tb --vcd=avr_iau_tb.vcd
 
 dau_tests: import
 	ghdl -m --std=08 --workdir=work dau_tb
-	ghdl -r --std=08 --workdir=work dau_tb
+	ghdl -r --std=08 --workdir=work dau_tb --vcd=avr_iau_tb.vcd
 
 reg_tests: import
 	ghdl -m --std=08 --workdir=work avr_reg_tb
@@ -29,3 +31,4 @@ reg_tests: import
 
 clean:
 	rm -r work/*.cf
+	rm *.vcd

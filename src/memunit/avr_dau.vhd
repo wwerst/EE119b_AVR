@@ -23,6 +23,7 @@
 --      12 Feb 21   Eric Chen   set up DAU
 --      15 Feb 21   Eric Chen   Use component declarations.
 --                              Do some formatting.
+--      22 Feb 21   Eric Chen   Merge register inputs
 
 ---------------------------------------------------------------------
 
@@ -38,14 +39,12 @@ use ieee.std_logic_1164.all;
 package DAU is
 
     -- sources constants
-    constant SOURCES: natural := 5;
+    constant SOURCES: natural := 3;
     subtype source_t is natural range SOURCES-1 downto 0;
 
     constant SRC_PDB: source_t := 0;
     constant SRC_STACK: source_t := 1;
-    constant SRC_X: source_t := 2;
-    constant SRC_Y: source_t := 3;
-    constant SRC_Z: source_t := 4;
+    constant SRC_REG: source_t := 2;
 
     -- offsets constants
     constant OFFSETS: natural := 4;
@@ -74,7 +73,7 @@ end package;
 --      clk         - to update stack pointer on
 --      SrcSel      - source to use, see DAU package for options
 --      PDB         - program data bus value, to use as source
---      X,Y,Z       - registers that can be used as sources
+--      reg         - register bus that can be used as a source
 --      OffsetSel   - offset to use, see DAU package for options
 --      array_off   - 6 bit unsigned offset for array addressing
 --
@@ -99,7 +98,7 @@ entity  AvrDau  is
         clk         : in  std_logic;
         SrcSel      : in  DAU.source_t;
         PDB         : in  std_logic_vector(15 downto 0);
-        X, Y, Z     : in  std_logic_vector(15 downto 0);
+        reg         : in  std_logic_vector(15 downto 0);
         OffsetSel   : in  DAU.offset_t;
         array_off   : in  std_logic_vector(5 downto 0);
         Address     : out AVR.addr_t;
@@ -120,8 +119,8 @@ architecture  dataflow  of  AvrDau  is
 
         port(
             AddrSrc    : in   std_logic_vector(srccnt * wordsize - 1 downto 0);
-        SrcSel     : in   integer  range srccnt - 1 downto 0;
-        AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
+            SrcSel     : in   integer  range srccnt - 1 downto 0;
+            AddrOff    : in   std_logic_vector(offsetcnt * wordsize - 1 downto 0);
             OffsetSel  : in   integer  range offsetcnt - 1 downto 0;
             IncDecSel  : in   std_logic;
             IncDecBit  : in   integer  range maxIncDecBit downto 0;
@@ -150,7 +149,7 @@ begin
     -- zero extend the unsigned offset
     array_ext   <= (array_off'RANGE => array_off, others => '0');
     -- sources and offsets
-    sources     <= (Z & Y & X & stack& pdb);
+    sources     <= (reg & stack& pdb);
     offsets <= (
        array_ext &
        NEGONE &
@@ -186,8 +185,8 @@ begin
     Address <= 
         computed_addr when 
             (srcSel = DAU.SRC_STACK and offsetSel = DAU.OFF_ONE) or 
-            ((srcSel = DAU.SRC_Y or srcSel = DAU.SRC_Z) and offsetSel = DAU.OFF_ARRAY) or 
-            (srcSel /= DAU.SRC_Stack and offsetSel = DAU.OFF_NEGONE) 
+            (srcSel = DAU.SRC_REG and offsetSel = DAU.OFF_ARRAY) or 
+            (srcSel = DAU.SRC_REG and offsetSel = DAU.OFF_NEGONE) 
         else source_addr;
 
     -- if doing stack access, update stack pointer on clock
