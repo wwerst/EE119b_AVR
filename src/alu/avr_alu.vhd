@@ -224,16 +224,15 @@ begin
                  '1'                   when ALUCmd = ALUOp.FBLOCK  else   -- Needed for COM instruction
                  carry;
 
-    -- TODO(WHW): This should use constants for indexing ordering, not implicit ordering.
     status_computed <= (
-        status_signal(AVR.STATUS_INT),     -- AVR.STATUS_INT
-        status_signal(AVR.STATUS_TRANS),   -- AVR.STATUS_TRANS
-        hcarry_avr,                        -- AVR.STATUS_HCARRY
-        sign_avr,                          -- AVR.STATUS_SIGN
-        over_avr,                          -- AVR.STATUS_OVER
-        neg_avr,                           -- AVR.STATUS_NEG   
-        zero_avr,                          -- AVR.STATUS_ZERO  
-        carry_avr                          -- AVR.STATUS_CARRY 
+        AVR.STATUS_INT => status_signal(AVR.STATUS_INT),     -- AVR.STATUS_INT
+        AVR.STATUS_TRANS => status_signal(AVR.STATUS_TRANS),   -- AVR.STATUS_TRANS
+        AVR.STATUS_HCARRY => hcarry_avr,                        -- AVR.STATUS_HCARRY
+        AVR.STATUS_SIGN   => sign_avr,                          -- AVR.STATUS_SIGN
+        AVR.STATUS_OVER   => over_avr,                          -- AVR.STATUS_OVER
+        AVR.STATUS_NEG    => neg_avr,                           -- AVR.STATUS_NEG   
+        AVR.STATUS_ZERO   => zero_avr,                          -- AVR.STATUS_ZERO  
+        AVR.STATUS_CARRY  => carry_avr                          -- AVR.STATUS_CARRY 
     );
     -- we can set the status register from the ALU output,
     -- or the actual computed status.

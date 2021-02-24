@@ -1,3 +1,21 @@
+---------------------------------------------------------------------
+
+-- Avr Alu Testbench
+
+-- This implements testing for the Avr ALU unit.
+-- Testing is implemented using OSVVM. These tests are ran in the
+-- automatic build system using Github Actions, using GHDL. See
+-- the Github Actions script for the documentation for the latest
+-- install process for GHDL.
+--
+-- Revision history:
+--      6  Feb 21   Will Werst  Initial implementation
+--      15 Feb 21   Will Werst  Add more testing for results
+--      23 Feb 21   Will Werst  Finish status register and flag mask testing
+--      
+---------------------------------------------------------------------
+
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -39,6 +57,8 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
+    -- For debugging, or on a slow computer, change this to 1000 or 10000 instructions.
+    -- For final testing, run at least 100_000 tests per op.
     constant NUM_TESTS_PER_OP : integer := 10000;
 
     constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
@@ -155,37 +175,29 @@ begin
             case UUT_ALUOpSelect is
                 when ALUOp.ADD_Op =>
                     expect_int := (opa_int + opb_int) mod 256;
-                    -- TODO(WHW): Add flag checking on the status register
                     AffirmIf(tb_id, expect_int = res_int, " Add op incorrect");
                 when ALUOp.ADC_Op =>
                     expect_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
                     expect_int := (expect_int + opa_int + opb_int) mod 256;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " Adc op incorrect");
                 when ALUOp.SUB_Op =>
                     expect_int := (opa_int - opb_int) mod 256;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " Sub op incorrect");
                 when ALUOp.SBC_Op =>
                     expect_int := 1 when UUT_Status(AVR.STATUS_CARRY) = '1' else 0;
                     expect_int := (opa_int - opb_int - expect_int) mod 256;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_int = res_int, " SBC op incorrect");
                 when ALUOp.AND_Op =>
                     expect_slv := (UUT_ALUOpA and UUT_ALUOpB);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " AND op incorrect");
                 when ALUOp.OR_Op =>
                     expect_slv := (UUT_ALUOpA or UUT_ALUOpB);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " OR op incorrect");
                 when ALUOp.EOR_Op =>
                     expect_slv := (UUT_ALUOpA xor UUT_ALUOpB);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " EOR op incorrect");
                 when ALUOp.COM_Op =>
                     expect_slv := not UUT_ALUOpA;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " COM op incorrect");
                 when ALUOp.BCLR_Op =>
                     for i in UUT_ALUOpB'range loop
@@ -195,7 +207,6 @@ begin
                             expect_slv(i) := UUT_ALUOpA(i);
                         end if;
                     end loop;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " BCLR op incorrect");
                 when ALUOp.BSET_Op =>
                     for i in UUT_ALUOpB'range loop
@@ -205,23 +216,18 @@ begin
                             expect_slv(i) := UUT_ALUOpA(i);
                         end if;
                     end loop;
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " BSET op incorrect");
                 when ALUOp.LSR_Op =>
                     expect_slv := '0' & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " LSR op incorrect");
                 when ALUOp.ROR_Op =>
                     expect_slv := UUT_Status(AVR.STATUS_CARRY) & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " ROR op incorrect");
                 when ALUOp.SWAP_Op =>
                     expect_slv := UUT_ALUOpA(3 downto 0) & UUT_ALUOpA(7 downto 4);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " SWAP op incorrect");
                 when ALUOp.ASR_Op =>
                     expect_slv := UUT_ALUOpA(UUT_ALUOpA'high) & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
-                    -- TODO(WHW): Add flag checking
                     AffirmIf(tb_id, expect_slv = UUT_Result, " ASR op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
