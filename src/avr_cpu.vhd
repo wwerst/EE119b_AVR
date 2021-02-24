@@ -223,22 +223,22 @@ begin
     );
 
 
-    DecodeProc: process(CurState, decode_signals) -- Comb process
+    DecodeProc: process -- process(CurState, decode_signals) -- Comb process
     begin
         -- Assigns to:
         --  All control signals
-        if std_match(ADIW) then
-            if first_clock then
-                ADD r1, r2
-            elsif second_clock
-                ADC r1, r2
-            end if;
-            controls <= something;
-        end if;
+        --if std_match(ADIW) then
+        --    if first_clock then
+        --        ADD r1, r2
+        --    elsif second_clock
+        --        ADC r1, r2
+        --    end if;
+        --    controls <= something;
+        --end if;
     end process DecodeProc;
 
 
-    ALUMuxProc: process(CurState, decode_signals) -- Maybe 
+    ALUMuxProc: process -- process(CurState, decode_signals) -- Maybe 
     begin
         -- Assigns to:
         --  ALUOpA
@@ -247,7 +247,7 @@ begin
     end process ALUMuxProc;
 
 
-    NextStateProc: process(CurState, decode_signals)
+    NextStateProc: process -- process(CurState, decode_signals)
     begin
         -- Assigns to:
         --  NextState
@@ -258,7 +258,7 @@ begin
     StoreStateProc: process(clock)
     begin
         if (rising_edge(clock)) then
-            CurState <= NextState;
+            --CurState <= NextState;
         end if;
     end process StoreStateProc;
 
