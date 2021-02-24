@@ -39,8 +39,6 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
-    signal prev_expected_sreg : AVR.word_t := "--------";
-
     constant NUM_TESTS_PER_OP : integer := 10000;
 
     constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
@@ -73,6 +71,8 @@ architecture testbench of alu_tb is
 
     shared variable AluCov : CovPType;
 
+    shared variable FlagCov : CovPType;
+
 begin
     UUT: avr_alu port map (
         clk         => clk            ,
@@ -99,27 +99,40 @@ begin
         variable tv_ALUOpSelect : integer;
         variable tv_ALUOpA      : integer;
         variable tv_ALUOpB      : integer;
+        variable tv_FlagMask    : integer;
     begin
         SetAlertLogName("ALU_Test1");
 
         AluCov.AddBins(INPUT_BINS);
+        FlagCov.AddBins(GenBin(AtLeast => 100, Min => 0, Max => 255, NumBin => 256));
 
-        while not (AluCov.IsCovered) loop
+        -- Reset status register at startup
+        UUT_ALUOpA <= (others => '0');
+        UUT_ALUOpB <= (others => '1');
+        UUT_ALUOpSelect <= ALUOp.BCLR_Op;
+        UUT_FlagMask <= (others => '1');
+        wait until rising_edge(clk);
+        wait until rising_edge(clk);
+
+        while not (AluCov.IsCovered and FlagCov.IsCovered) loop
             (tv_ALUOpSelect, tv_ALUOpA, tv_ALUOpB) := AluCov.GetRandPoint;
 
             UUT_ALUOpSelect <= std_logic_vector(to_unsigned(tv_ALUOpSelect, UUT_ALUOpSelect'length));
             UUT_ALUOpA <= std_logic_vector(to_unsigned(tv_ALUOpA, UUT_ALUOpA'length));
             UUT_ALUOpB <= std_logic_vector(to_unsigned(tv_ALUOpB, UUT_ALUOpB'length));
 
-            -- TODO(WHW): Implement different flag masks for ops
-            UUT_FlagMask <= (others => '1');
+            -- Generate random flag mask
+            tv_FlagMask := FlagCov.GetRandPoint;
+            UUT_FlagMask <= std_logic_vector(to_unsigned(tv_ALUOpA, UUT_ALUOpA'length));
 
             prev_Status <= UUT_Status;
             wait until rising_edge(clk);
 
             AluCov.ICover((tv_ALUOpSelect, tv_ALUOpA, tv_ALUOpB));
+            FlagCov.ICover(tv_FlagMask);
         end loop;
         AluCov.WriteBin;
+        FlagCov.WriteBin;
 
         done <= TRUE;
         wait;
@@ -226,6 +239,9 @@ begin
         variable exp_res_uint : integer;
         variable exp_res_sint : integer;
         variable expect_sreg : AVR.word_t;
+        variable prev_expected_sreg : AVR.word_t := "--------";
+        variable prev_opa : AVR.word_t := "--------";
+        variable prev_opb : AVR.word_t := "--------";
     begin
         tb_id := GetAlertLogID("AVR_ALU", ALERTLOG_BASE_ID);
         while not done loop
@@ -350,20 +366,62 @@ begin
                     -- Compute S
                     expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when ALUOp.BCLR_Op =>
+                    for i in UUT_ALUOpB'range loop
+                        if UUT_ALUOpB(i) = '1' then
+                            expect_sreg(i) := '0';
+                        else
+                            expect_sreg(i) := UUT_ALUOpA(i);
+                        end if;
+                    end loop;
                 when ALUOp.BSET_Op =>
+                    for i in UUT_ALUOpB'range loop
+                        if UUT_ALUOpB(i) = '1' then
+                            expect_sreg(i) := '1';
+                        else
+                            expect_sreg(i) := UUT_ALUOpA(i);
+                        end if;
+                    end loop;
                 when ALUOp.LSR_Op =>
+                    expect_sreg(AVR.STATUS_NEG) := '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when std_match("0000000-", UUT_ALUOpA) else '0';
+                    expect_sreg(AVR.STATUS_CARRY) := UUT_ALUOpA(0);
+
+                    expect_sreg(AVR.STATUS_OVER) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_CARRY);
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when ALUOp.ROR_Op =>
+                    expect_sreg(AVR.STATUS_NEG) := UUT_Result(AVR.WORDSIZE-1);
+                    -- UUT_Result is checked separately
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when UUT_Result = "00000000" else '0';
+                    expect_sreg(AVR.STATUS_CARRY) := UUT_ALUOpA(0);
+
+                    expect_sreg(AVR.STATUS_OVER) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_CARRY);
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when ALUOp.SWAP_Op =>
                 when ALUOp.ASR_Op =>
+                    expect_sreg(AVR.STATUS_NEG) := UUT_Result(AVR.WORDSIZE-1);
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when std_match("0000000-", UUT_ALUOpA) else '0';
+                    expect_sreg(AVR.STATUS_CARRY) := UUT_ALUOpA(0);
+
+                    expect_sreg(AVR.STATUS_OVER) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_CARRY);
+                    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
                 when others =>
-                    null;
+                    AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
-            --if  expect_sreg(AVR.STATUS_NEG) /= '-' and expect_sreg(AVR.STATUS_OVER) /= '-' then
-            --    expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
-            --end if;
+
+            for i in expect_sreg'range loop
+                if UUT_FlagMask(i) = '1' then
+                    null;
+                    -- leave unchanged
+                else
+                    expect_sreg(i) := UUT_Status(i);
+                end if;
+            end loop;
             -- Check the previous status register value
-            AffirmIf(tb_id, std_match(UUT_Status, prev_expected_sreg), " Status reg mismatch, expected " & to_string(prev_expected_sreg) & " but observed " & to_string(UUT_Status));
-            prev_expected_sreg <= expect_sreg;
+            AffirmIf(tb_id, std_match(UUT_Status, prev_expected_sreg), " Status reg mismatch, expected " & to_string(prev_expected_sreg) & " but observed " & to_string(UUT_Status)
+                & " OpA=" & to_string(prev_opa) & " OpB=" & to_string(prev_opb));
+            prev_expected_sreg := expect_sreg;
+            prev_opa := UUT_ALUOpA;
+            prev_opb := UUT_ALUOpB;
         end loop;
         wait;
     end process GenerateExpectedStatusRegProc;
