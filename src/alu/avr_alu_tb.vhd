@@ -1,3 +1,21 @@
+---------------------------------------------------------------------
+
+-- Avr Alu Testbench
+
+-- This implements testing for the Avr ALU unit.
+-- Testing is implemented using OSVVM. These tests are ran in the
+-- automatic build system using Github Actions, using GHDL. See
+-- the Github Actions script for the documentation for the latest
+-- install process for GHDL.
+--
+-- Revision history:
+--      6  Feb 21   Will Werst  Initial implementation
+--      15 Feb 21   Will Werst  Add more testing for results
+--      23 Feb 21   Will Werst  Finish status register and flag mask testing
+--      
+---------------------------------------------------------------------
+
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -39,7 +57,9 @@ architecture testbench of alu_tb is
 
     signal prev_Status     : AVR.word_t;
 
-    constant NUM_TESTS_PER_OP : integer := 10000;
+    -- For debugging, or on a slow computer, change this to 1000 or 10000 instructions.
+    -- For final testing, run at least 100_000 tests per op.
+    constant NUM_TESTS_PER_OP : integer := 100000;
 
     constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
 
