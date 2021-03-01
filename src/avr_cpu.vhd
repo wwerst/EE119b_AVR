@@ -213,13 +213,55 @@ begin
     );
 
     alu_u: avr_alu port map (
-        clock,
-        alu_opA,
-        alu_opB,
-        alu_ctrl.OpSelect,
-        alu_ctrl.FlagMask,
-        alu_status,
-        alu_result
+       clk         => clock,
+       ALUOpA      => alu_opA,
+       ALUOpB      => alu_opB,
+       ALUOpSelect => alu_ctrl.OpSelect,
+       FlagMask    => alu_ctrl.FlagMask,
+       Status      => alu_status,
+       Result      => alu_result
     );
+
+
+    DecodeProc: process -- process(CurState, decode_signals) -- Comb process
+    begin
+        -- Assigns to:
+        --  All control signals
+        --if std_match(ADIW) then
+        --    if first_clock then
+        --        ADD r1, r2
+        --    elsif second_clock
+        --        ADC r1, r2
+        --    end if;
+        --    controls <= something;
+        --end if;
+    end process DecodeProc;
+
+
+    ALUMuxProc: process -- process(CurState, decode_signals) -- Maybe 
+    begin
+        -- Assigns to:
+        --  ALUOpA
+        --  ALUOpB
+        
+    end process ALUMuxProc;
+
+
+    NextStateProc: process -- process(CurState, decode_signals)
+    begin
+        -- Assigns to:
+        --  NextState
+        -- Combinationally compute NextState
+    end process NextStateProc;
+
+
+    StoreStateProc: process(clock)
+    begin
+        if (rising_edge(clock)) then
+            --CurState <= NextState;
+        end if;
+    end process StoreStateProc;
+
+
 
 end architecture;
