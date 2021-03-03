@@ -60,6 +60,8 @@ package opcodes is
 
 --  Load and Store Opcodes
 
+   constant OpLD     :  opcode_word := "1001000---------";   -- Loads, including LDS, excluding LDI,LDD
+   constant OpST     :  opcode_word := "1001001---------";   -- stores
    constant OpELPM   :  opcode_word := "1001010111011000";   -- ELPM
    constant OpELPMZ  :  opcode_word := "1001000-----0110";   -- ELPM Rd, Z
    constant OpELPMZI :  opcode_word := "1001000-----0111";   -- ELPM Rd, Z+

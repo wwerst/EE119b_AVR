@@ -29,6 +29,10 @@ reg_tests: import
 	ghdl -m --std=08 --workdir=work avr_reg_tb
 	ghdl -r --std=08 --workdir=work avr_reg_tb --max-stack-alloc=$(STACK_SIZE) --vcd=avr_reg_tb.vcd
 
+cpu_tests: import
+	ghdl -m --std=08 --workdir=work avr_cpu_tb
+	ghdl -r --std=08 --workdir=work avr_cpu_tb --vcd=avr_cpu_tb.vcd
+
 clean:
 	rm -r work/*.cf
 	rm *.vcd
