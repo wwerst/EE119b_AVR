@@ -465,7 +465,7 @@ test_sub_of_zero:
 test_sub_underflow_of_zero:
     ldi r16, $00        ; 
     ldi r17, $05        ;
-    SUB r16, r17        ; 0 - 5 = -5
+    SUB r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
     IN  r18, SREG_ADDR  ; Read the Status register
     STS $0100, r18      ;W 35 0100
     STS $0100, r16      ;W FB 0100
