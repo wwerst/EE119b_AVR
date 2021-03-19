@@ -13,4 +13,4 @@ The original Github Actions test run is here: https://github.com/wwerst/EE119b_A
 - Makefile: Commands for running testing using GHDL+OSVVM
 - Readme: General repo readme stuff
 - .github/workflows/run_ghdl_tests.yml: Runs automated testing
-- Test_results.pdf: Printout of the github actions testing
+- hw3_test_coverage/\*: Printout of the github actions testing
