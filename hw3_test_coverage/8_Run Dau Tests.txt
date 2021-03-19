@@ -1,0 +1,14 @@
+2021-03-19T09:25:17.5367019Z ##[group]Run make dau_tests | tee dau_test_result.txt
+2021-03-19T09:25:17.5367723Z [36;1mmake dau_tests | tee dau_test_result.txt[0m
+2021-03-19T09:25:17.5368368Z [36;1mcat dau_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"[0m
+2021-03-19T09:25:17.5406450Z shell: /bin/bash -e {0}
+2021-03-19T09:25:17.5406859Z ##[endgroup]
+2021-03-19T09:25:17.5490775Z mkdir -p work
+2021-03-19T09:25:17.5504212Z ghdl -i --std=08 --workdir=work src/*.vhd
+2021-03-19T09:25:17.5547233Z ghdl -i --std=08 --workdir=work src/alu/*.vhd
+2021-03-19T09:25:17.5606596Z ghdl -i --std=08 --workdir=work src/memunit/*.vhd
+2021-03-19T09:25:17.5666709Z ghdl -i --std=08 --workdir=work src/registers/*.vhd
+2021-03-19T09:25:17.5715151Z echo "Running DAU Tests"
+2021-03-19T09:25:17.5721979Z Running DAU Tests
+2021-03-19T09:25:17.5723504Z ghdl -m --std=08 --workdir=work dau_tb
+2021-03-19T09:25:17.8567136Z ghdl -r --std=08 --workdir=work dau_tb --vcd=avr_iau_tb.vcd

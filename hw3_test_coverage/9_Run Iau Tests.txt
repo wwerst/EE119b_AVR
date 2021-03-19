@@ -1,0 +1,14 @@
+2021-03-19T09:25:25.9108966Z ##[group]Run make iau_tests | tee iau_test_result.txt
+2021-03-19T09:25:25.9109814Z [36;1mmake iau_tests | tee iau_test_result.txt[0m
+2021-03-19T09:25:25.9110457Z [36;1mcat iau_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"[0m
+2021-03-19T09:25:25.9163077Z shell: /bin/bash -e {0}
+2021-03-19T09:25:25.9163510Z ##[endgroup]
+2021-03-19T09:25:25.9270530Z mkdir -p work
+2021-03-19T09:25:25.9283641Z ghdl -i --std=08 --workdir=work src/*.vhd
+2021-03-19T09:25:25.9331707Z ghdl -i --std=08 --workdir=work src/alu/*.vhd
+2021-03-19T09:25:25.9483817Z ghdl -i --std=08 --workdir=work src/memunit/*.vhd
+2021-03-19T09:25:25.9547294Z ghdl -i --std=08 --workdir=work src/registers/*.vhd
+2021-03-19T09:25:25.9594932Z echo "Running IAU Tests"
+2021-03-19T09:25:25.9601802Z Running IAU Tests
+2021-03-19T09:25:25.9603492Z ghdl -m --std=08 --workdir=work iau_tb
+2021-03-19T09:25:26.2678866Z ghdl -r --std=08 --workdir=work iau_tb --vcd=avr_iau_tb.vcd
