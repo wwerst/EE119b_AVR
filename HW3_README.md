@@ -1,5 +1,7 @@
 # HW3 Readme for EE119b_AVR Repo
 
+Group: Eric Chen/Will Werst
+
 Homework 3 snapshot of subset of code for https://github.com/wwerst/EE119b_AVR
 
 # Test Coverage:
