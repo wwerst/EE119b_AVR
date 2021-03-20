@@ -23,7 +23,7 @@ iau_tests: import
 
 dau_tests: import
 	ghdl -m --std=08 --workdir=work dau_tb
-	ghdl -r --std=08 --workdir=work dau_tb --vcd=avr_iau_tb.vcd
+	ghdl -r --std=08 --workdir=work dau_tb --vcd=avr_dau_tb.vcd
 
 reg_tests: import
 	ghdl -m --std=08 --workdir=work avr_reg_tb

@@ -47,11 +47,11 @@ class Instruction:
     # integration with EE119 test vector generator
     def read(self, val, addr):
         """expect the instruction to generate a read with given value/address"""
-        self.check = ("R", v(val), a(addr))
+        self.check = ("R", f"{val:02X}", f"${addr:04X}")
         return self
     def write(self, val, addr):
         """expect the instruction to generate a write with given value/address"""
-        self.check = ("W", v(val), a(addr))
+        self.check = ("W", f"{val:02X}", f"${addr:04X}")
         return self
     def skip(self):
         """expect the instruction to be skipped (skip instructions)"""

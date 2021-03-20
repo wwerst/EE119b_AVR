@@ -99,6 +99,13 @@
 int  getCycleCount(const char *, char);
 
 
+/* nonstandard string function.
+ * converts string to uppercase. */
+void strupr(char *str) {
+    for (int i = 0; str[i] != '\0'; i ++) {
+        str[i] += (str[i] >= 'a' && str[i] <= 'z') ? 'A' - 'a' : 0;
+    }
+}
 
 
 int  main()
