@@ -108,34 +108,36 @@ architecture dataflow of AVR_CPU is
             DataOutD    : out AVR.reg_d_data_t
         );
     end component;
-    -- Single register input
-    signal reg_DataInS     : AVR.reg_s_data_t;
-    -- Single register outputs
-    signal reg_DataOutA    : AVR.reg_s_data_t;
-    signal reg_DataOutB    : AVR.reg_s_data_t;
-    -- Double register input
-    signal reg_DataInD     : AVR.reg_d_data_t;
-    -- Double register output
-    signal reg_DataOutD    : AVR.reg_d_data_t;
-    type reg_ctrl_t is record
-        -- Single register input select
-        EnableInS   : std_logic;
-        SelInS      : AVR.reg_s_sel_t;
+
+    type reg_read_ctrl_t is record
         -- Single register output selects
         SelOutA     : AVR.reg_s_sel_t;
         SelOutB     : AVR.reg_s_sel_t;
-        -- Double register input select
-        EnableInD   : std_logic;
-        SelInD      : AVR.reg_d_sel_t;
         -- Double register output selects
         SelOutD     : AVR.reg_d_sel_t;
     end record;
-    signal reg_ctrl: reg_ctrl_t;
-    subtype reg_ssrc_t is std_logic_vector(1 downto 0);
-    constant REG_SSRC_DDB: reg_ssrc_t := "00";
-    constant REG_SSRC_ALU: reg_ssrc_t := "01";
-    constant REG_SSRC_IMM: reg_ssrc_t := "10";
-    signal reg_ssrc: reg_ssrc_t;
+    signal reg_read_ctrl : reg_read_ctrl_t;
+
+    -- Single register outputs
+    signal reg_DataOutA    : AVR.reg_s_data_t;
+    signal reg_DataOutB    : AVR.reg_s_data_t;
+    -- Double register output
+    signal reg_DataOutD    : AVR.reg_d_data_t;
+
+    type reg_write_ctrl_t is record
+        -- Single register input select
+        EnableInS   : std_logic;
+        SelInS      : AVR.reg_s_sel_t;
+        -- Double register input select
+        EnableInD   : std_logic;
+        SelInD      : AVR.reg_d_sel_t;
+    end record;
+    signal reg_write_ctrl : reg_write_ctrl_t;
+    -- Single register input
+    signal reg_DataInS     : AVR.reg_s_data_t;
+    -- Double register input
+    signal reg_DataInD     : AVR.reg_d_data_t;
+
 
     component AvrDau is
         port(
@@ -168,232 +170,218 @@ architecture dataflow of AVR_CPU is
             Result      : out  AVR.word_t    -- Output result
         );
     end component;
-    signal alu_OpA      : AVR.word_t;   -- first operand
-    signal alu_OpB      : AVR.word_t;   -- second operand
-    signal alu_Status      : AVR.word_t;   -- Status register
-    signal alu_Result      : AVR.word_t;   -- Output result
-    type alu_ctrl_t is record
-        FlagMask    : AVR.word_t;   -- Flag mask. If 1, then update bit. If 0, leave bit unchanged.
-        OpSelect : ALUOp.ALUOP_t;
-    end record;
-    signal alu_ctrl: alu_ctrl_t;
+    signal alu_SReg     : AVR.word_t;   -- Status register
+    signal alu_Result   : AVR.word_t;   -- Output result
 
 
-    signal ir: std_logic_vector(15 downto 0);
+    signal InstReg: std_logic_vector(15 downto 0);
+    signal InstPayload: std_logic_vector(15 downto 0);
+
+    signal decodeReg16d : integer range 0 to 15;
+    signal decodeReg32d : integer range 0 to 31;
 
     -- state machine
-    subtype state_t is integer range 1 to 4;
-    signal CurState, NextState: state_t;
-    -- when we are on last state of instruction/need to load a new instruction
-    signal isLastState: std_logic;
+    subtype decode_state_t is integer range 0 to 3;
+    signal CurState, NextState: decode_state_t;
 
-    -- register operands used for load/store
-    signal regA, regB: std_logic_vector(4 downto 0);
-    -- immediate value from instruction
-    signal immediate: std_logic_vector(7 downto 0);
-    -- array offset from instruction
-    signal loadArr: std_logic_vector(5 downto 0);
+    type execute_op_data_t is record
+        OpA            : AVR.word_t;
+        OpB            : AVR.word_t;
+        ALUOpCode      : ALUOp.ALUOP_t;
+        ALUFlagMask    : AVR.word_t;
+        writeRegEnS    : std_logic;
+        writeRegSelS   : AVR.reg_s_sel_t;
+        --writeRegEnD    : std_logic;
+        --writeRegSelD   : AVR.reg_d_sel_t;
+    end record;
+
+    signal CurExecuteOpData, NextExecuteOpData : execute_op_data_t;
+
+    type write_op_data_t is record
+        dataS          : AVR.word_t;
+        writeRegEnS    : std_logic;
+        writeRegSelS   : AVR.reg_s_sel_t;
+        --dataD          : AVR.word_t;
+        --writeRegEnD    : std_logic;
+        --writeRegSelD   : AVR.reg_d_sel_t;
+    end record;
+
+    signal CurWriteOpData, NextWriteOpData : write_op_data_t;
+
+
 begin
 
+
+
+
     reg_u: AvrReg port map (
-        clock,
-        reg_ctrl.EnableInS,
-        reg_DataInS,
-        reg_ctrl.SelInS,
-        reg_ctrl.EnableInD,
-        reg_DataInD,
-        reg_ctrl.SelInD,
-        reg_ctrl.SelOutA,
-        reg_DataOutA,
-        reg_ctrl.SelOutB,
-        reg_DataOutB,
-        reg_ctrl.SelOutD,
-        reg_DataOutD
+        clk       => clock,
+        EnableInS => reg_write_ctrl.EnableInS,
+        DataInS   => reg_DataInS,
+        SelInS    => reg_write_ctrl.SelInS,
+        EnableInD => reg_write_ctrl.EnableInD,
+        DataInD   => reg_DataInD,
+        SelInD    => reg_write_ctrl.SelInD,
+        SelOutA   => reg_read_ctrl.SelOutA,
+        DataOutA  => reg_DataOutA,
+        SelOutB   => reg_read_ctrl.SelOutB,
+        DataOutB  => reg_DataOutB,
+        SelOutD   => reg_read_ctrl.SelOutD,
+        DataOutD  => reg_DataOutD
     );
 
     iau_u: AvrIau port map (
-        clock,
-        iau_ctrl.srcSel,
-        iau_branch,
-        iau_jump,
-        ProgDB,
-        DataDB,
-        reg_DataOutD,
-        iau_ctrl.offsetSel,
-        ProgAB
+        clk       => clock,
+        SrcSel    => iau_ctrl.srcSel,
+        branch    => iau_branch,
+        jump      => iau_jump,
+        PDB       => ProgDB,
+        DDB       => DataDB,
+        Z         => reg_DataOutD,
+        OffsetSel => iau_ctrl.offsetSel,
+        Address   => ProgAB
     );
 
     dau_u: AvrDau port map (
-        clock,
-        dau_ctrl.SrcSel,
-        ProgDB,
-        reg_DataOutD,
-        dau_ctrl.OffsetSel,
-        dau_array_off,
-        DataAB,
-        dau_update
+        clk       => clock,
+        SrcSel    => dau_ctrl.SrcSel,
+        PDB       => ProgDB,
+        reg       => reg_DataOutD,
+        OffsetSel => dau_ctrl.OffsetSel,
+        array_off => dau_array_off,
+        Address   => DataAB,
+        Update    => dau_update
     );
 
     alu_u: avr_alu port map (
        clk         => clock,
-       ALUOpA      => alu_opA,
-       ALUOpB      => alu_opB,
-       ALUOpSelect => alu_ctrl.OpSelect,
-       FlagMask    => alu_ctrl.FlagMask,
-       Status      => alu_status,
+       ALUOpA      => CurExecuteOpData.OpA,
+       ALUOpB      => CurExecuteOpData.OpB,
+       ALUOpSelect => CurExecuteOpData.ALUOpCode,
+       FlagMask    => CurExecuteOpData.ALUFlagMask,
+       Status      => alu_SReg,
        Result      => alu_result
     );
 
-    IRProc: process (clock) is begin
-        if rising_edge(clock) then
-            if isLastState = '1' then
-                ir <= ProgDB;
-            else
-                ir <= ir;
-            end if;
-        end if;
-    end process;
-
-    DecodeProc: process (Reset, ir, CurState, alu_Status) is
+    -- Loads the data from ProgDB
+    -- Can either be loaded into the instruction
+    -- register normally, or into payload register
+    InstrLatchProc: process(clk)
     begin
-        regA <= ir(8 downto 4);
-        regB <= ir(9) & ir(3 downto 0);
-        loadArr <= ir(13) & ir(11 downto 10) & ir(2 downto 0);
+        if rising_edge(clk) then
+            InstReg <= ProgDB;
+        end if;
+    end process InstrLatchProc;
 
-        -- defaults
-        isLastState <= '1';
-        -- increment PC
-        iau_ctrl.srcSel <= IAU.SRC_PC;
-        iau_ctrl.OffsetSel <= IAU.OFF_ONE;
-        -- don't do stuff
-        reg_ctrl.EnableInS <= '0';
-        reg_ctrl.EnableInD <= '0';
-        DataRd <= '1';
-        DataWr <= '1';
 
-        if (Reset = '0') then
-            iau_ctrl.srcSel <= IAU.SRC_ZERO;
-            iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-        elsif std_match(ir, Opcodes.OpLD) then
-            reg_ctrl.EnableInS <= '1';
-            reg_ctrl.SelInS <= regA;
-            reg_ssrc <= REG_SSRC_DDB;
-            DataRd <= '0'; -- TODO rd and wr have special timing
-            dau_ctrl.SrcSel <= DAU.SRC_REG;
-            if std_match(ir, Opcodes.OPLDX) then
-                reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
-            elsif std_match(ir, Opcodes.OpLDXI) then
-                reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
-            elsif std_match(ir, Opcodes.OpLDXD) then
-                reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
-            elsif std_match(ir, Opcodes.OpLDYI) then
-                reg_ctrl.SelOutD <= "10"; -- Y register
-                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
-            elsif std_match(ir, Opcodes.OpLDYD) then
-                reg_ctrl.SelOutD <= "10"; -- Y register
-                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
-            elsif std_match(ir, Opcodes.OpLDZI) then
-                reg_ctrl.SelOutD <= "11"; -- Z register
-                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
-            elsif std_match(ir, Opcodes.OpLDZD) then
-                reg_ctrl.SelOutD <= "11"; -- X register
-                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
-            elsif std_match(ir, Opcodes.OpLDS) then
-                isLastState <= '0';
-                DataRd <= '1';
-                dau_ctrl.srcSel <= DAU.SRC_PDB;
-                dau_ctrl.offsetSel <= DAU.OFF_ZERO;
-                reg_ctrl.EnableInS <= '0';
-                if CurState = 1 then
-                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    reg_ctrl.EnableInS <= '1';
-                    DataRd <= '0';
-                elsif CurState = 2 then
-                elsif CurState = 3 then
-                    isLastState <= '1';
-                end if;
-            elsif std_match(ir, Opcodes.OpPOP) then
-                -- TODO pop
-            end if;
-        elsif std_match(ir, Opcodes.OpLDDY) then
-            reg_ctrl.EnableInS <= '1';
-            reg_ctrl.SelInS <= regA;
-            reg_ssrc <= REG_SSRC_DDB;
-            DataRd <= '1'; -- TODO rd and wr have special timing
-            reg_ctrl.SelOutD <= "10"; -- Y register
-            dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ARRAY);
-        elsif std_match(ir, Opcodes.OpLDDZ) then
-            reg_ctrl.EnableInS <= '1';
-            reg_ctrl.SelInS <= regA;
-            reg_ssrc <= REG_SSRC_DDB;
-            DataRd <= '1'; -- TODO rd and wr have special timing
-            reg_ctrl.SelOutD <= "11"; -- Z register
-            dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ARRAY);
-        elsif std_match(ir, Opcodes.OpLDI) then
-            reg_ctrl.EnableInS <= '1';
-            reg_ctrl.SelInS <= regA;
-            reg_ssrc <= REG_SSRC_IMM;
-        elsif std_match(ir, Opcodes.OpST) then
-            reg_ctrl.SelOutA <= regA;
-            DataWr <= '0'; -- TODO rd and wr have special timing
-            if std_match(ir, Opcodes.OPSTX) then
-            elsif std_match(ir, Opcodes.OPSTXI) then
-            elsif std_match(ir, Opcodes.OPSTXD) then
-            elsif std_match(ir, Opcodes.OPSTYI) then
-            elsif std_match(ir, Opcodes.OPSTYD) then
-            elsif std_match(ir, Opcodes.OPSTZI) then
-            elsif std_match(ir, Opcodes.OPSTZD) then
-            elsif std_match(ir, Opcodes.OPSTS) then
-                isLastState <= '0';
-                DataWr <= '1';
-                dau_ctrl.srcSel <= DAU.SRC_PDB;
-                dau_ctrl.offsetSel <= DAU.OFF_ZERO;
-                if CurState = 1 then
-                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    DataWr <= '0';
-                elsif CurState = 2 then
-                elsif CurState = 3 then
-                    isLastState <= '1';
-                end if;
-            elsif std_match(ir, Opcodes.OPPUSH) then
+    decodeReg16d <= to_integer(unsigned(InstReg(7 downto 4))) + 16;
+    decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
+
+    -- Combinational logic that calculates the following:
+    --   iau_ctrl: Controls what the next address that is fetched is.
+    --   dau_ctrl: Controls what the data access unit is doing.
+    --   reg_read_ctrl: Controls what is being read from register unit.
+    --   ExecuteOpData: The op that is passed to execute stage.
+    --   
+    DecodeProc: process(all)
+        variable tmp_int : integer;
+    begin
+        -- Minimum instructions needed to start testing:
+        -- BCLR
+        -- LDI
+        -- ADD
+        -- IN Rd, $3F  ; Read status register
+        -- ST X, Rd
+
+        -- Assign defaults
+        -- Only the below assigned variables should be changed in this,
+        -- to avoid implied latch
+        iau_ctrl.srcSel <= IAU.SRC_PC; -- Start from current program counter
+        iau_ctrl.OffsetSel <= IAU.OFF_ONE; -- Increment address by one
+        dau_ctrl.SrcSel <= DAU.SRC_REG; -- Keep dau address the same
+        dau_ctrl.OffsetSel <= DAU.OFF_ZERO; -- Leave dau address unchanged
+        reg_read_ctrl.SelOutA <= (others => '0');
+        reg_read_ctrl.SelOutB <= (others => '0');
+        reg_read_ctrl.SelOutD <= (others => '0');
+
+        -- Default to executing a pass-through of OpA to result
+        -- Done by adding OpA to OpB = 0, then making sure flags don't change.
+        -- This makes passing data through to write unit easy.
+        NextExecuteOpData.OpA <= (others => '0');
+        NextExecuteOpData.OpB <= (others => '0');
+        NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+        NextExecuteOpData.ALUFlagMask <= (others => '0');
+        NextExecuteOpData.writeRegEnS <= '0';
+        NextExecuteOpData.writeRegSelS <= (others => '0');
+
+        if Reset = '0' then
+            null;
+        else
+            if std_match(InstReg, OpBCLR) then
+                tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
+                NextExecuteOpData.OpA <= alu_SReg;
+                NextExecuteOpData.OpB(tmp_int) <= '1';
+                NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
+            elsif std_match(InstReg, OpLDI) then
+                -- Pass immediate through ALU into write unit
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= std_logic_vector(to_unsigned(decodeReg16d, 5));
+                NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
+                NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
+            elsif std_match(InstReg, OpADD) then
+                null;
+            elsif std_match(InstReg, OpIN) then
+                null;
+            elsif std_match(InstReg, OpST) then
+                null;
+            else
+                null;
             end if;
         end if;
     end process DecodeProc;
 
-    with reg_ssrc select reg_DataInS <= 
-        DataDB when REG_SSRC_DDB,
-        alu_result when REG_SSRC_ALU,
-        immediate when REG_SSRC_IMM,
-        (reg_DataInS'RANGE => 'X') when others;
+    -----------------
+    -----------------
+    -- Execute Unit
+    -----------------
+    -----------------
 
-    --ALUMuxProc: process -- process(CurState, decode_signals) -- Maybe 
-    --begin
-    --    -- Assigns to:
-    --    --  ALUOpA
-    --    --  ALUOpB
-    --    
-    --end process ALUMuxProc;
+    -- This could be registered later
+    CurExecuteOpData <= NextExecuteOpData;
 
-
-    NextStateProc: process (CurState, isLastState)
+    -- Connects with ALU and does ALU ops
+    ExecuteProc: process(all)
     begin
-        -- Assigns to:
-        --  NextState
-        -- Combinationally compute NextState
-        NextState <= CurState + 1 when isLastState = '0' else 1;
-    end process NextStateProc;
-
-
-    StoreStateProc: process(clock)
-    begin
-        if (rising_edge(clock)) then
-            CurState <= NextState;
+        NextWriteOpData.dataS <= alu_Result;
+        NextWriteOpData.writeRegEnS <= '0';
+        NextWriteOpData.writeRegSelS <= (others => '0');
+        if reset = '0' then
+        else
+            NextWriteOpData.writeRegEnS <= CurExecuteOpData.writeRegEnS;
+            NextWriteOpData.writeRegSelS <= CurExecuteOpData.writeRegSelS;
         end if;
-    end process StoreStateProc;
+    end process ExecuteProc;
 
 
+    -----------------
+    -----------------
+    -- Write Unit
+    -----------------
+    -----------------
+
+    -- This could be registered later
+    CurWriteOpData <= NextWriteOpData;
+
+    -- Connects with Register write interface and writes data
+    WriteProc: process(all)
+    begin
+        reg_write_ctrl.EnableInS <= CurWriteOpData.writeRegEnS;
+        reg_write_ctrl.SelInS <= CurWriteOpData.writeRegSelS;
+        reg_write_ctrl.EnableInD <= '0';
+        reg_write_ctrl.SelInD <= (others => '0');
+        reg_DataInS <= CurWriteOpData.dataS;
+        reg_DataInD <= (others => '0');
+        
+    end process WriteProc;
 
 end architecture;
