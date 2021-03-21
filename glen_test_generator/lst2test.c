@@ -68,6 +68,7 @@
                                    'A'.
       15 Mar 21  Glen George    Fixed another missed strncmp() typo in the
                                    getCycleCount() function,
+      20 Mar 21  Eric Chen      hack in strpur; output vectors in table
 */
 
 
@@ -107,6 +108,209 @@ void strupr(char *str) {
     }
 }
 
+typedef struct {
+    char progDB[INST_SIZE+1];
+    char dataDBr[DATA_SIZE+1];
+
+    char progAB[ADDR_SIZE+1];
+    char dataAB[ADDR_SIZE+1];
+    char dataDBw[DATA_SIZE+1];
+    int read, write;
+} vector_t;
+
+void setProgDB(
+        vector_t *vecs,
+        char *progaddr,
+        char *inst, char *inst2,
+        char *data,
+        char *rdwrsj,
+        char *addr) {
+        /* get number of cycles for this instruction */
+        int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+        strncpy(vecs[0].progDB, inst, INST_SIZE+1);
+        /* output any additional words of the instruction */
+        for (int cycle = 1; cycle < cycle_cnt; cycle ++) {
+
+            /* keep the instruction bus constant on additional cycles */
+            if (strcmp(inst2, "    ") == 0)
+                /* no second word, keep first word there */
+                strncpy(vecs[cycle].progDB, inst, INST_SIZE+1);
+            else
+                /* have second word, hold it constant */
+                strncpy(vecs[cycle].progDB, inst2, INST_SIZE+1);
+        }
+}
+
+void setProgAB(
+        vector_t *vecs,
+        char *progaddr,
+        char *inst, char *inst2,
+        char *data,
+        char *rdwrsj,
+        char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+    /* output the address */
+    strncpy(vecs[0].progAB, progaddr, ADDR_SIZE+1);
+    int cycle = 1;
+
+    /* check if this is a multi-word instruction */
+    if (strcmp(inst2, "    ") != 0)  {
+
+        /* have a multi-word instruction, output 2nd address */
+        /* need to increment the 4-digit address (do it in ASCII) */
+        /* always increment low digit */
+        progaddr[3]++;
+
+        /* propagate any carries */
+        for (int j = 3; j >= 0; j--)  {
+
+            /* check if the digit went from a digit (9) to a letter (A) */
+            if (progaddr[j] == ('9' + 1))
+                /* need to adjust to a letter */
+                progaddr[j] = 'A';
+
+            /* check if carry out of this digit */
+            if (progaddr[j] == 'G')  {
+                /* carry out of this digit, reset it */
+                progaddr[j] = '0';
+                /* carry into next digit if there is one */
+                if (j > 0)
+                    progaddr[j - 1]++;
+            }
+        }
+
+
+        /* now output the address */
+        strncpy(vecs[1].progAB, progaddr, ADDR_SIZE+1);
+
+        /* have taken care of another cycle */
+        cycle ++;
+
+    }
+
+
+    /* output any additional cycles of the instruction */
+    for (; cycle < cycle_cnt; cycle ++) {
+
+        /* don't care what the address is for the other cycles */
+        strncpy(vecs[cycle].progAB, "XXXX", ADDR_SIZE+1);
+    }
+
+}
+
+void setRead(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+    for (int cycle = 0; cycle < cycle_cnt; cycle ++) {
+        if (cycle_cnt >= 2 && cycle == 1 && rdwrsj[0] == 'r') {
+            vecs[cycle].read = 0;
+        } else {
+            vecs[cycle].read = 1;
+        }
+    }
+}
+void setWrite(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+    for (int cycle = 0; cycle < cycle_cnt; cycle ++) {
+        if (cycle_cnt >= 2 && cycle == 1 && rdwrsj[0] == 'w') {
+            vecs[cycle].write = 0;
+        } else {
+            vecs[cycle].write = 1;
+        }
+    }
+}
+
+void setDataDBr(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+    /* output read data for each cycle */
+    for (int j = 1; j <= cycle_cnt; j++)  {
+
+        /* if one cycle instruction or on second cycle or 2 or more */
+        /*    cycle instruction, give the data to be read if reading */
+        if (((cycle_cnt == 1) || (j == 2)) && (rdwrsj[0] == 'r')) {
+            /* need to output data to be read */
+            strncpy(vecs[j-1].dataDBr, data, DATA_SIZE+1);
+        } else {
+            /* not reading - high-Z */
+            strncpy(vecs[j-1].dataDBr, "ZZ", DATA_SIZE+1);
+        }
+    }
+}
+
+void setDataDBw(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+    /* output read data for each cycle */
+    for (int j = 1; j <= cycle_cnt; j++)  {
+
+        /* if one cycle instruction or on second cycle or 2 or more */
+        /*    cycle instruction, give the value to compare if writing */
+        if (((cycle_cnt == 1) || (j == 2)) && (rdwrsj[0] == 'w')) {
+            /* data being written - output compare vector */
+            strncpy(vecs[j-1].dataDBw, data, DATA_SIZE+1);
+        } else {
+            /* not writing - don't do a compare */
+            strncpy(vecs[j-1].dataDBw, "XX", DATA_SIZE+1);
+        }
+    }
+}
+
+void setDataAB(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+    /* output read data for each cycle */
+    for (int j = 1; j <= cycle_cnt; j++)  {
+
+        /* if one cycle instruction or on second cycle or 2 or more cycle */
+        /*    instruction, give the value to compare if reading or writing */
+        if (((cycle_cnt == 1) || (j == 2)) &&
+            ((rdwrsj[0] == 'r') || (rdwrsj[0] == 'w'))) {
+            /* data being read or written - output address compare vector */
+            strncpy(vecs[j-1].dataAB, addr, ADDR_SIZE+1);
+        } else {
+            /* not reading or writing - don't do a compare */
+            strncpy(vecs[j-1].dataAB, "XXXX", ADDR_SIZE+1);
+        }
+    }
+}
 
 int  main()
 {
@@ -254,270 +458,41 @@ int  main()
 
 
     /* do the instruction vectors */
-    puts("Instruction Vectors");
-    /* no vectors on the line */
-    vec_on_line = 0;
+    vector_t vectors[4];
 
+    printf("# ProgDB dataDBr ProgAB read write DataAB DataDBw\n");
     /* output the vectors */
     for (i = 0; i < no_vectors; i++)  {
+        setProgDB(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setDataDBr(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
 
-        /* check if instruction fits on this line */
-        if ((vec_on_line++ % VEC_PER_LINE) == 0)
-            /* need a new line for vectors */
-            putchar('\n');
+        setProgAB(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setDataAB(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setDataDBw(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setRead(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setWrite(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
 
-        /* output the first word of the instruction */
-        printf("X\"%s\", ", inst[i]);
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* output any additional words of the instruction */
-        while (--cycle_cnt > 0)  {
-
-            /* instruction hasa multiple cycles, does it fit on the line */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* keep the instruction bus constant on additional cycles */
-            if (strcmp(inst2[i], "    ") == 0)
-                /* no second word, keep first word there */
-                printf("X\"%s\", ", inst[i]);
-            else
-                /* have second word, hold it constant */
-                printf("X\"%s\", ", inst2[i]);
+        int cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
+        for (j = 0; j < cycle_cnt; j ++) {
+            printf(
+                "%s %s %s %d %d %s %s\n",
+                vectors[j].progDB,
+                vectors[j].dataDBr,
+                vectors[j].progAB,
+                vectors[j].read,
+                vectors[j].write,
+                vectors[j].dataAB,
+                vectors[j].dataDBw
+            );
         }
     }
 
-
-    /* output the expected program address */
-    puts("\n\nProgram Address Vector\n");
-    /* no vectors on the line yet */
-    vec_on_line = 0;
-
-    /* output the vectors */
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        if ((vec_on_line++ % VEC_PER_LINE) == 0)
-            /* need a new line for vectors */
-            putchar('\n');
-
-        /* output the address */
-        printf("X\"%s\",            ", progaddr[i]);
-        /* have taken care of one cycle */
-        cycle_cnt--;
-
-        /* check if this is a multi-word instruction */
-        if (strcmp(inst2[i], "    ") != 0)  {
-
-            /* have a multi-word instruction, output 2nd address */
-            /* need to increment the 4-digit address (do it in ASCII) */
-            /* always increment low digit */
-            progaddr[i][3]++;
-
-            /* propagate any carries */
-            for (j = 3; j >= 0; j--)  {
-
-                /* check if the digit went from a digit (9) to a letter (A) */
-                if (progaddr[i][j] == ('9' + 1))
-                    /* need to adjust to a letter */
-                    progaddr[i][j] = 'A';
-
-                /* check if carry out of this digit */
-                if (progaddr[i][j] == 'G')  {
-                    /* carry out of this digit, reset it */
-                    progaddr[i][j] = '0';
-                    /* carry into next digit if there is one */
-                    if (j > 0)
-                        progaddr[i][j - 1]++;
-                }
-            }
-
-            /* want to output next address, make sure it fits */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* now output the address */
-            printf("X\"%s\",            ", progaddr[i]);
-
-            /* have taken care of another cycle */
-            cycle_cnt--;
-        }
-
-
-        /* output any additional cycles of the instruction */
-        while (cycle_cnt-- > 0)  {
-
-            /* instruction has more cycles, does it fit on the line */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* don't care what the address is for the other cycles */
-            printf("\"----------------\", ");
-        }
-    }
-
-
-    /* now read vector */
-    puts("\n\nData Read Vector\n");
-    putchar('\"');
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* if two cycles or more, read is on second cycle */
-        if (cycle_cnt-- >= 2)
-            /* is two or more cycles, read is on second cycle */
-            putchar('1');
-
-        /* output if there is a read signal (this is first or second cycle) */
-        if (rdwrsj[i][0] == 'r')
-            /* have a read signal */
-            putchar('0');
-        else
-            /* no read signal */
-            putchar('1');
-
-        /* output remaining read signals (inactive) */
-        while (--cycle_cnt > 0)
-            putchar('1');
-    }
-    putchar('\"');
-
-
-    /* then write vector */
-    puts("\n\nData Write Vector\n");
-    putchar('\"');
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* if two cycles or more, write is on second cycle */
-        if (cycle_cnt-- >= 2)
-            /* is two or more cycles, write is on second cycle */
-            putchar('1');
-
-        /* output if there is a write signal (this is first or second cycle) */
-        if (rdwrsj[i][0] == 'w')
-            /* have a write signal */
-            putchar('0');
-        else
-            /* no write signal */
-            putchar('1');
-
-        /* output remaining write signals (inactive) */
-        while (--cycle_cnt > 0)
-            putchar('1');
-    }
-    putchar('\"');
-
-
-    /* next data vectors */
-    puts("\n\nData Read Vectors");
-    /* no vectors on the line yet */
-    vec_on_line = 0;
-
-    /* output the vectors */
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* output read data for each cycle */
-        for (j = 1; j <= cycle_cnt; j++)  {
-
-            /* will output another vector so see if need a newline */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* if one cycle instruction or on second cycle or 2 or more */
-            /*    cycle instruction, give the data to be read if reading */
-            if (((cycle_cnt == 1) || (j == 2)) && (rdwrsj[i][0] == 'r'))
-                /* need to output data to be read */
-                printf("X\"%s\",      ", data[i]);
-            else
-                /* not reading - high-Z */
-                printf("\"ZZZZZZZZ\", ");
-        }
-    }
-
-
-    /* do data write vectors */
-    puts("\n\nData Write Vectors");
-    /* no vectors on the line yet */
-    vec_on_line = 0;
-
-    /* output the vectors */
-    /* output the vectors */
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* output read data for each cycle */
-        for (j = 1; j <= cycle_cnt; j++)  {
-
-            /* will output another vector so see if need a newline */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* if one cycle instruction or on second cycle or 2 or more */
-            /*    cycle instruction, give the value to compare if writing */
-            if (((cycle_cnt == 1) || (j == 2)) && (rdwrsj[i][0] == 'w'))
-                /* data being written - output compare vector */
-                printf("X\"%s\",      ", data[i]);
-            else
-                /* not writing - don't do a compare */
-                printf("\"--------\", ");
-        }
-    }
-
-
-    /* finally do data address vectors */
-    puts("\n\nData Address Vectors");
-    /* no vectors on the line yet */
-    vec_on_line = 0;
-
-    /* output the vectors */
-    for (i = 0; i < no_vectors; i++)  {
-
-        /* get number of cycles for this instruction */
-        cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
-
-        /* output read data for each cycle */
-        for (j = 1; j <= cycle_cnt; j++)  {
-
-            /* will output another vector so see if need a newline */
-            if ((vec_on_line++ % VEC_PER_LINE) == 0)
-                /* need a new line for vectors */
-                putchar('\n');
-
-            /* if one cycle instruction or on second cycle or 2 or more cycle */
-            /*    instruction, give the value to compare if reading or writing */
-            if (((cycle_cnt == 1) || (j == 2)) &&
-                ((rdwrsj[i][0] == 'r') || (rdwrsj[i][0] == 'w')))
-                /* data being read or written - output address compare vector */
-                printf("X\"%s\",            ", addr[i]);
-            else
-                /* not reading or writing - don't do a compare */
-                printf("\"----------------\", ");
-        }
-    }
-
-    /* finish off any remaining line */
-    putchar('\n');
-
-
+    free(progaddr);
+    free(inst);
+    free(inst2);
+    free(data);
+    free(rdwrsj);
+    free(addr);
     /* done with everything - exit */
     return  0;
 
