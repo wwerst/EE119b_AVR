@@ -132,7 +132,7 @@ begin
                 -- DataRd
                 -- DataDB (inout)
 
-                assert nonstd_match(progAB, veProgAB) report "progAB mismatch" severity error;
+                assert nonstd_match(progAB, veProgAB) report "progAB mismatch, expect " & to_string(veProgAB) severity error;
                 assert nonstd_match(dataAB, veDataAB) report "dataAB mismatch" severity error;
                 assert std_match(dataRd, veDataRd) report "Rd mismatch" severity error;
                 assert std_match(dataWr, veDataWr) report "Wr mismatch" severity error;
@@ -140,7 +140,9 @@ begin
                     assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch on cpu write" severity error;
                 end if;
                 
-
+                if linenum > 20 then
+                    exit;
+                end if;
 
             end if;
         end loop;

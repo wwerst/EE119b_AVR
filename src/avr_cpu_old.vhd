@@ -45,7 +45,7 @@ use work.IAU;
 use work.DAU;
 use work.ALUOp;
 
-entity  AVR_CPU  is
+entity  AVR_CPU_OLD  is
 
     port (
         ProgDB  :  in     std_logic_vector(15 downto 0);   -- program memory data bus
@@ -60,9 +60,9 @@ entity  AVR_CPU  is
         DataDB  :  inout  std_logic_vector(7 downto 0)     -- data memory data bus
     );
 
-end  AVR_CPU;
+end  AVR_CPU_OLD;
 
-architecture dataflow of AVR_CPU is
+architecture dataflow of AVR_CPU_OLD is
 
     component AvrIau is
         port(

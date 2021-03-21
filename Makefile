@@ -6,7 +6,7 @@ STACK_SIZE = $(shell ulimit -s)
 all:
 	sleep 1
 
-import:
+import: clean
 	mkdir -p work
 	ghdl -i --std=08 --workdir=work src/*.vhd
 	ghdl -i --std=08 --workdir=work src/alu/*.vhd
@@ -31,8 +31,9 @@ reg_tests: import
 
 cpu_tests: import
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --vcd=avr_cpu_tb.vcd
+	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw
 
 clean:
-	rm -r work/*.cf
-	rm *.vcd
+	rm -r work/*.cf || true
+	rm *.vcd        || true
+	rm *.ghw        || true

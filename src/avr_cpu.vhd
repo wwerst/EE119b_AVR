@@ -177,7 +177,7 @@ architecture dataflow of AVR_CPU is
     signal InstReg: std_logic_vector(15 downto 0);
     signal InstPayload: std_logic_vector(15 downto 0);
 
-    signal decodeReg16d : integer range 0 to 15;
+    signal decodeReg16d : integer range 0 to 31;
     signal decodeReg32d : integer range 0 to 31;
 
     -- state machine
@@ -266,9 +266,9 @@ begin
     -- Loads the data from ProgDB
     -- Can either be loaded into the instruction
     -- register normally, or into payload register
-    InstrLatchProc: process(clk)
+    InstrLatchProc: process(clock)
     begin
-        if rising_edge(clk) then
+        if rising_edge(clock) then
             InstReg <= ProgDB;
         end if;
     end process InstrLatchProc;
@@ -285,6 +285,8 @@ begin
     --   
     DecodeProc: process(all)
         variable tmp_int : integer;
+        variable tmp_rd  : std_logic_vector(4 downto 0);
+        variable tmp_rr  : std_logic_vector(4 downto 0);
     begin
         -- Minimum instructions needed to start testing:
         -- BCLR
@@ -315,24 +317,38 @@ begin
         NextExecuteOpData.writeRegSelS <= (others => '0');
 
         if Reset = '0' then
-            null;
+            -- Clear the status register
+            NextExecuteOpData.OpA <= (others => '0');
+            NextExecuteOpData.OpB <= (others => '1');
+            NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
+            NextExecuteOpData.ALUFlagMask <= (others => '1');
         else
-            if std_match(InstReg, OpBCLR) then
+            if std_match(InstReg, Opcodes.OpBCLR) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
+                NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
-            elsif std_match(InstReg, OpLDI) then
+            elsif std_match(InstReg, Opcodes.OpLDI) then
                 -- Pass immediate through ALU into write unit
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= std_logic_vector(to_unsigned(decodeReg16d, 5));
                 NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
                 NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
-            elsif std_match(InstReg, OpADD) then
+            elsif std_match(InstReg, Opcodes.OpADD) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpIN) then
                 null;
-            elsif std_match(InstReg, OpIN) then
-                null;
-            elsif std_match(InstReg, OpST) then
+            elsif std_match(InstReg, Opcodes.OpST) then
                 null;
             else
                 null;
