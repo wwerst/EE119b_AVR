@@ -75,7 +75,7 @@ end package;
 --
 -- Inputs:
 --      clk     - clock to update PC on
---      SrSel   - source ID, from IAU package
+--      SrcSel  - source ID, from IAU package
 --      branch  - 7 bit signed value
 --      jump    - 12 bit signed value
 --      PDB     - 16 bit unsigned value
@@ -148,14 +148,14 @@ begin
     branch_ext  <= (branch'RANGE => branch, others => branch(branch'HIGH));
     jump_ext    <= (jump'RANGE => jump, others => jump(jump'HIGH));
     -- concatenate sources and offsets
-    sources     <= (pc & ZERO);
-    offsets     <= (
-        DDB & x"00" &
-        x"00" & DDB &
-        Z           &
-        PDB         &
-        jump_ext    &
-        branch_ext  &
+    sources     <= (pc & ZERO);   -- pc for relative movements, ZERO for absolute movements
+    offsets     <= (    -- One of these offsets is selected by the Mau
+        DDB & x"00" &   -- Data Databus  (used for RET instruction)
+        x"00" & DDB &   -- Data Databus  (used for RET instruction)
+        Z           &   -- Double width register for indirect jumps
+        PDB         &   -- Program Data Bus (for an absolute jump, simultan)
+        jump_ext    &   -- Select for jump offset
+        branch_ext  &   -- Select for branch offset
         ONE         &
         ZERO
     );
