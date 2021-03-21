@@ -373,6 +373,27 @@ begin
                 NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpADIW) then
+                -- ADIW takes 2 cycles
+                if CurState = 0 then
+                    -- Stub function for delaying
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                else
+                    null;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpAND) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
+                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpIN) then
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
@@ -396,6 +417,19 @@ begin
                     reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                     DataDB <= reg_DataOutA;
                     DataWr <= '1' xor clock;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpSTS) then
+                -- Stub implementation
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                else
+                    null;
                 end if;
             else
                 null;
