@@ -89,7 +89,7 @@ begin
 
     -- stimulus and check process
     test_p: process
-        file vectorsf: text is "cpuvec.txt";
+        file vectorsf: text is "glen_test_generator/cpuvec.txt";
         variable linenum: integer := 0;
         variable l: line;
         variable fileok: boolean;
@@ -121,16 +121,37 @@ begin
                 hread(l, veDataAB);
                 hread(l, veDataDB);
 
-                progDB <= vProgDB;
-                dataDB <= vDataDB;
-
+                
                 wait until rising_edge(clk);
+
+                -- On clock, cpu puts out:
+                -- progAB
+                -- dataAB
+                -- DataWr
+                -- DataRd
+                -- DataDB (inout)
 
                 assert nonstd_match(progAB, veProgAB) report "progAB mismatch" severity error;
                 assert nonstd_match(dataAB, veDataAB) report "dataAB mismatch" severity error;
                 assert std_match(dataRd, veDataRd) report "Rd mismatch" severity error;
                 assert std_match(dataWr, veDataWr) report "Wr mismatch" severity error;
-                assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch" severity error;
+                if veDataWr = '0' then
+                    assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch on cpu write" severity error;
+                end if;
+                
+
+                wait for 0 ns;
+                progDB <= vProgDB;
+
+                -- If the data bus is being read, write value to it.
+                -- Else, read value being written and check
+
+                if veDataRd = '0' then
+                    dataDB <= vDataDB;
+                end if;
+                
+
+                
 
             end if;
         end loop;
