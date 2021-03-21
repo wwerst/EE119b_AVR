@@ -47,7 +47,6 @@ architecture testbench of avr_cpu_tb is
     signal Reset   :  std_logic;                       -- reset signal (active low)
     signal INT0    :  std_logic;                       -- interrupt signal (active low)
     signal INT1    :  std_logic;                       -- interrupt signal (active low)
-    signal clock   :  std_logic;                       -- system clock
     signal ProgAB  :  std_logic_vector(15 downto 0);   -- program memory address bus
     signal DataAB  :  std_logic_vector(15 downto 0);   -- data memory address bus
     signal DataWr  :  std_logic;                       -- data memory write enable (active low)
@@ -79,7 +78,7 @@ begin
         Reset  => Reset ,
         INT0   => INT0  ,
         INT1   => INT1  ,
-        clock  => clock ,
+        clock  => clk ,
         ProgAB => ProgAB,
         DataAB => DataAB,
         DataWr => DataWr,
@@ -105,7 +104,6 @@ begin
         INT1 <= '0';
         Reset <= '0';
         wait until rising_edge(clk);
-        Reset <= '1';
 
         -- initializtion
         while not endfile(vectorsf) loop
@@ -121,8 +119,11 @@ begin
                 hread(l, veDataAB);
                 hread(l, veDataDB);
 
-                
+                progDB <= vProgDB;
+                dataDB <= vDataDB;
+
                 wait until rising_edge(clk);
+                Reset <= '1';
 
                 -- On clock, cpu puts out:
                 -- progAB
@@ -140,18 +141,6 @@ begin
                 end if;
                 
 
-                wait for 0 ns;
-                progDB <= vProgDB;
-
-                -- If the data bus is being read, write value to it.
-                -- Else, read value being written and check
-
-                if veDataRd = '0' then
-                    dataDB <= vDataDB;
-                end if;
-                
-
-                
 
             end if;
         end loop;

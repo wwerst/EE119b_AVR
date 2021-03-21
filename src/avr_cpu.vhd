@@ -254,9 +254,9 @@ begin
         end if;
     end process;
 
-    DecodeProc: process (ir, CurState, alu_Status) is
+    DecodeProc: process (Reset, ir, CurState, alu_Status) is
     begin
-        regA <= ir(8 downto 4); -- TODO needs to persist for LDS
+        regA <= ir(8 downto 4);
         regB <= ir(9) & ir(3 downto 0);
         loadArr <= ir(13) & ir(11 downto 10) & ir(2 downto 0);
 
@@ -268,46 +268,55 @@ begin
         -- don't do stuff
         reg_ctrl.EnableInS <= '0';
         reg_ctrl.EnableInD <= '0';
-        DataRd <= '0';
-        DataWr <= '0';
+        DataRd <= '1';
+        DataWr <= '1';
 
-        -- Assigns to:
-        if std_match(ir, Opcodes.OpLD) then
+        if (Reset = '0') then
+            iau_ctrl.srcSel <= IAU.SRC_ZERO;
+            iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+        elsif std_match(ir, Opcodes.OpLD) then
             reg_ctrl.EnableInS <= '1';
             reg_ctrl.SelInS <= regA;
             reg_ssrc <= REG_SSRC_DDB;
-            DataRd <= '1'; -- TODO rd and wr have special timing
+            DataRd <= '0'; -- TODO rd and wr have special timing
+            dau_ctrl.SrcSel <= DAU.SRC_REG;
             if std_match(ir, Opcodes.OPLDX) then
                 reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ZERO);
+                dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
             elsif std_match(ir, Opcodes.OpLDXI) then
                 reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
             elsif std_match(ir, Opcodes.OpLDXD) then
                 reg_ctrl.SelOutD <= "01"; -- X register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_NEGONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
             elsif std_match(ir, Opcodes.OpLDYI) then
                 reg_ctrl.SelOutD <= "10"; -- Y register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
             elsif std_match(ir, Opcodes.OpLDYD) then
                 reg_ctrl.SelOutD <= "10"; -- Y register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_NEGONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
             elsif std_match(ir, Opcodes.OpLDZI) then
                 reg_ctrl.SelOutD <= "11"; -- Z register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_ONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_ONE;
             elsif std_match(ir, Opcodes.OpLDZD) then
                 reg_ctrl.SelOutD <= "11"; -- X register
-                dau_ctrl <= (SrcSel => DAU.SRC_REG, OffsetSel => DAU.OFF_NEGONE);
+                dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
             elsif std_match(ir, Opcodes.OpLDS) then
+                isLastState <= '0';
+                DataRd <= '1';
+                dau_ctrl.srcSel <= DAU.SRC_PDB;
+                dau_ctrl.offsetSel <= DAU.OFF_ZERO;
+                reg_ctrl.EnableInS <= '0';
                 if CurState = 1 then
-                    isLastState <= '0';
-                else
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    reg_ctrl.EnableInS <= '1';
+                    DataRd <= '0';
+                elsif CurState = 2 then
+                elsif CurState = 3 then
                     isLastState <= '1';
                 end if;
-
-                --reg_ctrl.EnableInS <= '1';
-                --reg_ctrl.SelInS <= regA;
-                --reg_ssrc <= REG_SSRC_IMM;
+            elsif std_match(ir, Opcodes.OpPOP) then
+                -- TODO pop
             end if;
         elsif std_match(ir, Opcodes.OpLDDY) then
             reg_ctrl.EnableInS <= '1';
@@ -327,12 +336,30 @@ begin
             reg_ctrl.EnableInS <= '1';
             reg_ctrl.SelInS <= regA;
             reg_ssrc <= REG_SSRC_IMM;
-        --    if first_clock then
-        --        ADD r1, r2
-        --    elsif second_clock
-        --        ADC r1, r2
-        --    end if;
-        --    controls <= something;
+        elsif std_match(ir, Opcodes.OpST) then
+            reg_ctrl.SelOutA <= regA;
+            DataWr <= '0'; -- TODO rd and wr have special timing
+            if std_match(ir, Opcodes.OPSTX) then
+            elsif std_match(ir, Opcodes.OPSTXI) then
+            elsif std_match(ir, Opcodes.OPSTXD) then
+            elsif std_match(ir, Opcodes.OPSTYI) then
+            elsif std_match(ir, Opcodes.OPSTYD) then
+            elsif std_match(ir, Opcodes.OPSTZI) then
+            elsif std_match(ir, Opcodes.OPSTZD) then
+            elsif std_match(ir, Opcodes.OPSTS) then
+                isLastState <= '0';
+                DataWr <= '1';
+                dau_ctrl.srcSel <= DAU.SRC_PDB;
+                dau_ctrl.offsetSel <= DAU.OFF_ZERO;
+                if CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataWr <= '0';
+                elsif CurState = 2 then
+                elsif CurState = 3 then
+                    isLastState <= '1';
+                end if;
+            elsif std_match(ir, Opcodes.OPPUSH) then
+            end if;
         end if;
     end process DecodeProc;
 

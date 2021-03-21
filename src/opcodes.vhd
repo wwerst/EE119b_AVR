@@ -61,55 +61,59 @@ package opcodes is
 --  Load and Store Opcodes
 
    constant OpLD     :  opcode_word := "1001000---------";   -- Loads, including LDS, excluding LDI,LDD
-   constant OpST     :  opcode_word := "1001001---------";   -- stores
-   constant OpELPM   :  opcode_word := "1001010111011000";   -- ELPM
-   constant OpELPMZ  :  opcode_word := "1001000-----0110";   -- ELPM Rd, Z
-   constant OpELPMZI :  opcode_word := "1001000-----0111";   -- ELPM Rd, Z+
    constant OpLDX    :  opcode_word := "1001000-----1100";   -- LD Rd, X
    constant OpLDXI   :  opcode_word := "1001000-----1101";   -- LD Rd, X+
    constant OpLDXD   :  opcode_word := "1001000-----1110";   -- LD Rd, -X
    constant OpLDYI   :  opcode_word := "1001000-----1001";   -- LD Rd, Y+
    constant OpLDYD   :  opcode_word := "1001000-----1010";   -- LD Rd, -Y
-   constant OpLDDY   :  opcode_word := "10-0--0-----1---";   -- LDD Rd, Y + q
    constant OpLDZI   :  opcode_word := "1001000-----0001";   -- LD Rd, Z+
    constant OpLDZD   :  opcode_word := "1001000-----0010";   -- LD Rd, -Z
-   constant OpLDDZ   :  opcode_word := "10-0--0-----0---";   -- LDD Rd, Z + q
-   constant OpLDI    :  opcode_word := "1110------------";   -- LDI Rd, k
    constant OpLDS    :  opcode_word := "1001000-----0000";   -- LDS Rd, m
-   constant OpLPM    :  opcode_word := "1001010111001000";   -- LPM
-   constant OpLPMZ   :  opcode_word := "1001000-----0100";   -- LPM Rd, Z
-   constant OpLPMZI  :  opcode_word := "1001000-----0101";   -- LPM Rd, Z+
-   constant OpMOV    :  opcode_word := "001011----------";   -- MOV Rd, Rr
-   constant OpMOVW   :  opcode_word := "00000001--------";   -- MOVW Rd, Rr
-   constant OpSPM    :  opcode_word := "1001010111101000";   -- SPM
+   constant OpPOP    :  opcode_word := "1001000-----1111";   -- POP Rd
+
+   constant OpST     :  opcode_word := "1001001---------";   -- stores
    constant OpSTX    :  opcode_word := "1001001-----1100";   -- ST X, Rr
    constant OpSTXI   :  opcode_word := "1001001-----1101";   -- ST X+, Rr
    constant OpSTXD   :  opcode_word := "1001001-----1110";   -- ST -X, Rr
    constant OpSTYI   :  opcode_word := "1001001-----1001";   -- ST Y+, Rr
    constant OpSTYD   :  opcode_word := "1001001-----1010";   -- ST -Y, Rr
-   constant OpSTDY   :  opcode_word := "10-0--1-----1---";   -- STD Y + q, Rr
    constant OpSTZI   :  opcode_word := "1001001-----0001";   -- ST Z+, Rr
    constant OpSTZD   :  opcode_word := "1001001-----0010";   -- ST -Z, Rr
-   constant OpSTDZ   :  opcode_word := "10-0--1-----0---";   -- STD Z + q, Rr
    constant OpSTS    :  opcode_word := "1001001-----0000";   -- STS m, Rr
-
---  Push and Pop Opcodes
-
-   constant OpPOP    :  opcode_word := "1001000-----1111";   -- POP Rd
    constant OpPUSH   :  opcode_word := "1001001-----1111";   -- PUSH Rd
+
+   constant OpLDDY   :  opcode_word := "10-0--0-----1---";   -- LDD Rd, Y + q
+   constant OpLDDZ   :  opcode_word := "10-0--0-----0---";   -- LDD Rd, Z + q
+   constant OpSTDY   :  opcode_word := "10-0--1-----1---";   -- STD Y + q, Rr
+   constant OpSTDZ   :  opcode_word := "10-0--1-----0---";   -- STD Z + q, Rr
+
+   constant OpLDI    :  opcode_word := "1110------------";   -- LDI Rd, k
+   constant OpMOV    :  opcode_word := "001011----------";   -- MOV Rd, Rr
+
+   -- unsupported in our implementation
+   --constant OpELPM   :  opcode_word := "1001010111011000";   -- ELPM
+   --constant OpELPMZ  :  opcode_word := "1001000-----0110";   -- ELPM Rd, Z
+   --constant OpELPMZI :  opcode_word := "1001000-----0111";   -- ELPM Rd, Z+
+   --constant OpLPM    :  opcode_word := "1001010111001000";   -- LPM
+   --constant OpSPM    :  opcode_word := "1001010111101000";   -- SPM
+   --constant OpLPMZ   :  opcode_word := "1001000-----0100";   -- LPM Rd, Z
+   --constant OpLPMZI  :  opcode_word := "1001000-----0101";   -- LPM Rd, Z+
+   --constant OpMOVW   :  opcode_word := "00000001--------";   -- MOVW Rd, Rr
+
 
 --  Unconditional Branches
 
    constant OpEICALL :  opcode_word := "1001010100011001";   -- EICALL
    constant OpEIJMP  :  opcode_word := "1001010000011001";   -- EIJMP
    constant OpJMP    :  opcode_word := "1001010-----110-";   -- JMP a
-   constant OpRJMP   :  opcode_word := "1100------------";   -- RJMP j
    constant OpIJMP   :  opcode_word := "10010100----1001";   -- IJMP
    constant OpCALL   :  opcode_word := "1001010-----111-";   -- CALL a
-   constant OpRCALL  :  opcode_word := "1101------------";   -- RCALL j
    constant OpICALL  :  opcode_word := "10010101----1001";   -- ICALL
    constant OpRET    :  opcode_word := "100101010--01000";   -- RET
    constant OpRETI   :  opcode_word := "100101010--11000";   -- RETI
+
+   constant OpRJMP   :  opcode_word := "1100------------";   -- RJMP j
+   constant OpRCALL  :  opcode_word := "1101------------";   -- RCALL j
 
 --  Conditional Branches
 
