@@ -67,6 +67,7 @@ architecture dataflow of AVR_CPU is
     component AvrIau is
         port(
             clk         : in  std_logic;
+            reset       : in  std_logic;
             SrcSel      : in  IAU.source_t;
             branch      : in  std_logic_vector(6 downto 0);
             jump        : in  std_logic_vector(11 downto 0);
@@ -177,6 +178,8 @@ architecture dataflow of AVR_CPU is
     signal InstReg: std_logic_vector(15 downto 0);
     signal InstPayload: std_logic_vector(15 downto 0);
 
+    signal LoadInstReg: std_logic;
+
     signal decodeReg16d : integer range 0 to 31;
     signal decodeReg32d : integer range 0 to 31;
 
@@ -232,6 +235,7 @@ begin
 
     iau_u: AvrIau port map (
         clk       => clock,
+        reset     => Reset,
         SrcSel    => iau_ctrl.srcSel,
         branch    => iau_branch,
         jump      => iau_jump,
@@ -269,7 +273,12 @@ begin
     InstrLatchProc: process(clock)
     begin
         if rising_edge(clock) then
-            InstReg <= ProgDB;
+            if LoadInstReg then
+                InstReg <= ProgDB;
+                CurState <= 0;
+            else
+                CurState <= CurState + 1;
+            end if;
         end if;
     end process InstrLatchProc;
 
@@ -315,6 +324,13 @@ begin
         NextExecuteOpData.ALUFlagMask <= (others => '0');
         NextExecuteOpData.writeRegEnS <= '0';
         NextExecuteOpData.writeRegSelS <= (others => '0');
+        DataDB <= (others => 'Z');
+        DataWr <= '1';
+        DataRd <= '1';
+
+
+        -- Control signal for previous pipeline stage
+        LoadInstReg <= '1';
 
         if Reset = '0' then
             -- Clear the status register
@@ -346,10 +362,41 @@ begin
                 NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpADC) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
+                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpIN) then
-                null;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
+                NextExecuteOpData.OpA <= alu_SReg;
             elsif std_match(InstReg, Opcodes.OpST) then
-                null;
+                if CurState = 0 then
+                    -- First cycle for store instruction.
+                    -- On first cycle, do the following:
+                    -- Put the address on the Data bus (already connected to double width output)
+                    -- Put the data on the Data bus
+                    -- Stop the InstReg from incrementing
+                    reg_read_ctrl.SelOutD <= "01";
+                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                    DataDB <= reg_DataOutA;
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                    DataWr <= '0' xor clock;
+                else
+                    reg_read_ctrl.SelOutD <= "01";
+                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                    DataDB <= reg_DataOutA;
+                    DataWr <= '1' xor clock;
+                end if;
             else
                 null;
             end if;

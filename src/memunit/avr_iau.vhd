@@ -98,6 +98,7 @@ use work.MemUnitConstants;
 entity  AvrIau  is
     port(
         clk         : in  std_logic;
+        reset       : in  std_logic;
         SrcSel      : in  IAU.source_t;
         branch      : in  std_logic_vector(6 downto 0);
         jump        : in  std_logic_vector(11 downto 0);
@@ -176,7 +177,12 @@ begin
     -- every clock, update PC
     process(clk) begin
         if rising_edge(clk) then
-            pc <= Address;
+            if reset = '0' then
+                -- Reset to address -1
+                pc <= (others => '1');
+            else
+                pc <= Address;
+            end if;
         end if;
     end process;
 end dataflow;

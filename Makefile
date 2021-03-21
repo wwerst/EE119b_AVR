@@ -31,7 +31,7 @@ reg_tests: import
 
 cpu_tests: import
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw
+	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd
 
 clean:
 	rm -r work/*.cf || true

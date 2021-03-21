@@ -104,6 +104,8 @@ begin
         INT1 <= '0';
         Reset <= '0';
         wait until rising_edge(clk);
+        wait until rising_edge(clk);
+        Reset <= '1';
 
         -- initializtion
         while not endfile(vectorsf) loop
@@ -123,7 +125,6 @@ begin
                 dataDB <= vDataDB;
 
                 wait until rising_edge(clk);
-                Reset <= '1';
 
                 -- On clock, cpu puts out:
                 -- progAB
@@ -135,12 +136,12 @@ begin
                 assert nonstd_match(progAB, veProgAB) report "progAB mismatch, expect " & to_string(veProgAB) severity error;
                 assert nonstd_match(dataAB, veDataAB) report "dataAB mismatch" severity error;
                 assert std_match(dataRd, veDataRd) report "Rd mismatch" severity error;
-                assert std_match(dataWr, veDataWr) report "Wr mismatch" severity error;
+                assert std_match(dataWr, veDataWr) report "Wr mismatch, expect " & to_string(veDataWr) severity error;
                 if veDataWr = '0' then
                     assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch on cpu write" severity error;
                 end if;
                 
-                if linenum > 20 then
+                if linenum > 200 then
                     exit;
                 end if;
 
