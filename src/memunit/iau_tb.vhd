@@ -69,7 +69,7 @@ architecture testbench of iau_tb is
 
     -- test bench signals, expected values
     signal offsetValue: integer := 0;
-    signal expected_pc: integer;
+    signal expected_pc: integer := 0;
     signal expected_address: AVR.addr_t;
 
     -- test bench functions
@@ -210,23 +210,22 @@ begin
         --SetAlertStopCount(ERROR, 20);
 
         -- zero out PC
-        wait until rising_edge(clk);
         srcSel <= IAU.SRC_ZERO;
         offsetSel <= IAU.OFF_Z;
         Z <= (others => '0');
+        wait until rising_edge(clk);
 
         for i in tests'LOW to tests'HIGH loop
-            wait until rising_edge(clk);
             applyStimulus(tests(i), srcSel, offsetSel, offsetValue,
                 branch, jump, pdb, ddb, z);
 
+            wait until rising_edge(clk);
             -- check pc is correct
             AffirmIf(alertId, address = expected_address, "mismatch");
         end loop;
 
         -- should not have trouble with intelligent coverage
         while not covBin.IsCovered loop
-            wait until rising_edge(clk);
             -- get new stimulus
             stimulus := covBin.GetRandPoint;
             covBin.ICover(stimulus);
@@ -235,6 +234,7 @@ begin
             applyStimulus(stimulus, srcSel, offsetSel, offsetValue,
                 branch, jump, pdb, ddb, z);
 
+            wait until rising_edge(clk);
             -- check pc is correct
             AffirmIf(alertId, address = expected_address, "mismatch");
         end loop;
@@ -266,7 +266,7 @@ begin
         end if;
 
         -- output result and update expected PC
-        expected_address <= std_logic_vector(to_unsigned(addr, AVR.ADDRSIZE));
+        expected_address <= std_logic_vector(to_unsigned(expected_pc, AVR.ADDRSIZE));
         if rising_edge(clk) then
             expected_pc <= addr;
         end if;
