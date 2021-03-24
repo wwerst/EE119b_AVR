@@ -39,6 +39,7 @@ architecture testbench of iau_tb is
     component AvrIau
         port(
             clk         : in  std_logic;
+            reset       : in  std_logic;
             SrcSel      : in  IAU.source_t;
             branch      : in  std_logic_vector(6 downto 0);
             jump        : in  std_logic_vector(11 downto 0);
@@ -53,6 +54,7 @@ architecture testbench of iau_tb is
     -- Set up test bench clock and done signal
     constant CLK_PERIOD : time      := 1 ms;
     signal clk          : std_logic := '0';
+    signal reset        : std_logic := '1';
     signal done         : boolean   := FALSE;
 
     -- signals for IAU
@@ -185,6 +187,7 @@ begin
 
     UUT: entity work.AvrIau port map (
         clk => clk,
+        reset => reset,
         srcSel => srcSel,
         branch => branch,
         jump => jump,

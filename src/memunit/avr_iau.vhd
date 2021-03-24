@@ -75,7 +75,7 @@ end package;
 --
 -- Inputs:
 --      clk     - clock to update PC on
---      SrSel   - source ID, from IAU package
+--      SrcSel  - source ID, from IAU package
 --      branch  - 7 bit signed value
 --      jump    - 12 bit signed value
 --      PDB     - 16 bit unsigned value
@@ -98,6 +98,7 @@ use work.MemUnitConstants;
 entity  AvrIau  is
     port(
         clk         : in  std_logic;
+        reset       : in  std_logic;
         SrcSel      : in  IAU.source_t;
         branch      : in  std_logic_vector(6 downto 0);
         jump        : in  std_logic_vector(11 downto 0);
@@ -148,14 +149,14 @@ begin
     branch_ext  <= (branch'RANGE => branch, others => branch(branch'HIGH));
     jump_ext    <= (jump'RANGE => jump, others => jump(jump'HIGH));
     -- concatenate sources and offsets
-    sources     <= (pc & ZERO);
-    offsets     <= (
-        DDB & x"00" &
-        x"00" & DDB &
-        Z           &
-        PDB         &
-        jump_ext    &
-        branch_ext  &
+    sources     <= (pc & ZERO);   -- pc for relative movements, ZERO for absolute movements
+    offsets     <= (    -- One of these offsets is selected by the Mau
+        DDB & x"00" &   -- Data Databus  (used for RET instruction)
+        x"00" & DDB &   -- Data Databus  (used for RET instruction)
+        Z           &   -- Double width register for indirect jumps
+        PDB         &   -- Program Data Bus (for an absolute jump, simultan)
+        jump_ext    &   -- Select for jump offset
+        branch_ext  &   -- Select for branch offset
         ONE         &
         ZERO
     );
@@ -176,7 +177,12 @@ begin
     -- every clock, update PC
     process(clk) begin
         if rising_edge(clk) then
-            pc <= Address;
+            if reset = '0' then
+                -- Reset to address -1
+                pc <= (others => '1');
+            else
+                pc <= Address;
+            end if;
         end if;
     end process;
 end dataflow;

@@ -5,6 +5,7 @@ work/
 
 # VHDL wave files
 *.vcd
+*.ghw
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
