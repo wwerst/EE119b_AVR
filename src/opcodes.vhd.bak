@@ -64,10 +64,8 @@ package opcodes is
    constant OpLDX    :  opcode_word := "1001000-----1100";   -- LD Rd, X
    constant OpLDXI   :  opcode_word := "1001000-----1101";   -- LD Rd, X+
    constant OpLDXD   :  opcode_word := "1001000-----1110";   -- LD Rd, -X
-   constant OpLDY    :  opcode_word := "1000000-----1000";   -- LD Rd, Y
    constant OpLDYI   :  opcode_word := "1001000-----1001";   -- LD Rd, Y+
    constant OpLDYD   :  opcode_word := "1001000-----1010";   -- LD Rd, -Y
-   constant OpLDZ    :  opcode_word := "1000000-----0000";   -- LD Rd, Z
    constant OpLDZI   :  opcode_word := "1001000-----0001";   -- LD Rd, Z+
    constant OpLDZD   :  opcode_word := "1001000-----0010";   -- LD Rd, -Z
    constant OpLDS    :  opcode_word := "1001000-----0000";   -- LDS Rd, m

@@ -55,26 +55,26 @@
     STS     $0000  ,r31     ;W EC 0000   r31 should be 236
 
 ; do some random LDIs
-    LDI     r26    ,$80     ;
-    LDI     r19    ,$A1     ;
-    LDI     r16    ,$C7     ;
-    LDI     r27    ,$64     ;
-    LDI     r28    ,$A5     ;
-    LDI     r24    ,$22     ;
-    LDI     r29    ,$4B     ;
-    LDI     r23    ,$6B     ;
-    LDI     r25    ,$D9     ;
-    LDI     r21    ,$69     ;
-    STS     $0000  ,r26     ;W 80 0000   r26 should be 128
-    STS     $0000  ,r19     ;W A1 0000   r19 should be 161
-    STS     $0000  ,r16     ;W C7 0000   r16 should be 199
-    STS     $0000  ,r27     ;W 64 0000   r27 should be 100
-    STS     $0000  ,r28     ;W A5 0000   r28 should be 165
-    STS     $0000  ,r24     ;W 22 0000   r24 should be 34
-    STS     $0000  ,r29     ;W 4B 0000   r29 should be 75
-    STS     $0000  ,r23     ;W 6B 0000   r23 should be 107
-    STS     $0000  ,r25     ;W D9 0000   r25 should be 217
-    STS     $0000  ,r21     ;W 69 0000   r21 should be 105
+    LDI     r21    ,$9D     ;
+    LDI     r31    ,$C2     ;
+    LDI     r19    ,$7C     ;
+    LDI     r29    ,$B9     ;
+    LDI     r18    ,$53     ;
+    LDI     r16    ,$57     ;
+    LDI     r22    ,$A7     ;
+    LDI     r24    ,$68     ;
+    LDI     r30    ,$C9     ;
+    LDI     r28    ,$36     ;
+    STS     $0000  ,r21     ;W 9D 0000   r21 should be 157
+    STS     $0000  ,r31     ;W C2 0000   r31 should be 194
+    STS     $0000  ,r19     ;W 7C 0000   r19 should be 124
+    STS     $0000  ,r29     ;W B9 0000   r29 should be 185
+    STS     $0000  ,r18     ;W 53 0000   r18 should be 83
+    STS     $0000  ,r16     ;W 57 0000   r16 should be 87
+    STS     $0000  ,r22     ;W A7 0000   r22 should be 167
+    STS     $0000  ,r24     ;W 68 0000   r24 should be 104
+    STS     $0000  ,r30     ;W C9 0000   r30 should be 201
+    STS     $0000  ,r28     ;W 36 0000   r28 should be 54
 
 
 
@@ -88,44 +88,44 @@
     STS     $0000  ,r0      ;W EC 0000   r0 should be 236
     LD      r8     ,X       ;R EC 0004
     STS     $0000  ,r8      ;W EC 0000   r8 should be 236
-    LD      r31    ,X       ;R EC 0004
-    STS     $0000  ,r31     ;W EC 0000   r31 should be 236
+    LD      r25    ,X       ;R EC 0004
+    STS     $0000  ,r25     ;W EC 0000   r25 should be 236
 
 ; load with pre decrement through 0x0000
-    LD      r19    ,-X      ;R 70 0003
-    LD      r15    ,-X      ;R 74 0002
-    LD      r31    ,-X      ;R 0F 0001
-    LD      r16    ,-X      ;R 5E 0000
-    LD      r3     ,-X      ;R E4 FFFF
-    LD      r24    ,-X      ;R D9 FFFE
-    LD      r4     ,-X      ;R 43 FFFD
-    LD      r9     ,-X      ;R 3C FFFC
-    STS     $0000  ,r19     ;W 70 0000   r19 should be 112
-    STS     $0000  ,r15     ;W 74 0000   r15 should be 116
-    STS     $0000  ,r31     ;W 0F 0000   r31 should be 15
-    STS     $0000  ,r16     ;W 5E 0000   r16 should be 94
-    STS     $0000  ,r3      ;W E4 0000   r3 should be 228
-    STS     $0000  ,r24     ;W D9 0000   r24 should be 217
-    STS     $0000  ,r4      ;W 43 0000   r4 should be 67
-    STS     $0000  ,r9      ;W 3C 0000   r9 should be 60
+    LD      r10    ,-X      ;R 50 0003
+    LD      r2     ,-X      ;R E6 0002
+    LD      r12    ,-X      ;R 2D 0001
+    LD      r13    ,-X      ;R D6 0000
+    LD      r16    ,-X      ;R 8C FFFF
+    LD      r8     ,-X      ;R 75 FFFE
+    LD      r9     ,-X      ;R 9B FFFD
+    LD      r0     ,-X      ;R BA FFFC
+    STS     $0000  ,r10     ;W 50 0000   r10 should be 80
+    STS     $0000  ,r2      ;W E6 0000   r2 should be 230
+    STS     $0000  ,r12     ;W 2D 0000   r12 should be 45
+    STS     $0000  ,r13     ;W D6 0000   r13 should be 214
+    STS     $0000  ,r16     ;W 8C 0000   r16 should be 140
+    STS     $0000  ,r8      ;W 75 0000   r8 should be 117
+    STS     $0000  ,r9      ;W 9B 0000   r9 should be 155
+    STS     $0000  ,r0      ;W BA 0000   r0 should be 186
 
 ; load with post increment through 0xFFFF
-    LD      r11    ,X+      ;R 55 FFFC
-    LD      r14    ,X+      ;R 83 FFFD
-    LD      r18    ,X+      ;R CA FFFE
-    LD      r21    ,X+      ;R 80 FFFF
-    LD      r28    ,X+      ;R A7 0000
-    LD      r5     ,X+      ;R D4 0001
-    LD      r3     ,X+      ;R A9 0002
-    LD      r1     ,X+      ;R AC 0003
-    STS     $0000  ,r11     ;W 55 0000   r11 should be 85
-    STS     $0000  ,r14     ;W 83 0000   r14 should be 131
-    STS     $0000  ,r18     ;W CA 0000   r18 should be 202
-    STS     $0000  ,r21     ;W 80 0000   r21 should be 128
-    STS     $0000  ,r28     ;W A7 0000   r28 should be 167
-    STS     $0000  ,r5      ;W D4 0000   r5 should be 212
-    STS     $0000  ,r3      ;W A9 0000   r3 should be 169
-    STS     $0000  ,r1      ;W AC 0000   r1 should be 172
+    LD      r20    ,X+      ;R 7A FFFC
+    LD      r21    ,X+      ;R BD FFFD
+    LD      r16    ,X+      ;R D0 FFFE
+    LD      r11    ,X+      ;R DA FFFF
+    LD      r1     ,X+      ;R 83 0000
+    LD      r25    ,X+      ;R B7 0001
+    LD      r17    ,X+      ;R 5A 0002
+    LD      r7     ,X+      ;R 4C 0003
+    STS     $0000  ,r20     ;W 7A 0000   r20 should be 122
+    STS     $0000  ,r21     ;W BD 0000   r21 should be 189
+    STS     $0000  ,r16     ;W D0 0000   r16 should be 208
+    STS     $0000  ,r11     ;W DA 0000   r11 should be 218
+    STS     $0000  ,r1      ;W 83 0000   r1 should be 131
+    STS     $0000  ,r25     ;W B7 0000   r25 should be 183
+    STS     $0000  ,r17     ;W 5A 0000   r17 should be 90
+    STS     $0000  ,r7      ;W 4C 0000   r7 should be 76
 
 ; do a few simple LDs from Y register
     LDI     r28    ,$04     ;            set Y to $0004
@@ -134,44 +134,44 @@
     STS     $0000  ,r0      ;W EC 0000   r0 should be 236
     LD      r8     ,Y       ;R EC 0004
     STS     $0000  ,r8      ;W EC 0000   r8 should be 236
-    LD      r31    ,Y       ;R EC 0004
-    STS     $0000  ,r31     ;W EC 0000   r31 should be 236
+    LD      r25    ,Y       ;R EC 0004
+    STS     $0000  ,r25     ;W EC 0000   r25 should be 236
 
 ; load with pre decrement through 0x0000
-    LD      r10    ,-Y      ;R F7 0003
-    LD      r8     ,-Y      ;R 77 0002
-    LD      r30    ,-Y      ;R 47 0001
-    LD      r13    ,-Y      ;R B7 0000
-    LD      r27    ,-Y      ;R 33 FFFF
-    LD      r16    ,-Y      ;R 36 FFFE
-    LD      r1     ,-Y      ;R 3A FFFD
-    LD      r11    ,-Y      ;R D7 FFFC
-    STS     $0000  ,r10     ;W F7 0000   r10 should be 247
-    STS     $0000  ,r8      ;W 77 0000   r8 should be 119
-    STS     $0000  ,r30     ;W 47 0000   r30 should be 71
-    STS     $0000  ,r13     ;W B7 0000   r13 should be 183
-    STS     $0000  ,r27     ;W 33 0000   r27 should be 51
-    STS     $0000  ,r16     ;W 36 0000   r16 should be 54
-    STS     $0000  ,r1      ;W 3A 0000   r1 should be 58
-    STS     $0000  ,r11     ;W D7 0000   r11 should be 215
+    LD      r19    ,-Y      ;R C1 0003
+    LD      r27    ,-Y      ;R 19 0002
+    LD      r5     ,-Y      ;R 2E 0001
+    LD      r10    ,-Y      ;R 62 0000
+    LD      r21    ,-Y      ;R B5 FFFF
+    LD      r26    ,-Y      ;R 0B FFFE
+    LD      r31    ,-Y      ;R E5 FFFD
+    LD      r24    ,-Y      ;R 8B FFFC
+    STS     $0000  ,r19     ;W C1 0000   r19 should be 193
+    STS     $0000  ,r27     ;W 19 0000   r27 should be 25
+    STS     $0000  ,r5      ;W 2E 0000   r5 should be 46
+    STS     $0000  ,r10     ;W 62 0000   r10 should be 98
+    STS     $0000  ,r21     ;W B5 0000   r21 should be 181
+    STS     $0000  ,r26     ;W 0B 0000   r26 should be 11
+    STS     $0000  ,r31     ;W E5 0000   r31 should be 229
+    STS     $0000  ,r24     ;W 8B 0000   r24 should be 139
 
 ; load with post increment through 0xFFFF
-    LD      r15    ,Y+      ;R 78 FFFC
-    LD      r5     ,Y+      ;R A6 FFFD
-    LD      r30    ,Y+      ;R 4E FFFE
-    LD      r14    ,Y+      ;R 63 FFFF
-    LD      r17    ,Y+      ;R 57 0000
-    LD      r22    ,Y+      ;R 2B 0001
-    LD      r2     ,Y+      ;R D3 0002
-    LD      r9     ,Y+      ;R 51 0003
-    STS     $0000  ,r15     ;W 78 0000   r15 should be 120
-    STS     $0000  ,r5      ;W A6 0000   r5 should be 166
-    STS     $0000  ,r30     ;W 4E 0000   r30 should be 78
-    STS     $0000  ,r14     ;W 63 0000   r14 should be 99
-    STS     $0000  ,r17     ;W 57 0000   r17 should be 87
-    STS     $0000  ,r22     ;W 2B 0000   r22 should be 43
-    STS     $0000  ,r2      ;W D3 0000   r2 should be 211
-    STS     $0000  ,r9      ;W 51 0000   r9 should be 81
+    LD      r23    ,Y+      ;R B1 FFFC
+    LD      r15    ,Y+      ;R 52 FFFD
+    LD      r3     ,Y+      ;R 0B FFFE
+    LD      r7     ,Y+      ;R 7E FFFF
+    LD      r27    ,Y+      ;R 64 0000
+    LD      r14    ,Y+      ;R D2 0001
+    LD      r8     ,Y+      ;R 67 0002
+    LD      r13    ,Y+      ;R 5E 0003
+    STS     $0000  ,r23     ;W B1 0000   r23 should be 177
+    STS     $0000  ,r15     ;W 52 0000   r15 should be 82
+    STS     $0000  ,r3      ;W 0B 0000   r3 should be 11
+    STS     $0000  ,r7      ;W 7E 0000   r7 should be 126
+    STS     $0000  ,r27     ;W 64 0000   r27 should be 100
+    STS     $0000  ,r14     ;W D2 0000   r14 should be 210
+    STS     $0000  ,r8      ;W 67 0000   r8 should be 103
+    STS     $0000  ,r13     ;W 5E 0000   r13 should be 94
 
 ; do a few simple LDs from Z register
     LDI     r30    ,$04     ;            set Z to $0004
@@ -180,44 +180,44 @@
     STS     $0000  ,r0      ;W EC 0000   r0 should be 236
     LD      r8     ,Z       ;R EC 0004
     STS     $0000  ,r8      ;W EC 0000   r8 should be 236
-    LD      r31    ,Z       ;R EC 0004
-    STS     $0000  ,r31     ;W EC 0000   r31 should be 236
+    LD      r25    ,Z       ;R EC 0004
+    STS     $0000  ,r25     ;W EC 0000   r25 should be 236
 
 ; load with pre decrement through 0x0000
-    LD      r6     ,-Z      ;R 7D 0003
-    LD      r27    ,-Z      ;R 1D 0002
-    LD      r3     ,-Z      ;R 03 0001
-    LD      r22    ,-Z      ;R CA 0000
-    LD      r19    ,-Z      ;R 88 FFFF
-    LD      r24    ,-Z      ;R 00 FFFE
-    LD      r20    ,-Z      ;R 8B FFFD
-    LD      r15    ,-Z      ;R FD FFFC
-    STS     $0000  ,r6      ;W 7D 0000   r6 should be 125
-    STS     $0000  ,r27     ;W 1D 0000   r27 should be 29
-    STS     $0000  ,r3      ;W 03 0000   r3 should be 3
-    STS     $0000  ,r22     ;W CA 0000   r22 should be 202
-    STS     $0000  ,r19     ;W 88 0000   r19 should be 136
-    STS     $0000  ,r24     ;W 00 0000   r24 should be 0
-    STS     $0000  ,r20     ;W 8B 0000   r20 should be 139
-    STS     $0000  ,r15     ;W FD 0000   r15 should be 253
+    LD      r19    ,-Z      ;R 6C 0003
+    LD      r4     ,-Z      ;R CB 0002
+    LD      r22    ,-Z      ;R B6 0001
+    LD      r15    ,-Z      ;R 7D 0000
+    LD      r7     ,-Z      ;R D4 FFFF
+    LD      r8     ,-Z      ;R 02 FFFE
+    LD      r14    ,-Z      ;R EC FFFD
+    LD      r3     ,-Z      ;R 63 FFFC
+    STS     $0000  ,r19     ;W 6C 0000   r19 should be 108
+    STS     $0000  ,r4      ;W CB 0000   r4 should be 203
+    STS     $0000  ,r22     ;W B6 0000   r22 should be 182
+    STS     $0000  ,r15     ;W 7D 0000   r15 should be 125
+    STS     $0000  ,r7      ;W D4 0000   r7 should be 212
+    STS     $0000  ,r8      ;W 02 0000   r8 should be 2
+    STS     $0000  ,r14     ;W EC 0000   r14 should be 236
+    STS     $0000  ,r3      ;W 63 0000   r3 should be 99
 
 ; load with post increment through 0xFFFF
-    LD      r3     ,Z+      ;R C9 FFFC
-    LD      r0     ,Z+      ;R 05 FFFD
-    LD      r6     ,Z+      ;R ED FFFE
-    LD      r19    ,Z+      ;R 83 FFFF
-    LD      r16    ,Z+      ;R 40 0000
-    LD      r20    ,Z+      ;R D5 0001
-    LD      r21    ,Z+      ;R 62 0002
-    LD      r1     ,Z+      ;R 77 0003
-    STS     $0000  ,r3      ;W C9 0000   r3 should be 201
-    STS     $0000  ,r0      ;W 05 0000   r0 should be 5
-    STS     $0000  ,r6      ;W ED 0000   r6 should be 237
-    STS     $0000  ,r19     ;W 83 0000   r19 should be 131
-    STS     $0000  ,r16     ;W 40 0000   r16 should be 64
-    STS     $0000  ,r20     ;W D5 0000   r20 should be 213
-    STS     $0000  ,r21     ;W 62 0000   r21 should be 98
-    STS     $0000  ,r1      ;W 77 0000   r1 should be 119
+    LD      r5     ,Z+      ;R 5B FFFC
+    LD      r10    ,Z+      ;R 5E FFFD
+    LD      r15    ,Z+      ;R BE FFFE
+    LD      r13    ,Z+      ;R 0B FFFF
+    LD      r16    ,Z+      ;R 61 0000
+    LD      r2     ,Z+      ;R 25 0001
+    LD      r1     ,Z+      ;R 59 0002
+    LD      r21    ,Z+      ;R 1B 0003
+    STS     $0000  ,r5      ;W 5B 0000   r5 should be 91
+    STS     $0000  ,r10     ;W 5E 0000   r10 should be 94
+    STS     $0000  ,r15     ;W BE 0000   r15 should be 190
+    STS     $0000  ,r13     ;W 0B 0000   r13 should be 11
+    STS     $0000  ,r16     ;W 61 0000   r16 should be 97
+    STS     $0000  ,r2      ;W 25 0000   r2 should be 37
+    STS     $0000  ,r1      ;W 59 0000   r1 should be 89
+    STS     $0000  ,r21     ;W 1B 0000   r21 should be 27
 
 
 
@@ -225,40 +225,40 @@
 
     LDI     r28    ,$E0     ;            set Y to $FFE0
     LDI     r29    ,$FF     ;
-    LDD     r20    ,Y+0     ;R 84 FFE0
-    LDD     r24    ,Y+3     ;R D0 FFE3
-    LDD     r24    ,Y+42    ;R 87 000A
-    LDD     r10    ,Y+5     ;R 21 FFE5
-    LDD     r6     ,Y+47    ;R BF 000F
-    LDD     r3     ,Y+40    ;R 14 0008
-    LDD     r13    ,Y+61    ;R F8 001D
-    LDD     r19    ,Y+63    ;R A0 001F
-    STS     $0000  ,r20     ;W 84 0000   r20 should be 132
-    STS     $0000  ,r24     ;W D0 0000   r24 should be 208
-    STS     $0000  ,r24     ;W 87 0000   r24 should be 135
-    STS     $0000  ,r10     ;W 21 0000   r10 should be 33
-    STS     $0000  ,r6      ;W BF 0000   r6 should be 191
-    STS     $0000  ,r3      ;W 14 0000   r3 should be 20
-    STS     $0000  ,r13     ;W F8 0000   r13 should be 248
-    STS     $0000  ,r19     ;W A0 0000   r19 should be 160
+    LDD     r3     ,Y+0     ;R F5 FFE0
+    LDD     r17    ,Y+45    ;R 49 000D
+    LDD     r13    ,Y+10    ;R 55 FFEA
+    LDD     r31    ,Y+55    ;R DB 0017
+    LDD     r26    ,Y+11    ;R 3A FFEB
+    LDD     r1     ,Y+32    ;R ED 0000
+    LDD     r5     ,Y+2     ;R C0 FFE2
+    LDD     r10    ,Y+63    ;R E4 001F
+    STS     $0000  ,r3      ;W F5 0000   r3 should be 245
+    STS     $0000  ,r17     ;W 49 0000   r17 should be 73
+    STS     $0000  ,r13     ;W 55 0000   r13 should be 85
+    STS     $0000  ,r31     ;W DB 0000   r31 should be 219
+    STS     $0000  ,r26     ;W 3A 0000   r26 should be 58
+    STS     $0000  ,r1      ;W ED 0000   r1 should be 237
+    STS     $0000  ,r5      ;W C0 0000   r5 should be 192
+    STS     $0000  ,r10     ;W E4 0000   r10 should be 228
     LDI     r30    ,$E0     ;            set Z to $FFE0
     LDI     r31    ,$FF     ;
-    LDD     r3     ,Z+0     ;R 11 FFE0
-    LDD     r23    ,Z+32    ;R 72 0000
-    LDD     r13    ,Z+52    ;R 65 0014
-    LDD     r13    ,Z+35    ;R 3C 0003
-    LDD     r11    ,Z+52    ;R EA 0014
-    LDD     r22    ,Z+55    ;R 97 0017
-    LDD     r6     ,Z+62    ;R 5A 001E
-    LDD     r29    ,Z+63    ;R 4F 001F
-    STS     $0000  ,r3      ;W 11 0000   r3 should be 17
-    STS     $0000  ,r23     ;W 72 0000   r23 should be 114
-    STS     $0000  ,r13     ;W 65 0000   r13 should be 101
-    STS     $0000  ,r13     ;W 3C 0000   r13 should be 60
-    STS     $0000  ,r11     ;W EA 0000   r11 should be 234
-    STS     $0000  ,r22     ;W 97 0000   r22 should be 151
-    STS     $0000  ,r6      ;W 5A 0000   r6 should be 90
-    STS     $0000  ,r29     ;W 4F 0000   r29 should be 79
+    LDD     r9     ,Z+0     ;R B0 FFE0
+    LDD     r28    ,Z+60    ;R 46 001C
+    LDD     r8     ,Z+11    ;R D1 FFEB
+    LDD     r25    ,Z+52    ;R AF 0014
+    LDD     r5     ,Z+0     ;R EC FFE0
+    LDD     r13    ,Z+1     ;R 7A FFE1
+    LDD     r6     ,Z+17    ;R 83 FFF1
+    LDD     r17    ,Z+63    ;R B2 001F
+    STS     $0000  ,r9      ;W B0 0000   r9 should be 176
+    STS     $0000  ,r28     ;W 46 0000   r28 should be 70
+    STS     $0000  ,r8      ;W D1 0000   r8 should be 209
+    STS     $0000  ,r25     ;W AF 0000   r25 should be 175
+    STS     $0000  ,r5      ;W EC 0000   r5 should be 236
+    STS     $0000  ,r13     ;W 7A 0000   r13 should be 122
+    STS     $0000  ,r6      ;W 83 0000   r6 should be 131
+    STS     $0000  ,r17     ;W B2 0000   r17 should be 178
 
 
 
@@ -274,26 +274,26 @@
     STS     $0000  ,r30     ;W EC 0000   r30 should be 236
 
 ; do some random LDSs
-    LDS     r15    ,$9938   ;R CC 9938
-    LDS     r28    ,$DDDE   ;R AE DDDE
-    LDS     r0     ,$66B7   ;R CD 66B7
-    LDS     r30    ,$F974   ;R 44 F974
-    LDS     r12    ,$5EEB   ;R BA 5EEB
-    LDS     r14    ,$E7A3   ;R BE E7A3
-    LDS     r26    ,$EE84   ;R 37 EE84
-    LDS     r20    ,$A5FB   ;R B4 A5FB
-    LDS     r27    ,$226D   ;R 26 226D
-    LDS     r3     ,$22C2   ;R 0E 22C2
-    STS     $0000  ,r15     ;W CC 0000   r15 should be 204
-    STS     $0000  ,r28     ;W AE 0000   r28 should be 174
-    STS     $0000  ,r0      ;W CD 0000   r0 should be 205
-    STS     $0000  ,r30     ;W 44 0000   r30 should be 68
-    STS     $0000  ,r12     ;W BA 0000   r12 should be 186
-    STS     $0000  ,r14     ;W BE 0000   r14 should be 190
-    STS     $0000  ,r26     ;W 37 0000   r26 should be 55
-    STS     $0000  ,r20     ;W B4 0000   r20 should be 180
-    STS     $0000  ,r27     ;W 26 0000   r27 should be 38
-    STS     $0000  ,r3      ;W 0E 0000   r3 should be 14
+    LDS     r17    ,$A3CF   ;R 01 A3CF
+    LDS     r25    ,$2F0C   ;R 38 2F0C
+    LDS     r27    ,$1F5F   ;R FC 1F5F
+    LDS     r30    ,$25FF   ;R B2 25FF
+    LDS     r15    ,$190C   ;R E0 190C
+    LDS     r23    ,$8EC0   ;R 0E 8EC0
+    LDS     r7     ,$FF6A   ;R 15 FF6A
+    LDS     r21    ,$5F0E   ;R 2F 5F0E
+    LDS     r24    ,$2C58   ;R 7A 2C58
+    LDS     r4     ,$5C1D   ;R DC 5C1D
+    STS     $0000  ,r17     ;W 01 0000   r17 should be 1
+    STS     $0000  ,r25     ;W 38 0000   r25 should be 56
+    STS     $0000  ,r27     ;W FC 0000   r27 should be 252
+    STS     $0000  ,r30     ;W B2 0000   r30 should be 178
+    STS     $0000  ,r15     ;W E0 0000   r15 should be 224
+    STS     $0000  ,r23     ;W 0E 0000   r23 should be 14
+    STS     $0000  ,r7      ;W 15 0000   r7 should be 21
+    STS     $0000  ,r21     ;W 2F 0000   r21 should be 47
+    STS     $0000  ,r24     ;W 7A 0000   r24 should be 122
+    STS     $0000  ,r4      ;W DC 0000   r4 should be 220
 
 
 
@@ -301,47 +301,47 @@
 
 
 ; do a few simple MOVs
-    LDS     r0     ,$0000   ;R EB 0000
+    LDS     r0     ,$0000   ;R 7F 0000
     MOV     r0     ,r1      ;
-    STS     $0000  ,r1      ;W EB 0000   r1 should be 235
-    LDS     r31    ,$0000   ;R 9F 0000
+    STS     $0000  ,r1      ;W 7F 0000   r1 should be 127
+    LDS     r31    ,$0000   ;R B2 0000
     MOV     r31    ,r30     ;
-    STS     $0000  ,r30     ;W 9F 0000   r30 should be 159
+    STS     $0000  ,r30     ;W B2 0000   r30 should be 178
 
 ; do a random move through all registers
-    LDS     r23    ,$0000   ;R 1B 0000
-    MOV     r23    ,r8      ;
-    MOV     r8     ,r12     ;
-    MOV     r12    ,r14     ;
-    MOV     r14    ,r30     ;
-    MOV     r30    ,r26     ;
-    MOV     r26    ,r22     ;
-    MOV     r22    ,r0      ;
-    MOV     r0     ,r17     ;
-    MOV     r17    ,r13     ;
-    MOV     r13    ,r10     ;
-    MOV     r10    ,r5      ;
-    MOV     r5     ,r29     ;
-    MOV     r29    ,r7      ;
-    MOV     r7     ,r27     ;
-    MOV     r27    ,r9      ;
-    MOV     r9     ,r16     ;
-    MOV     r16    ,r3      ;
-    MOV     r3     ,r18     ;
-    MOV     r18    ,r4      ;
-    MOV     r4     ,r11     ;
-    MOV     r11    ,r20     ;
-    MOV     r20    ,r2      ;
-    MOV     r2     ,r28     ;
-    MOV     r28    ,r19     ;
-    MOV     r19    ,r24     ;
-    MOV     r24    ,r6      ;
-    MOV     r6     ,r31     ;
-    MOV     r31    ,r25     ;
-    MOV     r25    ,r1      ;
+    LDS     r1     ,$0000   ;R 92 0000
     MOV     r1     ,r21     ;
-    MOV     r21    ,r15     ;
-    STS     $0000  ,r15     ;W 1B 0000   r15 should be 27
+    MOV     r21    ,r0      ;
+    MOV     r0     ,r8      ;
+    MOV     r8     ,r3      ;
+    MOV     r3     ,r6      ;
+    MOV     r6     ,r13     ;
+    MOV     r13    ,r16     ;
+    MOV     r16    ,r2      ;
+    MOV     r2     ,r7      ;
+    MOV     r7     ,r24     ;
+    MOV     r24    ,r4      ;
+    MOV     r4     ,r31     ;
+    MOV     r31    ,r22     ;
+    MOV     r22    ,r23     ;
+    MOV     r23    ,r5      ;
+    MOV     r5     ,r12     ;
+    MOV     r12    ,r25     ;
+    MOV     r25    ,r19     ;
+    MOV     r19    ,r30     ;
+    MOV     r30    ,r26     ;
+    MOV     r26    ,r27     ;
+    MOV     r27    ,r20     ;
+    MOV     r20    ,r17     ;
+    MOV     r17    ,r10     ;
+    MOV     r10    ,r9      ;
+    MOV     r9     ,r15     ;
+    MOV     r15    ,r14     ;
+    MOV     r14    ,r11     ;
+    MOV     r11    ,r28     ;
+    MOV     r28    ,r29     ;
+    MOV     r29    ,r18     ;
+    STS     $0000  ,r18     ;W 92 0000   r18 should be 146
 
 
 
@@ -357,40 +357,40 @@
     ST      X      ,r31     ;W EC 0004
 
 ; store with pre decrement through 0x0000
-    LDS     r16    ,$0000   ;R 17 0000   set r16 to 23
-    LDS     r13    ,$0000   ;R 0A 0000   set r13 to 10
-    LDS     r29    ,$0000   ;R C7 0000   set r29 to 199
-    LDS     r24    ,$0000   ;R 64 0000   set r24 to 100
-    LDS     r17    ,$0000   ;R 7C 0000   set r17 to 124
-    LDS     r15    ,$0000   ;R 2F 0000   set r15 to 47
-    LDS     r9     ,$0000   ;R AB 0000   set r9 to 171
-    LDS     r7     ,$0000   ;R B2 0000   set r7 to 178
-    ST      -X     ,r16     ;W 17 0003
-    ST      -X     ,r13     ;W 0A 0002
-    ST      -X     ,r29     ;W C7 0001
-    ST      -X     ,r24     ;W 64 0000
-    ST      -X     ,r17     ;W 7C FFFF
-    ST      -X     ,r15     ;W 2F FFFE
-    ST      -X     ,r9      ;W AB FFFD
-    ST      -X     ,r7      ;W B2 FFFC
+    LDS     r1     ,$0000   ;R 6A 0000   set r1 to 106
+    LDS     r11    ,$0000   ;R 6B 0000   set r11 to 107
+    LDS     r23    ,$0000   ;R F0 0000   set r23 to 240
+    LDS     r12    ,$0000   ;R 9D 0000   set r12 to 157
+    LDS     r13    ,$0000   ;R 65 0000   set r13 to 101
+    LDS     r4     ,$0000   ;R 14 0000   set r4 to 20
+    LDS     r8     ,$0000   ;R B8 0000   set r8 to 184
+    LDS     r30    ,$0000   ;R 38 0000   set r30 to 56
+    ST      -X     ,r1      ;W 6A 0003
+    ST      -X     ,r11     ;W 6B 0002
+    ST      -X     ,r23     ;W F0 0001
+    ST      -X     ,r12     ;W 9D 0000
+    ST      -X     ,r13     ;W 65 FFFF
+    ST      -X     ,r4      ;W 14 FFFE
+    ST      -X     ,r8      ;W B8 FFFD
+    ST      -X     ,r30     ;W 38 FFFC
 
 ; store with post increment through 0xFFFF
-    LDS     r7     ,$0000   ;R 63 0000   set r7 to 99
-    LDS     r13    ,$0000   ;R AF 0000   set r13 to 175
-    LDS     r8     ,$0000   ;R 65 0000   set r8 to 101
-    LDS     r28    ,$0000   ;R BD 0000   set r28 to 189
-    LDS     r17    ,$0000   ;R 3A 0000   set r17 to 58
-    LDS     r12    ,$0000   ;R E5 0000   set r12 to 229
-    LDS     r22    ,$0000   ;R CC 0000   set r22 to 204
-    LDS     r9     ,$0000   ;R 8D 0000   set r9 to 141
-    ST      X+     ,r7      ;W 63 FFFC
-    ST      X+     ,r13     ;W AF FFFD
-    ST      X+     ,r8      ;W 65 FFFE
-    ST      X+     ,r28     ;W BD FFFF
-    ST      X+     ,r17     ;W 3A 0000
-    ST      X+     ,r12     ;W E5 0001
-    ST      X+     ,r22     ;W CC 0002
-    ST      X+     ,r9      ;W 8D 0003
+    LDS     r14    ,$0000   ;R E0 0000   set r14 to 224
+    LDS     r13    ,$0000   ;R 5A 0000   set r13 to 90
+    LDS     r23    ,$0000   ;R 9A 0000   set r23 to 154
+    LDS     r31    ,$0000   ;R D4 0000   set r31 to 212
+    LDS     r24    ,$0000   ;R 50 0000   set r24 to 80
+    LDS     r22    ,$0000   ;R C7 0000   set r22 to 199
+    LDS     r18    ,$0000   ;R A2 0000   set r18 to 162
+    LDS     r12    ,$0000   ;R 01 0000   set r12 to 1
+    ST      X+     ,r14     ;W E0 FFFC
+    ST      X+     ,r13     ;W 5A FFFD
+    ST      X+     ,r23     ;W 9A FFFE
+    ST      X+     ,r31     ;W D4 FFFF
+    ST      X+     ,r24     ;W 50 0000
+    ST      X+     ,r22     ;W C7 0001
+    ST      X+     ,r18     ;W A2 0002
+    ST      X+     ,r12     ;W 01 0003
     LDI     r28    ,$04     ;            set Y to $0004
     LDI     r29    ,$00     ;
     LDS     r0     ,$0000   ;R EC 0000   set r0 to 236
@@ -401,40 +401,40 @@
     ST      Y      ,r31     ;W EC 0004
 
 ; store with pre decrement through 0x0000
-    LDS     r0     ,$0000   ;R 62 0000   set r0 to 98
-    LDS     r18    ,$0000   ;R 63 0000   set r18 to 99
-    LDS     r4     ,$0000   ;R EF 0000   set r4 to 239
-    LDS     r2     ,$0000   ;R 98 0000   set r2 to 152
-    LDS     r27    ,$0000   ;R 18 0000   set r27 to 24
-    LDS     r16    ,$0000   ;R 3B 0000   set r16 to 59
-    LDS     r9     ,$0000   ;R C4 0000   set r9 to 196
-    LDS     r30    ,$0000   ;R 91 0000   set r30 to 145
-    ST      -Y     ,r0      ;W 62 0003
-    ST      -Y     ,r18     ;W 63 0002
-    ST      -Y     ,r4      ;W EF 0001
-    ST      -Y     ,r2      ;W 98 0000
-    ST      -Y     ,r27     ;W 18 FFFF
-    ST      -Y     ,r16     ;W 3B FFFE
-    ST      -Y     ,r9      ;W C4 FFFD
-    ST      -Y     ,r30     ;W 91 FFFC
+    LDS     r0     ,$0000   ;R 3D 0000   set r0 to 61
+    LDS     r24    ,$0000   ;R EC 0000   set r24 to 236
+    LDS     r5     ,$0000   ;R 12 0000   set r5 to 18
+    LDS     r15    ,$0000   ;R 87 0000   set r15 to 135
+    LDS     r11    ,$0000   ;R 49 0000   set r11 to 73
+    LDS     r30    ,$0000   ;R 86 0000   set r30 to 134
+    LDS     r31    ,$0000   ;R 00 0000   set r31 to 0
+    LDS     r6     ,$0000   ;R B6 0000   set r6 to 182
+    ST      -Y     ,r0      ;W 3D 0003
+    ST      -Y     ,r24     ;W EC 0002
+    ST      -Y     ,r5      ;W 12 0001
+    ST      -Y     ,r15     ;W 87 0000
+    ST      -Y     ,r11     ;W 49 FFFF
+    ST      -Y     ,r30     ;W 86 FFFE
+    ST      -Y     ,r31     ;W 00 FFFD
+    ST      -Y     ,r6      ;W B6 FFFC
 
 ; store with post increment through 0xFFFF
-    LDS     r20    ,$0000   ;R 6D 0000   set r20 to 109
-    LDS     r8     ,$0000   ;R 4F 0000   set r8 to 79
-    LDS     r13    ,$0000   ;R A4 0000   set r13 to 164
-    LDS     r19    ,$0000   ;R 2A 0000   set r19 to 42
-    LDS     r11    ,$0000   ;R 5B 0000   set r11 to 91
-    LDS     r26    ,$0000   ;R 84 0000   set r26 to 132
-    LDS     r0     ,$0000   ;R 5D 0000   set r0 to 93
-    LDS     r27    ,$0000   ;R 56 0000   set r27 to 86
-    ST      Y+     ,r20     ;W 6D FFFC
-    ST      Y+     ,r8      ;W 4F FFFD
-    ST      Y+     ,r13     ;W A4 FFFE
-    ST      Y+     ,r19     ;W 2A FFFF
-    ST      Y+     ,r11     ;W 5B 0000
-    ST      Y+     ,r26     ;W 84 0001
-    ST      Y+     ,r0      ;W 5D 0002
-    ST      Y+     ,r27     ;W 56 0003
+    LDS     r20    ,$0000   ;R AC 0000   set r20 to 172
+    LDS     r13    ,$0000   ;R B7 0000   set r13 to 183
+    LDS     r4     ,$0000   ;R 67 0000   set r4 to 103
+    LDS     r23    ,$0000   ;R 4B 0000   set r23 to 75
+    LDS     r21    ,$0000   ;R 0A 0000   set r21 to 10
+    LDS     r25    ,$0000   ;R 27 0000   set r25 to 39
+    LDS     r31    ,$0000   ;R CA 0000   set r31 to 202
+    LDS     r26    ,$0000   ;R 27 0000   set r26 to 39
+    ST      Y+     ,r20     ;W AC FFFC
+    ST      Y+     ,r13     ;W B7 FFFD
+    ST      Y+     ,r4      ;W 67 FFFE
+    ST      Y+     ,r23     ;W 4B FFFF
+    ST      Y+     ,r21     ;W 0A 0000
+    ST      Y+     ,r25     ;W 27 0001
+    ST      Y+     ,r31     ;W CA 0002
+    ST      Y+     ,r26     ;W 27 0003
     LDI     r30    ,$04     ;            set Z to $0004
     LDI     r31    ,$00     ;
     LDS     r0     ,$0000   ;R EC 0000   set r0 to 236
@@ -445,40 +445,40 @@
     ST      Z      ,r31     ;W EC 0004
 
 ; store with pre decrement through 0x0000
-    LDS     r29    ,$0000   ;R D1 0000   set r29 to 209
-    LDS     r8     ,$0000   ;R 01 0000   set r8 to 1
-    LDS     r13    ,$0000   ;R B3 0000   set r13 to 179
-    LDS     r7     ,$0000   ;R 47 0000   set r7 to 71
-    LDS     r16    ,$0000   ;R 67 0000   set r16 to 103
-    LDS     r3     ,$0000   ;R F8 0000   set r3 to 248
-    LDS     r11    ,$0000   ;R 71 0000   set r11 to 113
-    LDS     r15    ,$0000   ;R C0 0000   set r15 to 192
-    ST      -Z     ,r29     ;W D1 0003
-    ST      -Z     ,r8      ;W 01 0002
-    ST      -Z     ,r13     ;W B3 0001
-    ST      -Z     ,r7      ;W 47 0000
-    ST      -Z     ,r16     ;W 67 FFFF
-    ST      -Z     ,r3      ;W F8 FFFE
-    ST      -Z     ,r11     ;W 71 FFFD
-    ST      -Z     ,r15     ;W C0 FFFC
+    LDS     r26    ,$0000   ;R 62 0000   set r26 to 98
+    LDS     r9     ,$0000   ;R 45 0000   set r9 to 69
+    LDS     r6     ,$0000   ;R A9 0000   set r6 to 169
+    LDS     r17    ,$0000   ;R DE 0000   set r17 to 222
+    LDS     r5     ,$0000   ;R 26 0000   set r5 to 38
+    LDS     r0     ,$0000   ;R 9D 0000   set r0 to 157
+    LDS     r28    ,$0000   ;R AA 0000   set r28 to 170
+    LDS     r19    ,$0000   ;R D5 0000   set r19 to 213
+    ST      -Z     ,r26     ;W 62 0003
+    ST      -Z     ,r9      ;W 45 0002
+    ST      -Z     ,r6      ;W A9 0001
+    ST      -Z     ,r17     ;W DE 0000
+    ST      -Z     ,r5      ;W 26 FFFF
+    ST      -Z     ,r0      ;W 9D FFFE
+    ST      -Z     ,r28     ;W AA FFFD
+    ST      -Z     ,r19     ;W D5 FFFC
 
 ; store with post increment through 0xFFFF
-    LDS     r26    ,$0000   ;R 4F 0000   set r26 to 79
-    LDS     r1     ,$0000   ;R 1F 0000   set r1 to 31
-    LDS     r12    ,$0000   ;R 1D 0000   set r12 to 29
-    LDS     r4     ,$0000   ;R 87 0000   set r4 to 135
-    LDS     r21    ,$0000   ;R 4F 0000   set r21 to 79
-    LDS     r18    ,$0000   ;R 67 0000   set r18 to 103
-    LDS     r3     ,$0000   ;R 63 0000   set r3 to 99
-    LDS     r9     ,$0000   ;R 8D 0000   set r9 to 141
-    ST      Z+     ,r26     ;W 4F FFFC
-    ST      Z+     ,r1      ;W 1F FFFD
-    ST      Z+     ,r12     ;W 1D FFFE
-    ST      Z+     ,r4      ;W 87 FFFF
-    ST      Z+     ,r21     ;W 4F 0000
-    ST      Z+     ,r18     ;W 67 0001
-    ST      Z+     ,r3      ;W 63 0002
-    ST      Z+     ,r9      ;W 8D 0003
+    LDS     r25    ,$0000   ;R B0 0000   set r25 to 176
+    LDS     r11    ,$0000   ;R 6C 0000   set r11 to 108
+    LDS     r20    ,$0000   ;R 1F 0000   set r20 to 31
+    LDS     r29    ,$0000   ;R 20 0000   set r29 to 32
+    LDS     r5     ,$0000   ;R 2F 0000   set r5 to 47
+    LDS     r10    ,$0000   ;R 4B 0000   set r10 to 75
+    LDS     r16    ,$0000   ;R 3C 0000   set r16 to 60
+    LDS     r0     ,$0000   ;R 86 0000   set r0 to 134
+    ST      Z+     ,r25     ;W B0 FFFC
+    ST      Z+     ,r11     ;W 6C FFFD
+    ST      Z+     ,r20     ;W 1F FFFE
+    ST      Z+     ,r29     ;W 20 FFFF
+    ST      Z+     ,r5      ;W 2F 0000
+    ST      Z+     ,r10     ;W 4B 0001
+    ST      Z+     ,r16     ;W 3C 0002
+    ST      Z+     ,r0      ;W 86 0003
 
 
 
@@ -486,40 +486,40 @@
 
     LDI     r28    ,$E0     ;            set Y to $FFE0
     LDI     r29    ,$FF     ;
-    LDS     r1     ,$0000   ;R 77 0000   set r1 to 119
-    LDS     r31    ,$0000   ;R DE 0000   set r31 to 222
-    LDS     r4     ,$0000   ;R 39 0000   set r4 to 57
-    LDS     r24    ,$0000   ;R B8 0000   set r24 to 184
-    LDS     r17    ,$0000   ;R CB 0000   set r17 to 203
-    LDS     r31    ,$0000   ;R A4 0000   set r31 to 164
-    LDS     r4     ,$0000   ;R 25 0000   set r4 to 37
-    LDS     r21    ,$0000   ;R 22 0000   set r21 to 34
-    STD     Y+0    ,r1      ;W 77 FFE0
-    STD     Y+61   ,r31     ;W DE 001D
-    STD     Y+8    ,r4      ;W 39 FFE8
-    STD     Y+34   ,r24     ;W B8 0002
-    STD     Y+2    ,r17     ;W CB FFE2
-    STD     Y+25   ,r31     ;W A4 FFF9
-    STD     Y+62   ,r4      ;W 25 001E
-    STD     Y+63   ,r21     ;W 22 001F
+    LDS     r19    ,$0000   ;R A5 0000   set r19 to 165
+    LDS     r12    ,$0000   ;R 7F 0000   set r12 to 127
+    LDS     r13    ,$0000   ;R B4 0000   set r13 to 180
+    LDS     r25    ,$0000   ;R CC 0000   set r25 to 204
+    LDS     r8     ,$0000   ;R 4E 0000   set r8 to 78
+    LDS     r26    ,$0000   ;R B2 0000   set r26 to 178
+    LDS     r22    ,$0000   ;R 8E 0000   set r22 to 142
+    LDS     r24    ,$0000   ;R 31 0000   set r24 to 49
+    STD     Y+0    ,r19     ;W A5 FFE0
+    STD     Y+27   ,r12     ;W 7F FFFB
+    STD     Y+17   ,r13     ;W B4 FFF1
+    STD     Y+53   ,r25     ;W CC 0015
+    STD     Y+46   ,r8      ;W 4E 000E
+    STD     Y+43   ,r26     ;W B2 000B
+    STD     Y+35   ,r22     ;W 8E 0003
+    STD     Y+63   ,r24     ;W 31 001F
     LDI     r30    ,$E0     ;            set Z to $FFE0
     LDI     r31    ,$FF     ;
-    LDS     r21    ,$0000   ;R 72 0000   set r21 to 114
-    LDS     r23    ,$0000   ;R 80 0000   set r23 to 128
-    LDS     r4     ,$0000   ;R 92 0000   set r4 to 146
-    LDS     r21    ,$0000   ;R EF 0000   set r21 to 239
-    LDS     r9     ,$0000   ;R 23 0000   set r9 to 35
-    LDS     r15    ,$0000   ;R 0C 0000   set r15 to 12
-    LDS     r7     ,$0000   ;R D5 0000   set r7 to 213
-    LDS     r12    ,$0000   ;R 9E 0000   set r12 to 158
-    STD     Z+0    ,r21     ;W 72 FFE0
-    STD     Z+49   ,r23     ;W 80 0011
-    STD     Z+52   ,r4      ;W 92 0014
-    STD     Z+32   ,r21     ;W EF 0000
-    STD     Z+33   ,r9      ;W 23 0001
-    STD     Z+15   ,r15     ;W 0C FFEF
-    STD     Z+54   ,r7      ;W D5 0016
-    STD     Z+63   ,r12     ;W 9E 001F
+    LDS     r25    ,$0000   ;R 44 0000   set r25 to 68
+    LDS     r28    ,$0000   ;R ED 0000   set r28 to 237
+    LDS     r27    ,$0000   ;R 2E 0000   set r27 to 46
+    LDS     r6     ,$0000   ;R 65 0000   set r6 to 101
+    LDS     r14    ,$0000   ;R CB 0000   set r14 to 203
+    LDS     r15    ,$0000   ;R 92 0000   set r15 to 146
+    LDS     r26    ,$0000   ;R D6 0000   set r26 to 214
+    LDS     r6     ,$0000   ;R 01 0000   set r6 to 1
+    STD     Z+0    ,r25     ;W 44 FFE0
+    STD     Z+4    ,r28     ;W ED FFE4
+    STD     Z+41   ,r27     ;W 2E 0009
+    STD     Z+60   ,r6      ;W 65 001C
+    STD     Z+46   ,r14     ;W CB 000E
+    STD     Z+47   ,r15     ;W 92 000F
+    STD     Z+27   ,r26     ;W D6 FFFB
+    STD     Z+63   ,r6      ;W 01 001F
 
 
 
@@ -535,163 +535,163 @@
     STS     $FFFF  ,r30     ;W EC FFFF
 
 ; do some random STSs
-    LDS     r17    ,$0000   ;R C2 0000   set r17 to 194
-    LDS     r10    ,$0000   ;R 72 0000   set r10 to 114
-    LDS     r1     ,$0000   ;R 98 0000   set r1 to 152
-    LDS     r0     ,$0000   ;R 58 0000   set r0 to 88
-    LDS     r9     ,$0000   ;R C4 0000   set r9 to 196
-    LDS     r19    ,$0000   ;R E5 0000   set r19 to 229
-    LDS     r6     ,$0000   ;R 4D 0000   set r6 to 77
-    LDS     r2     ,$0000   ;R 5A 0000   set r2 to 90
-    LDS     r21    ,$0000   ;R C3 0000   set r21 to 195
-    LDS     r13    ,$0000   ;R 8F 0000   set r13 to 143
-    STS     $80A1  ,r17     ;W C2 80A1
-    STS     $2993  ,r10     ;W 72 2993
-    STS     $8C20  ,r1      ;W 98 8C20
-    STS     $EDA4  ,r0      ;W 58 EDA4
-    STS     $5AF9  ,r9      ;W C4 5AF9
-    STS     $6201  ,r19     ;W E5 6201
-    STS     $57E8  ,r6      ;W 4D 57E8
-    STS     $D772  ,r2      ;W 5A D772
-    STS     $62BC  ,r21     ;W C3 62BC
-    STS     $CA2E  ,r13     ;W 8F CA2E
+    LDS     r20    ,$0000   ;R 03 0000   set r20 to 3
+    LDS     r2     ,$0000   ;R 35 0000   set r2 to 53
+    LDS     r11    ,$0000   ;R 9B 0000   set r11 to 155
+    LDS     r13    ,$0000   ;R 22 0000   set r13 to 34
+    LDS     r1     ,$0000   ;R 16 0000   set r1 to 22
+    LDS     r7     ,$0000   ;R 83 0000   set r7 to 131
+    LDS     r8     ,$0000   ;R A6 0000   set r8 to 166
+    LDS     r28    ,$0000   ;R 24 0000   set r28 to 36
+    LDS     r26    ,$0000   ;R 5C 0000   set r26 to 92
+    LDS     r14    ,$0000   ;R D8 0000   set r14 to 216
+    STS     $AC10  ,r20     ;W 03 AC10
+    STS     $6311  ,r2      ;W 35 6311
+    STS     $E286  ,r11     ;W 9B E286
+    STS     $651C  ,r13     ;W 22 651C
+    STS     $A354  ,r1      ;W 16 A354
+    STS     $8951  ,r7      ;W 83 8951
+    STS     $1BC4  ,r8      ;W A6 1BC4
+    STS     $3224  ,r28     ;W 24 3224
+    STS     $EECE  ,r26     ;W 5C EECE
+    STS     $A4ED  ,r14     ;W D8 A4ED
 
 ;PREPROCESS TestPUSH
 
 ;PREPROCESS TestPOP
 
 ; load some random values into registers
-    LDS     r15    ,$0000   ;R 74 0000   set r15 to 116
-    LDS     r9     ,$0000   ;R 8C 0000   set r9 to 140
-    LDS     r17    ,$0000   ;R 93 0000   set r17 to 147
-    LDS     r24    ,$0000   ;R 95 0000   set r24 to 149
-    LDS     r4     ,$0000   ;R 96 0000   set r4 to 150
-    LDS     r28    ,$0000   ;R F2 0000   set r28 to 242
-    LDS     r31    ,$0000   ;R 48 0000   set r31 to 72
-    LDS     r3     ,$0000   ;R AE 0000   set r3 to 174
-    LDS     r14    ,$0000   ;R 15 0000   set r14 to 21
-    LDS     r18    ,$0000   ;R 84 0000   set r18 to 132
-    LDS     r2     ,$0000   ;R D4 0000   set r2 to 212
-    LDS     r21    ,$0000   ;R 19 0000   set r21 to 25
-    LDS     r20    ,$0000   ;R 8D 0000   set r20 to 141
-    LDS     r10    ,$0000   ;R E4 0000   set r10 to 228
-    LDS     r1     ,$0000   ;R FF 0000   set r1 to 255
-    LDS     r26    ,$0000   ;R 67 0000   set r26 to 103
-    LDS     r27    ,$0000   ;R 53 0000   set r27 to 83
-    LDS     r11    ,$0000   ;R 61 0000   set r11 to 97
-    LDS     r19    ,$0000   ;R 85 0000   set r19 to 133
-    LDS     r7     ,$0000   ;R 3F 0000   set r7 to 63
-    LDS     r29    ,$0000   ;R AE 0000   set r29 to 174
-    LDS     r16    ,$0000   ;R E2 0000   set r16 to 226
-    LDS     r30    ,$0000   ;R A1 0000   set r30 to 161
-    LDS     r13    ,$0000   ;R 28 0000   set r13 to 40
-    LDS     r0     ,$0000   ;R 5C 0000   set r0 to 92
-    LDS     r5     ,$0000   ;R 1B 0000   set r5 to 27
-    LDS     r6     ,$0000   ;R 5F 0000   set r6 to 95
-    LDS     r8     ,$0000   ;R 08 0000   set r8 to 8
-    LDS     r23    ,$0000   ;R 61 0000   set r23 to 97
-    LDS     r12    ,$0000   ;R E8 0000   set r12 to 232
-    LDS     r25    ,$0000   ;R B1 0000   set r25 to 177
-    LDS     r22    ,$0000   ;R 86 0000   set r22 to 134
+    LDS     r16    ,$0000   ;R 7D 0000   set r16 to 125
+    LDS     r5     ,$0000   ;R 62 0000   set r5 to 98
+    LDS     r19    ,$0000   ;R 78 0000   set r19 to 120
+    LDS     r27    ,$0000   ;R D4 0000   set r27 to 212
+    LDS     r6     ,$0000   ;R B5 0000   set r6 to 181
+    LDS     r30    ,$0000   ;R 2B 0000   set r30 to 43
+    LDS     r12    ,$0000   ;R 39 0000   set r12 to 57
+    LDS     r20    ,$0000   ;R C8 0000   set r20 to 200
+    LDS     r28    ,$0000   ;R 87 0000   set r28 to 135
+    LDS     r11    ,$0000   ;R 28 0000   set r11 to 40
+    LDS     r8     ,$0000   ;R 82 0000   set r8 to 130
+    LDS     r21    ,$0000   ;R B8 0000   set r21 to 184
+    LDS     r24    ,$0000   ;R EC 0000   set r24 to 236
+    LDS     r4     ,$0000   ;R B6 0000   set r4 to 182
+    LDS     r7     ,$0000   ;R A9 0000   set r7 to 169
+    LDS     r9     ,$0000   ;R 3C 0000   set r9 to 60
+    LDS     r22    ,$0000   ;R 95 0000   set r22 to 149
+    LDS     r0     ,$0000   ;R D8 0000   set r0 to 216
+    LDS     r17    ,$0000   ;R 69 0000   set r17 to 105
+    LDS     r23    ,$0000   ;R FE 0000   set r23 to 254
+    LDS     r26    ,$0000   ;R 16 0000   set r26 to 22
+    LDS     r13    ,$0000   ;R FF 0000   set r13 to 255
+    LDS     r15    ,$0000   ;R 0A 0000   set r15 to 10
+    LDS     r2     ,$0000   ;R 4D 0000   set r2 to 77
+    LDS     r14    ,$0000   ;R 59 0000   set r14 to 89
+    LDS     r31    ,$0000   ;R 0B 0000   set r31 to 11
+    LDS     r29    ,$0000   ;R E4 0000   set r29 to 228
+    LDS     r1     ,$0000   ;R C8 0000   set r1 to 200
+    LDS     r18    ,$0000   ;R 4E 0000   set r18 to 78
+    LDS     r10    ,$0000   ;R B5 0000   set r10 to 181
+    LDS     r3     ,$0000   ;R E4 0000   set r3 to 228
+    LDS     r25    ,$0000   ;R C4 0000   set r25 to 196
 
 ; push all the registers
-    PUSH    r15             ;W 74 0000
-    PUSH    r9              ;W 8C FFFF
-    PUSH    r17             ;W 93 FFFE
-    PUSH    r24             ;W 95 FFFD
-    PUSH    r4              ;W 96 FFFC
-    PUSH    r28             ;W F2 FFFB
-    PUSH    r31             ;W 48 FFFA
-    PUSH    r3              ;W AE FFF9
-    PUSH    r14             ;W 15 FFF8
-    PUSH    r18             ;W 84 FFF7
-    PUSH    r2              ;W D4 FFF6
-    PUSH    r21             ;W 19 FFF5
-    PUSH    r20             ;W 8D FFF4
-    PUSH    r10             ;W E4 FFF3
-    PUSH    r1              ;W FF FFF2
-    PUSH    r26             ;W 67 FFF1
-    PUSH    r27             ;W 53 FFF0
-    PUSH    r11             ;W 61 FFEF
-    PUSH    r19             ;W 85 FFEE
-    PUSH    r7              ;W 3F FFED
-    PUSH    r29             ;W AE FFEC
-    PUSH    r16             ;W E2 FFEB
-    PUSH    r30             ;W A1 FFEA
-    PUSH    r13             ;W 28 FFE9
-    PUSH    r0              ;W 5C FFE8
-    PUSH    r5              ;W 1B FFE7
-    PUSH    r6              ;W 5F FFE6
-    PUSH    r8              ;W 08 FFE5
-    PUSH    r23             ;W 61 FFE4
-    PUSH    r12             ;W E8 FFE3
-    PUSH    r25             ;W B1 FFE2
-    PUSH    r22             ;W 86 FFE1
+    PUSH    r16             ;W 7D 0000
+    PUSH    r5              ;W 62 FFFF
+    PUSH    r19             ;W 78 FFFE
+    PUSH    r27             ;W D4 FFFD
+    PUSH    r6              ;W B5 FFFC
+    PUSH    r30             ;W 2B FFFB
+    PUSH    r12             ;W 39 FFFA
+    PUSH    r20             ;W C8 FFF9
+    PUSH    r28             ;W 87 FFF8
+    PUSH    r11             ;W 28 FFF7
+    PUSH    r8              ;W 82 FFF6
+    PUSH    r21             ;W B8 FFF5
+    PUSH    r24             ;W EC FFF4
+    PUSH    r4              ;W B6 FFF3
+    PUSH    r7              ;W A9 FFF2
+    PUSH    r9              ;W 3C FFF1
+    PUSH    r22             ;W 95 FFF0
+    PUSH    r0              ;W D8 FFEF
+    PUSH    r17             ;W 69 FFEE
+    PUSH    r23             ;W FE FFED
+    PUSH    r26             ;W 16 FFEC
+    PUSH    r13             ;W FF FFEB
+    PUSH    r15             ;W 0A FFEA
+    PUSH    r2              ;W 4D FFE9
+    PUSH    r14             ;W 59 FFE8
+    PUSH    r31             ;W 0B FFE7
+    PUSH    r29             ;W E4 FFE6
+    PUSH    r1              ;W C8 FFE5
+    PUSH    r18             ;W 4E FFE4
+    PUSH    r10             ;W B5 FFE3
+    PUSH    r3              ;W E4 FFE2
+    PUSH    r25             ;W C4 FFE1
 
 ; pop all the registers
-    POP     r22             ;R 86 FFE1
-    POP     r25             ;R B1 FFE2
-    POP     r12             ;R E8 FFE3
-    POP     r23             ;R 61 FFE4
-    POP     r8              ;R 08 FFE5
-    POP     r6              ;R 5F FFE6
-    POP     r5              ;R 1B FFE7
-    POP     r0              ;R 5C FFE8
-    POP     r13             ;R 28 FFE9
-    POP     r30             ;R A1 FFEA
-    POP     r16             ;R E2 FFEB
-    POP     r29             ;R AE FFEC
-    POP     r7              ;R 3F FFED
-    POP     r19             ;R 85 FFEE
-    POP     r11             ;R 61 FFEF
-    POP     r27             ;R 53 FFF0
-    POP     r26             ;R 67 FFF1
-    POP     r1              ;R FF FFF2
-    POP     r10             ;R E4 FFF3
-    POP     r20             ;R 8D FFF4
-    POP     r21             ;R 19 FFF5
-    POP     r2              ;R D4 FFF6
-    POP     r18             ;R 84 FFF7
-    POP     r14             ;R 15 FFF8
-    POP     r3              ;R AE FFF9
-    POP     r31             ;R 48 FFFA
-    POP     r28             ;R F2 FFFB
-    POP     r4              ;R 96 FFFC
-    POP     r24             ;R 95 FFFD
-    POP     r17             ;R 93 FFFE
-    POP     r9              ;R 8C FFFF
-    POP     r15             ;R 74 0000
+    POP     r25             ;R C4 FFE1
+    POP     r3              ;R E4 FFE2
+    POP     r10             ;R B5 FFE3
+    POP     r18             ;R 4E FFE4
+    POP     r1              ;R C8 FFE5
+    POP     r29             ;R E4 FFE6
+    POP     r31             ;R 0B FFE7
+    POP     r14             ;R 59 FFE8
+    POP     r2              ;R 4D FFE9
+    POP     r15             ;R 0A FFEA
+    POP     r13             ;R FF FFEB
+    POP     r26             ;R 16 FFEC
+    POP     r23             ;R FE FFED
+    POP     r17             ;R 69 FFEE
+    POP     r0              ;R D8 FFEF
+    POP     r22             ;R 95 FFF0
+    POP     r9              ;R 3C FFF1
+    POP     r7              ;R A9 FFF2
+    POP     r4              ;R B6 FFF3
+    POP     r24             ;R EC FFF4
+    POP     r21             ;R B8 FFF5
+    POP     r8              ;R 82 FFF6
+    POP     r11             ;R 28 FFF7
+    POP     r28             ;R 87 FFF8
+    POP     r20             ;R C8 FFF9
+    POP     r12             ;R 39 FFFA
+    POP     r30             ;R 2B FFFB
+    POP     r6              ;R B5 FFFC
+    POP     r27             ;R D4 FFFD
+    POP     r19             ;R 78 FFFE
+    POP     r5              ;R 62 FFFF
+    POP     r16             ;R 7D 0000
 
 ; check all the values are unchanged
-    STS     $0000  ,r15     ;W 74 0000   r15 should be 116
-    STS     $0000  ,r9      ;W 8C 0000   r9 should be 140
-    STS     $0000  ,r17     ;W 93 0000   r17 should be 147
-    STS     $0000  ,r24     ;W 95 0000   r24 should be 149
-    STS     $0000  ,r4      ;W 96 0000   r4 should be 150
-    STS     $0000  ,r28     ;W F2 0000   r28 should be 242
-    STS     $0000  ,r31     ;W 48 0000   r31 should be 72
-    STS     $0000  ,r3      ;W AE 0000   r3 should be 174
-    STS     $0000  ,r14     ;W 15 0000   r14 should be 21
-    STS     $0000  ,r18     ;W 84 0000   r18 should be 132
-    STS     $0000  ,r2      ;W D4 0000   r2 should be 212
-    STS     $0000  ,r21     ;W 19 0000   r21 should be 25
-    STS     $0000  ,r20     ;W 8D 0000   r20 should be 141
-    STS     $0000  ,r10     ;W E4 0000   r10 should be 228
-    STS     $0000  ,r1      ;W FF 0000   r1 should be 255
-    STS     $0000  ,r26     ;W 67 0000   r26 should be 103
-    STS     $0000  ,r27     ;W 53 0000   r27 should be 83
-    STS     $0000  ,r11     ;W 61 0000   r11 should be 97
-    STS     $0000  ,r19     ;W 85 0000   r19 should be 133
-    STS     $0000  ,r7      ;W 3F 0000   r7 should be 63
-    STS     $0000  ,r29     ;W AE 0000   r29 should be 174
-    STS     $0000  ,r16     ;W E2 0000   r16 should be 226
-    STS     $0000  ,r30     ;W A1 0000   r30 should be 161
-    STS     $0000  ,r13     ;W 28 0000   r13 should be 40
-    STS     $0000  ,r0      ;W 5C 0000   r0 should be 92
-    STS     $0000  ,r5      ;W 1B 0000   r5 should be 27
-    STS     $0000  ,r6      ;W 5F 0000   r6 should be 95
-    STS     $0000  ,r8      ;W 08 0000   r8 should be 8
-    STS     $0000  ,r23     ;W 61 0000   r23 should be 97
-    STS     $0000  ,r12     ;W E8 0000   r12 should be 232
-    STS     $0000  ,r25     ;W B1 0000   r25 should be 177
-    STS     $0000  ,r22     ;W 86 0000   r22 should be 134
+    STS     $0000  ,r16     ;W 7D 0000   r16 should be 125
+    STS     $0000  ,r5      ;W 62 0000   r5 should be 98
+    STS     $0000  ,r19     ;W 78 0000   r19 should be 120
+    STS     $0000  ,r27     ;W D4 0000   r27 should be 212
+    STS     $0000  ,r6      ;W B5 0000   r6 should be 181
+    STS     $0000  ,r30     ;W 2B 0000   r30 should be 43
+    STS     $0000  ,r12     ;W 39 0000   r12 should be 57
+    STS     $0000  ,r20     ;W C8 0000   r20 should be 200
+    STS     $0000  ,r28     ;W 87 0000   r28 should be 135
+    STS     $0000  ,r11     ;W 28 0000   r11 should be 40
+    STS     $0000  ,r8      ;W 82 0000   r8 should be 130
+    STS     $0000  ,r21     ;W B8 0000   r21 should be 184
+    STS     $0000  ,r24     ;W EC 0000   r24 should be 236
+    STS     $0000  ,r4      ;W B6 0000   r4 should be 182
+    STS     $0000  ,r7      ;W A9 0000   r7 should be 169
+    STS     $0000  ,r9      ;W 3C 0000   r9 should be 60
+    STS     $0000  ,r22     ;W 95 0000   r22 should be 149
+    STS     $0000  ,r0      ;W D8 0000   r0 should be 216
+    STS     $0000  ,r17     ;W 69 0000   r17 should be 105
+    STS     $0000  ,r23     ;W FE 0000   r23 should be 254
+    STS     $0000  ,r26     ;W 16 0000   r26 should be 22
+    STS     $0000  ,r13     ;W FF 0000   r13 should be 255
+    STS     $0000  ,r15     ;W 0A 0000   r15 should be 10
+    STS     $0000  ,r2      ;W 4D 0000   r2 should be 77
+    STS     $0000  ,r14     ;W 59 0000   r14 should be 89
+    STS     $0000  ,r31     ;W 0B 0000   r31 should be 11
+    STS     $0000  ,r29     ;W E4 0000   r29 should be 228
+    STS     $0000  ,r1      ;W C8 0000   r1 should be 200
+    STS     $0000  ,r18     ;W 4E 0000   r18 should be 78
+    STS     $0000  ,r10     ;W B5 0000   r10 should be 181
+    STS     $0000  ,r3      ;W E4 0000   r3 should be 228
+    STS     $0000  ,r25     ;W C4 0000   r25 should be 196

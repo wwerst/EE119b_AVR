@@ -141,9 +141,9 @@ begin
                     assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch on cpu write" severity error;
                 end if;
                 
-                if linenum > 500 then
-                    exit;
-                end if;
+                --if linenum > 500 then
+                --    exit;
+                --end if;
 
             end if;
         end loop;
