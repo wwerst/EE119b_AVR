@@ -183,6 +183,8 @@ architecture dataflow of AVR_CPU is
     signal decodeReg16d : integer range 0 to 31;
     signal decodeReg32d : integer range 0 to 31;
 
+    signal startDataRd, startDataWr: std_logic;
+
     -- state machine
     subtype decode_state_t is integer range 0 to 3;
     signal CurState, NextState: decode_state_t;
@@ -194,8 +196,8 @@ architecture dataflow of AVR_CPU is
         ALUFlagMask    : AVR.word_t;
         writeRegEnS    : std_logic;
         writeRegSelS   : AVR.reg_s_sel_t;
-        --writeRegEnD    : std_logic;
-        --writeRegSelD   : AVR.reg_d_sel_t;
+        writeRegEnD    : std_logic;
+        writeRegSelD   : AVR.reg_d_sel_t;
     end record;
 
     signal CurExecuteOpData, NextExecuteOpData : execute_op_data_t;
@@ -204,9 +206,9 @@ architecture dataflow of AVR_CPU is
         dataS          : AVR.word_t;
         writeRegEnS    : std_logic;
         writeRegSelS   : AVR.reg_s_sel_t;
-        --dataD          : AVR.word_t;
-        --writeRegEnD    : std_logic;
-        --writeRegSelD   : AVR.reg_d_sel_t;
+        dataD          : AVR.addr_t;
+        writeRegEnD    : std_logic;
+        writeRegSelD   : AVR.reg_d_sel_t;
     end record;
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
@@ -282,6 +284,13 @@ begin
         end if;
     end process InstrLatchProc;
 
+    process(clock) begin
+        if falling_edge(clock) then
+            DataRd <= startDataRd;
+            DataWr <= startDataWr;
+        end if;
+    end process;
+
 
     decodeReg16d <= to_integer(unsigned(InstReg(7 downto 4))) + 16;
     decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
@@ -324,9 +333,11 @@ begin
         NextExecuteOpData.ALUFlagMask <= (others => '0');
         NextExecuteOpData.writeRegEnS <= '0';
         NextExecuteOpData.writeRegSelS <= (others => '0');
+        NextExecuteOpData.writeRegEnD <= '0';
+        NextExecuteOpData.writeRegSelD <= (others => '0');
         DataDB <= (others => 'Z');
-        DataWr <= '1';
-        DataRd <= '1';
+        startDataWr <= '1';
+        startDataRd <= '1';
 
 
         -- Control signal for previous pipeline stage
@@ -334,23 +345,21 @@ begin
 
         if Reset = '0' then
             -- Clear the status register
+            --iau_ctrl.srcSel <= IAU.SRC_ZERO;
             NextExecuteOpData.OpA <= (others => '0');
             NextExecuteOpData.OpB <= (others => '1');
             NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
             NextExecuteOpData.ALUFlagMask <= (others => '1');
         else
+
+            -- ALU
+
             if std_match(InstReg, Opcodes.OpBCLR) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
                 NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
-            elsif std_match(InstReg, Opcodes.OpLDI) then
-                -- Pass immediate through ALU into write unit
-                NextExecuteOpData.writeRegEnS <= '1';
-                NextExecuteOpData.writeRegSelS <= std_logic_vector(to_unsigned(decodeReg16d, 5));
-                NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
-                NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
             elsif std_match(InstReg, Opcodes.OpADD) then
                 tmp_rd := InstReg(8 downto 4);
                 tmp_rr := InstReg(9) & InstReg(3 downto 0);
@@ -394,11 +403,20 @@ begin
                 NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+
+            -- LOAD/STORE
+
             elsif std_match(InstReg, Opcodes.OpIN) then
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= alu_SReg;
-            elsif std_match(InstReg, Opcodes.OpST) then
+            elsif std_match(InstReg, Opcodes.OpLDI) then
+                -- Pass immediate through ALU into write unit
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= std_logic_vector(to_unsigned(decodeReg16d, 5));
+                NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
+                NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
+            elsif std_match(InstReg, Opcodes.OpSTX) then
                 if CurState = 0 then
                     -- First cycle for store instruction.
                     -- On first cycle, do the following:
@@ -411,25 +429,26 @@ begin
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
-                    DataWr <= '0' xor clock;
+                    startDataWr <= '0';
                 else
                     reg_read_ctrl.SelOutD <= "01";
                     reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                     DataDB <= reg_DataOutA;
-                    DataWr <= '1' xor clock;
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTS) then
                 -- Stub implementation
                 if CurState = 0 then
-                    iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
+                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                    DataDB <= reg_DataOutA;
+                    startDataWr <= '0';
                     LoadInstReg <= '0';
                 elsif CurState = 1 then
-                    iau_ctrl.srcSel <= IAU.SRC_PC;
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
+                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                    DataDB <= reg_DataOutA;
                     LoadInstReg <= '0';
-                else
-                    null;
                 end if;
             else
                 null;
@@ -452,10 +471,16 @@ begin
         NextWriteOpData.dataS <= alu_Result;
         NextWriteOpData.writeRegEnS <= '0';
         NextWriteOpData.writeRegSelS <= (others => '0');
+
+        NextWriteOpData.dataD <= dau_update; -- TODO proper pipelineing
+        NextWriteOpData.writeRegEnD <= '0';
+        NextWriteOpData.writeRegSelD <= (others => '0');
         if reset = '0' then
         else
             NextWriteOpData.writeRegEnS <= CurExecuteOpData.writeRegEnS;
             NextWriteOpData.writeRegSelS <= CurExecuteOpData.writeRegSelS;
+            NextWriteOpData.writeRegEnD <= CurExecuteOpData.writeRegEnD;
+            NextWriteOpData.writeRegSelD <= CurExecuteOpData.writeRegSelD;
         end if;
     end process ExecuteProc;
 
@@ -474,11 +499,12 @@ begin
     begin
         reg_write_ctrl.EnableInS <= CurWriteOpData.writeRegEnS;
         reg_write_ctrl.SelInS <= CurWriteOpData.writeRegSelS;
-        reg_write_ctrl.EnableInD <= '0';
-        reg_write_ctrl.SelInD <= (others => '0');
         reg_DataInS <= CurWriteOpData.dataS;
-        reg_DataInD <= (others => '0');
-        
+
+        reg_write_ctrl.EnableInD <= CurWriteOpData.writeRegEnD;
+        reg_write_ctrl.SelInD <= CurWriteOpData.writeRegSelD;
+        reg_DataInD <= CurWriteOpData.dataD;
+
     end process WriteProc;
 
 end architecture;
