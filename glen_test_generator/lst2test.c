@@ -460,7 +460,7 @@ int  main()
     /* do the instruction vectors */
     vector_t vectors[4];
 
-    printf("# ProgDB dataDBr ProgAB read write DataAB DataDBw\n");
+    printf("# ProgAB ProgDB dataDBr read write DataAB DataDBw\n");
     /* output the vectors */
     for (i = 0; i < no_vectors; i++)  {
         setProgDB(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
@@ -476,9 +476,9 @@ int  main()
         for (j = 0; j < cycle_cnt; j ++) {
             printf(
                 "%s %s %s %d %d %s %s\n",
+                vectors[j].progAB,
                 vectors[j].progDB,
                 vectors[j].dataDBr,
-                vectors[j].progAB,
                 vectors[j].read,
                 vectors[j].write,
                 vectors[j].dataAB,

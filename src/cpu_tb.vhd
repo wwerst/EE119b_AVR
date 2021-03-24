@@ -112,10 +112,10 @@ begin
             linenum := linenum + 1;
             readline(vectorsf, l);
             if ((l'LENGTH > 0) and (l(1) /= '#'))  then
+                hread(l, veProgAB);
                 hread(l, vProgDB);
                 hread(l, vDataDB);
 
-                hread(l, veProgAB);
                 read(l, veDataRd);
                 read(l, veDataWr);
                 hread(l, veDataAB);
