@@ -700,6 +700,26 @@ begin
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= tmp_rd;
                 end if;
+            elsif std_match(InstReg, Opcodes.OpSUB) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSUBI) then
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
