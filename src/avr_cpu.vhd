@@ -570,6 +570,32 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpINC) then
+                -- Increment Rd by adding an immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Add 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpLSR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.LSR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpNEG) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutB <= tmp_rd;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
