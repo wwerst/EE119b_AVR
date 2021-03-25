@@ -59,7 +59,7 @@ architecture testbench of alu_tb is
 
     -- For debugging, or on a slow computer, change this to 1000 or 10000 instructions.
     -- For final testing, run at least 100_000 tests per op.
-    constant NUM_TESTS_PER_OP : integer := 10000;
+    constant NUM_TESTS_PER_OP : integer := 5000;
 
     constant randomWordBin: CovBinType := GenBin(AtLeast => NUM_TESTS_PER_OP, Min => 0, Max => 255, NumBin => 1);
 
