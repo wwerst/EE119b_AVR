@@ -549,7 +549,7 @@ begin
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpEOR) then
-                -- Subtract Rd by immediate value of 1
+                -- Compute XOR of Rd and Rr, and store back in Rd
                 tmp_rd := InstReg(8 downto 4);
                 tmp_rr := InstReg(9) & InstReg(3 downto 0);
                 reg_read_ctrl.SelOutA <= tmp_rd;
@@ -557,6 +557,16 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.EOR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpINC) then
+                -- Increment Rd by adding an immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Add 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
