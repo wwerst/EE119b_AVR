@@ -92,6 +92,7 @@
 
 #define  ADDR_SIZE      4       /* number of characters in hex address */
 #define  INST_SIZE      4       /* number of characters in hex instruction */
+#define  ASM_SIZE       80      /* The assembly code line length */
 #define  DATA_SIZE      2       /* number of characters in hex r/w data */
 
 
@@ -116,6 +117,7 @@ typedef struct {
     char dataAB[ADDR_SIZE+1];
     char dataDBw[DATA_SIZE+1];
     int read, write;
+    char asmCodeDebug[ASM_SIZE+1];
 } vector_t;
 
 void setProgDB(
@@ -312,12 +314,32 @@ void setDataAB(
     }
 }
 
+void setASMCode(
+    vector_t *vecs,
+    char *progaddr,
+    char *inst, char *inst2,
+    char *data,
+    char *rdwrsj,
+    char *addr,
+    char *asm_code) {
+    /* get number of cycles for this instruction */
+    int cycle_cnt = getCycleCount(inst, rdwrsj[0]);
+
+    
+    /* output the assembly line associated with test vector */
+    for (int cycle = 0; cycle < cycle_cnt; cycle ++) {
+        strncpy(vecs[cycle].asmCodeDebug, asm_code, ASM_SIZE+1);
+    }
+
+}
+
 int  main()
 {
     /* variables */
     char  (*progaddr)[ADDR_SIZE + 1] = NULL; /* test vector program address */
     char  (*inst)[INST_SIZE + 1] = NULL;/* test vector instruction */
     char  (*inst2)[INST_SIZE + 1] = NULL;    /* test vector instruction word 2 */
+    char  (*asm_code)[ASM_SIZE + 1] = NULL;
     char  (*data)[DATA_SIZE + 1] = NULL;/* test vector data */
     char  (*rdwrsj)[2] = NULL;          /* test vector read/write/skip/jump */
     char  (*addr)[ADDR_SIZE + 1] = NULL;/* test vector data address */
@@ -357,6 +379,7 @@ int  main()
                 progaddr = realloc(progaddr, alloc_vectors * sizeof(*progaddr));
                 inst = realloc(inst, alloc_vectors * sizeof(*inst));
                 inst2 = realloc(inst2, alloc_vectors * sizeof(*inst2));
+                asm_code = realloc(asm_code, alloc_vectors * sizeof(*asm_code));
                 data = realloc(data, alloc_vectors * sizeof(*data));
                 rdwrsj = realloc(rdwrsj, alloc_vectors * sizeof(*rdwrsj));
                 addr = realloc(addr, alloc_vectors * sizeof(*addr));
@@ -393,6 +416,12 @@ int  main()
                 inst2[no_vectors][INST_SIZE] = '\0';
                 /* make sure in uppercase */
                 strupr(inst2[no_vectors]);
+
+                /* Copy remainder of line for debug output assembly in test vector file */
+                strncpy(
+                    asm_code[no_vectors],
+                    strtok(&line[i + 2*INST_SIZE + 1], "\n"),
+                    ASM_SIZE);
 
                 /* read/write and skip and jump follows the semi-colon */
                 while ((line[i] != '\0') && (line[i] != ';'))
@@ -460,7 +489,7 @@ int  main()
     /* do the instruction vectors */
     vector_t vectors[4];
 
-    printf("# ProgDB dataDBr ProgAB read write DataAB DataDBw\n");
+    printf("# ProgAB ProgDB dataDBr read write DataAB DataDBw        AssemblyCode\n");
     /* output the vectors */
     for (i = 0; i < no_vectors; i++)  {
         setProgDB(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
@@ -471,18 +500,20 @@ int  main()
         setDataDBw(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
         setRead(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
         setWrite(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i]);
+        setASMCode(vectors, progaddr[i], inst[i], inst2[i], data[i], rdwrsj[i], addr[i], asm_code[i]);
 
         int cycle_cnt = getCycleCount(inst[i], rdwrsj[i][0]);
         for (j = 0; j < cycle_cnt; j ++) {
             printf(
-                "%s %s %s %d %d %s %s\n",
+                "%s %s %s %d %d %s %s        %s\n",
+                vectors[j].progAB,
                 vectors[j].progDB,
                 vectors[j].dataDBr,
-                vectors[j].progAB,
                 vectors[j].read,
                 vectors[j].write,
                 vectors[j].dataAB,
-                vectors[j].dataDBw
+                vectors[j].dataDBw,
+                vectors[j].asmCodeDebug
             );
         }
     }

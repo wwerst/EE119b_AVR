@@ -144,6 +144,8 @@ architecture  dataflow  of  AvrIau  is
     -- concatenated vectors of all sources and offsets
     signal sources  : std_logic_vector(IAU.SOURCES*AVR.ADDRSIZE - 1 downto 0);
     signal offsets  : std_logic_vector(IAU.OFFSETS*AVR.ADDRSIZE - 1 downto 0);
+
+    signal next_address: AVR.addr_t;
 begin
     -- sign extend branch and jump offsets
     branch_ext  <= (branch'RANGE => branch, others => branch(branch'HIGH));
@@ -171,17 +173,18 @@ begin
         IncDecSel   => MemUnitConstants.MemUnit_INC,
         IncDecBit   => 0,
         PrePostSel  => MemUnitConstants.MemUnit_PRE,
-        Address     => Address
+        Address     => next_address
     );
+    Address <= PC;
 
     -- every clock, update PC
     process(clk) begin
         if rising_edge(clk) then
             if reset = '0' then
-                -- Reset to address -1
-                pc <= (others => '1');
+                -- Reset to address 0
+                pc <= (others => '0');
             else
-                pc <= Address;
+                pc <= next_address;
             end if;
         end if;
     end process;
