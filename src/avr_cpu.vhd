@@ -218,6 +218,7 @@ architecture dataflow of AVR_CPU is
     constant FlagMaskZCNVSH :  AVR.word_t := "00111111";
     constant FlagMaskZCNVS  :  AVR.word_t := "00011111";
     constant FlagMaskCNVS   :  AVR.word_t := "00011101";
+    constant FlagMaskCNVSH  :  AVR.word_t := "00111101";
     constant FlagMaskZNVS   :  AVR.word_t := "00011110";
     constant FlagMaskT      :  AVR.word_t := "01000000";
 
@@ -626,6 +627,79 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSBC) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                -- Implement special behavior for zero flag for SBC
+                -- If the previous result is zero, then update flag
+                -- Otherwise, don't update, therefore leaving flag at 0.
+                if alu_SReg(AVR.STATUS_ZERO) = '1' then
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                else
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskCNVSH;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSBCI) then
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= InstReg(11 downto 8) & InstReg(3 downto 0);
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                -- Implement special behavior for zero flag for SBC
+                -- If the previous result is zero, then update flag
+                -- Otherwise, don't update, therefore leaving flag at 0.
+                if alu_SReg(AVR.STATUS_ZERO) = '1' then
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                else
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskCNVSH;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            --elsif std_match(InstReg, Opcodes.OpSBIW) then
+            --    -- ADIW takes 2 cycles:
+            --    -- First, do an ADD with low register and immediate
+            --    -- Next, do an ADC with high register and zero.
+            --    if CurState = 0 then
+            --        -- Keep the instruction register the same
+            --        iau_ctrl.srcSel <= IAU.SRC_PC;
+            --        iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+            --        LoadInstReg <= '0';
+            --        -- Do an ADD low register in double register, immediate K
+            --        tmp_rd := ("11" & InstReg(5 downto 4) & "0");
+            --        reg_read_ctrl.SelOutA <= tmp_rd;
+            --        NextExecuteOpData.OpA <= reg_DataOutA;
+            --        -- Set immediate value bits. Default to 0, see above default conds.
+            --        NextExecuteOpData.OpB(5 downto 4) <= Instreg(7 downto 6);
+            --        NextExecuteOpData.OpB(3 downto 0) <= Instreg(3 downto 0);
+            --        NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+            --        NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+            --        NextExecuteOpData.writeRegEnS <= '1';
+            --        NextExecuteOpData.writeRegSelS <= tmp_rd;
+            --    else
+            --        -- Do an ADC high register in double register, 0
+            --        -- This carries the carry from low add into high register
+            --        tmp_rd := ("11" & InstReg(5 downto 4) & "1");
+            --        reg_read_ctrl.SelOutA <= tmp_rd;
+            --        NextExecuteOpData.OpA <= reg_DataOutA;
+            --        -- Set to 0 by default statements above, but be explicit about it:
+            --        NextExecuteOpData.OpB <= (others => '0');
+            --        NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
+            --        if alu_SReg(AVR.STATUS_ZERO) = '0' then
+            --            -- If the low register was not zero, the result is not zero,
+            --            -- so leave zero flag unset.
+            --            NextExecuteOpData.ALUFlagMask <= FlagMaskCNVS;
+            --        else 
+            --            NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+            --        end if;
+            --        NextExecuteOpData.writeRegEnS <= '1';
+            --        NextExecuteOpData.writeRegSelS <= tmp_rd;
+            --    end if;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
