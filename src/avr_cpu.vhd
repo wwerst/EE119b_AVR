@@ -361,6 +361,12 @@ begin
                 NextExecuteOpData.OpB(tmp_int) <= '1';
                 NextExecuteOpData.ALUFlagMask <= (others => '1');
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
+            elsif std_match(InstReg, Opcodes.OpBSET) then
+                tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
+                NextExecuteOpData.OpA <= alu_SReg;
+                NextExecuteOpData.OpB(tmp_int) <= '1';
+                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
             elsif std_match(InstReg, Opcodes.OpADD) then
                 tmp_rd := InstReg(8 downto 4);
                 tmp_rr := InstReg(9) & InstReg(3 downto 0);
