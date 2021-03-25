@@ -419,7 +419,8 @@ begin
             elsif (std_match(InstReg, Opcodes.OpLD) 
                     or std_match(Instreg, Opcodes.OpLDY)
                     or std_match(InstReg, Opcodes.OpLDZ))
-                    and not(std_match(InstReg, Opcodes.OpLDS))
+                    and not(std_match(InstReg, Opcodes.OpLDS)
+                    or std_match(InstReg, Opcodes.OpPOP))
             then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
@@ -470,6 +471,7 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDDY)
                     or std_match(InstReg, Opcodes.OpLDDZ)
+                    or std_match(InstReg, Opcodes.OpPOP)
             then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
@@ -485,6 +487,13 @@ begin
                 elsif std_match(InstReg, Opcodes.OpLDDZ) then
                     reg_read_ctrl.SelOutD <= "11";
                     dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
+                elsif std_match(InstReg, Opcodes.OpPOP) then
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    if CurState = 0 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    elsif CurState = 1 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDI) then
                 -- Pass immediate through ALU into write unit
@@ -508,7 +517,8 @@ begin
             elsif (std_match(InstReg, Opcodes.OpST)
                     or std_match(InstReg, Opcodes.OpSTY)
                     or std_match(InstReg, Opcodes.OpSTZ))
-                    and not(std_match(InstReg, Opcodes.OpSTS))
+                    and not(std_match(InstReg, Opcodes.OpSTS)
+                    or std_match(InstReg, Opcodes.OpPUSH))
             then
                 reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                 DataDB <= reg_DataOutA;
@@ -563,6 +573,7 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTDY)
                     or std_match(InstReg, Opcodes.OpSTDZ)
+                    or std_match(InstReg, Opcodes.OpPUSH)
             then
                 reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                 DataDB <= reg_DataOutA;
@@ -577,6 +588,13 @@ begin
                 elsif std_match(InstReg, Opcodes.OpSTDZ) then
                     reg_read_ctrl.SelOutD <= "11";
                     dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
+                elsif std_match(InstReg, Opcodes.OpPUSH) then
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    if CurState = 0 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    elsif CurState = 1 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTS) then
                 if CurState = 0 then
