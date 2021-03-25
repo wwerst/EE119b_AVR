@@ -548,6 +548,18 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpEOR) then
+                -- Subtract Rd by immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.EOR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
