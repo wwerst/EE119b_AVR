@@ -72,3 +72,7 @@ jobs:
       run: |
         make cpu_alu_tests | tee cpu_alu_test_result.txt
         cat cpu_alu_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"
+    - name: Run CPU Data Move Instruction Tests
+      run: |
+        make cpu_data_move_tests | tee cpu_data_move_test_result.txt
+        cat cpu_data_move_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"
