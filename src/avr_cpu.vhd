@@ -493,9 +493,17 @@ begin
                 tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
                 tmp_rd := InstReg(8 downto 4);
                 reg_read_ctrl.SelOutA <= tmp_rd;
-                NextExecuteOpData.OpA(AVR.STATUS_TRANS) <= reg_DataOutA(tmp_int);
+                NextExecuteOpData.OpA <= (others => reg_DataOutA(tmp_int));
                 NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskT;
+            elsif std_match(InstReg, Opcodes.OpCOM) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.COM_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
