@@ -471,11 +471,36 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpBLD) then
+                -- 
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB(tmp_int) <= (reg_DataOutA(tmp_int) xor alu_SReg(AVR.STATUS_TRANS));
+                NextExecuteOpData.ALUOpCode <= ALUOp.EOR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
+                -- Fixed IN Rd, $3F  ; Copies status register to Rd
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= alu_SReg;
+            elsif std_match(InstReg, Opcodes.OpOut) then
+                -- Fixed OUT $3F, Rr  ; Outputs Rr to the status register
+                -- BSET instruction is Sreg = A or B. By default, B is zeros.
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                if (InstReg(10 downto 9) & InstReg(3 downto 0)) = "111111" then
+                    -- The target for output is the status register
+                    -- Load the register into status register
+                    NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '0';
             elsif std_match(InstReg, Opcodes.OpMOV) then
                 reg_read_ctrl.SelOutA <= InstReg(9) & InstReg(3 downto 0);
                 NextExecuteOpData.OpA <= reg_DataOutA;
