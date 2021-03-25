@@ -504,6 +504,30 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpCP) then
+                -- Compare Rd and Rr by doing subtraction
+                -- but not storing result
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
+            elsif std_match(InstReg, Opcodes.OpCPC) then
+                -- Compare with carry Rd and Rr by doing subtraction
+                -- with carry but not storing result
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
