@@ -219,6 +219,7 @@ architecture dataflow of AVR_CPU is
     constant FlagMaskZCNVS  :  AVR.word_t := "00011111";
     constant FlagMaskCNVS   :  AVR.word_t := "00011101";
     constant FlagMaskZNVS   :  AVR.word_t := "00011110";
+    constant FlagMaskT      :  AVR.word_t := "01000000";
 
 
 
@@ -483,6 +484,18 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpBST) then
+                -- BST Rd, b
+                -- Set the SREG T flag to the bit at tmp_int in Rd
+                -- Do this by using the ALUOp.BSET_Op with the single bit from
+                -- Rd assigned to the T slot in OpA, and then only update the
+                -- T position of SREG using flag mask
+                tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA(AVR.STATUS_TRANS) <= reg_DataOutA(tmp_int);
+                NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskT;
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
