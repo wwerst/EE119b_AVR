@@ -283,7 +283,10 @@ begin
     InstrLatchProc: process(clock)
     begin
         if rising_edge(clock) then
-            if LoadInstReg then
+            if reset = '0' then
+                InstReg <= (others => '0');
+                CurState <= 0;
+            elsif LoadInstReg then
                 InstReg <= ProgDB;
                 CurState <= 0;
             else
@@ -362,8 +365,9 @@ begin
         else
 
             -- ALU
-
-            if std_match(InstReg, Opcodes.OpBCLR) then
+            if std_match(InstReg, Opcodes.OpNOP) then
+                null;
+            elsif std_match(InstReg, Opcodes.OpBCLR) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
@@ -459,16 +463,24 @@ begin
                     NextExecuteOpData.OpA <= reg_DataOutA;
                     NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
                 end if;
+            elsif std_match(Instreg, Opcodes.OpASR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ASR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= alu_SReg;
             elsif std_match(InstReg, Opcodes.OpMOV) then
-                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= InstReg(9) & InstReg(3 downto 0);
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.writeRegEnS <= '1';
-                NextExecuteOpData.writeRegSelS <= InstReg(9) & InstReg(3 downto 0);
+                NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
             elsif (std_match(InstReg, Opcodes.OpLD) 
                     or std_match(Instreg, Opcodes.OpLDY)
                     or std_match(InstReg, Opcodes.OpLDZ))
@@ -664,7 +676,7 @@ begin
                     LoadInstReg <= '0';
                 end if;
             else
-                null;
+                assert (reset = '0' or now = 0 ns) report "Unknown instruction " & to_string(InstReg);
             end if;
         end if;
     end process DecodeProc;
