@@ -618,6 +618,14 @@ begin
                 end if;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpROR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ROR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
