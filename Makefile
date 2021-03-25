@@ -11,6 +11,7 @@ lst2test:
 
 cpu_test_vector_files: lst2test
 	cd glen_test_generator; ./lst2test < alu_test_part1.lss > alu_test_part1_tv.txt
+	cd glen_test_generator; ./lst2test < alu_test_part2.lss > alu_test_part2_tv.txt
 
 import: clean
 	mkdir -p work
