@@ -1,24 +1,39 @@
 [*]
 [*] GTKWave Analyzer v3.3.86 (w)1999-2017 BSI
-[*] Sun Feb 14 04:48:57 2021
+[*] Thu Mar 25 02:20:14 2021
 [*]
-[dumpfile] "/home/wwerst/proj/EE119b_AVR/avr_reg_tb.vcd"
-[dumpfile_mtime] "Sun Feb 14 04:47:17 2021"
-[dumpfile_size] 41150
-[savefile] "/home/wwerst/proj/EE119b_AVR/config.gtkw"
-[timestart] 10850000000000
-[size] 2493 1385
-[pos] 2598 -2
-*-42.000000 32920000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-[sst_width] 223
-[signals_width] 134
+[dumpfile] "/home/wwerst/EE119b_AVR/avr_cpu_tb.ghw"
+[dumpfile_mtime] "Thu Mar 25 02:05:01 2021"
+[dumpfile_size] 138356
+[savefile] "/home/wwerst/EE119b_AVR/config.gtkw"
+[timestart] 357110000000000
+[size] 2493 1280
+[pos] -145 -599
+*-41.000000 374310000000000 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
+[treeopen] top.
+[treeopen] top.avr_cpu_tb.
+[treeopen] top.avr_cpu_tb.uut.
+[treeopen] top.avr_cpu_tb.uut.alu_u.
+[treeopen] top.avr_cpu_tb.uut.nextexecuteopdata.
+[sst_width] 303
+[signals_width] 244
 [sst_expanded] 1
-[sst_vpaned_height] 428
+[sst_vpaned_height] 391
+@28
+top.avr_cpu_tb.clk
+#{top.avr_cpu_tb.uut.alu_sreg[7:0]} top.avr_cpu_tb.uut.alu_sreg[7] top.avr_cpu_tb.uut.alu_sreg[6] top.avr_cpu_tb.uut.alu_sreg[5] top.avr_cpu_tb.uut.alu_sreg[4] top.avr_cpu_tb.uut.alu_sreg[3] top.avr_cpu_tb.uut.alu_sreg[2] top.avr_cpu_tb.uut.alu_sreg[1] top.avr_cpu_tb.uut.alu_sreg[0]
+#{top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[7:0]} top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[7] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[6] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[5] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[4] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[3] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[2] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[1] top.avr_cpu_tb.uut.nextexecuteopdata.aluflagmask[0]
 @22
-avr_reg_tb.datains[7:0]
-avr_reg_tb.selins[4:0]
-avr_reg_tb.dataouta[7:0]
+#{top.avr_cpu_tb.progab[15:0]} top.avr_cpu_tb.progab[15] top.avr_cpu_tb.progab[14] top.avr_cpu_tb.progab[13] top.avr_cpu_tb.progab[12] top.avr_cpu_tb.progab[11] top.avr_cpu_tb.progab[10] top.avr_cpu_tb.progab[9] top.avr_cpu_tb.progab[8] top.avr_cpu_tb.progab[7] top.avr_cpu_tb.progab[6] top.avr_cpu_tb.progab[5] top.avr_cpu_tb.progab[4] top.avr_cpu_tb.progab[3] top.avr_cpu_tb.progab[2] top.avr_cpu_tb.progab[1] top.avr_cpu_tb.progab[0]
+#{top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[6:0]} top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[6] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[5] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[4] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[3] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[2] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[1] top.avr_cpu_tb.uut.nextexecuteopdata.aluopcode[0]
+#{top.avr_cpu_tb.uut.instreg[15:0]} top.avr_cpu_tb.uut.instreg[15] top.avr_cpu_tb.uut.instreg[14] top.avr_cpu_tb.uut.instreg[13] top.avr_cpu_tb.uut.instreg[12] top.avr_cpu_tb.uut.instreg[11] top.avr_cpu_tb.uut.instreg[10] top.avr_cpu_tb.uut.instreg[9] top.avr_cpu_tb.uut.instreg[8] top.avr_cpu_tb.uut.instreg[7] top.avr_cpu_tb.uut.instreg[6] top.avr_cpu_tb.uut.instreg[5] top.avr_cpu_tb.uut.instreg[4] top.avr_cpu_tb.uut.instreg[3] top.avr_cpu_tb.uut.instreg[2] top.avr_cpu_tb.uut.instreg[1] top.avr_cpu_tb.uut.instreg[0]
 @23
-avr_reg_tb.selouta[4:0]
+#{top.avr_cpu_tb.uut.alu_u.status_signal[7:0]} top.avr_cpu_tb.uut.alu_u.status_signal[7] top.avr_cpu_tb.uut.alu_u.status_signal[6] top.avr_cpu_tb.uut.alu_u.status_signal[5] top.avr_cpu_tb.uut.alu_u.status_signal[4] top.avr_cpu_tb.uut.alu_u.status_signal[3] top.avr_cpu_tb.uut.alu_u.status_signal[2] top.avr_cpu_tb.uut.alu_u.status_signal[1] top.avr_cpu_tb.uut.alu_u.status_signal[0]
+@22
+#{top.avr_cpu_tb.uut.alu_u.status_computed[7:0]} top.avr_cpu_tb.uut.alu_u.status_computed[7] top.avr_cpu_tb.uut.alu_u.status_computed[6] top.avr_cpu_tb.uut.alu_u.status_computed[5] top.avr_cpu_tb.uut.alu_u.status_computed[4] top.avr_cpu_tb.uut.alu_u.status_computed[3] top.avr_cpu_tb.uut.alu_u.status_computed[2] top.avr_cpu_tb.uut.alu_u.status_computed[1] top.avr_cpu_tb.uut.alu_u.status_computed[0]
+#{top.avr_cpu_tb.uut.alu_u.status_mux[7:0]} top.avr_cpu_tb.uut.alu_u.status_mux[7] top.avr_cpu_tb.uut.alu_u.status_mux[6] top.avr_cpu_tb.uut.alu_u.status_mux[5] top.avr_cpu_tb.uut.alu_u.status_mux[4] top.avr_cpu_tb.uut.alu_u.status_mux[3] top.avr_cpu_tb.uut.alu_u.status_mux[2] top.avr_cpu_tb.uut.alu_u.status_mux[1] top.avr_cpu_tb.uut.alu_u.status_mux[0]
+#{top.avr_cpu_tb.uut.alu_u.result_signal[7:0]} top.avr_cpu_tb.uut.alu_u.result_signal[7] top.avr_cpu_tb.uut.alu_u.result_signal[6] top.avr_cpu_tb.uut.alu_u.result_signal[5] top.avr_cpu_tb.uut.alu_u.result_signal[4] top.avr_cpu_tb.uut.alu_u.result_signal[3] top.avr_cpu_tb.uut.alu_u.result_signal[2] top.avr_cpu_tb.uut.alu_u.result_signal[1] top.avr_cpu_tb.uut.alu_u.result_signal[0]
+#{top.avr_cpu_tb.uut.alu_u.aluopa[7:0]} top.avr_cpu_tb.uut.alu_u.aluopa[7] top.avr_cpu_tb.uut.alu_u.aluopa[6] top.avr_cpu_tb.uut.alu_u.aluopa[5] top.avr_cpu_tb.uut.alu_u.aluopa[4] top.avr_cpu_tb.uut.alu_u.aluopa[3] top.avr_cpu_tb.uut.alu_u.aluopa[2] top.avr_cpu_tb.uut.alu_u.aluopa[1] top.avr_cpu_tb.uut.alu_u.aluopa[0]
+#{top.avr_cpu_tb.uut.alu_u.aluopb[7:0]} top.avr_cpu_tb.uut.alu_u.aluopb[7] top.avr_cpu_tb.uut.alu_u.aluopb[6] top.avr_cpu_tb.uut.alu_u.aluopb[5] top.avr_cpu_tb.uut.alu_u.aluopb[4] top.avr_cpu_tb.uut.alu_u.aluopb[3] top.avr_cpu_tb.uut.alu_u.aluopb[2] top.avr_cpu_tb.uut.alu_u.aluopb[1] top.avr_cpu_tb.uut.alu_u.aluopb[0]
 [pattern_trace] 1
 [pattern_trace] 0

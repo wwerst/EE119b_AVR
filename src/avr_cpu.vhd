@@ -213,6 +213,16 @@ architecture dataflow of AVR_CPU is
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
 
+    constant FlagMaskAll    :  AVR.word_t := "11111111";
+    constant FlagMaskNone   :  AVR.word_t := "00000000";
+    constant FlagMaskZCNVSH :  AVR.word_t := "00111111";
+    constant FlagMaskZCNVS  :  AVR.word_t := "00011111";
+    constant FlagMaskCNVS   :  AVR.word_t := "00011101";
+    constant FlagMaskCNVSH  :  AVR.word_t := "00111101";
+    constant FlagMaskZNVS   :  AVR.word_t := "00011110";
+    constant FlagMaskT      :  AVR.word_t := "01000000";
+
+
 
 begin
 
@@ -275,7 +285,10 @@ begin
     InstrLatchProc: process(clock)
     begin
         if rising_edge(clock) then
-            if LoadInstReg then
+            if reset = '0' then
+                InstReg <= (others => '0');
+                CurState <= 0;
+            elsif LoadInstReg then
                 InstReg <= ProgDB;
                 CurState <= 0;
             else
@@ -331,7 +344,7 @@ begin
         NextExecuteOpData.OpA <= (others => '0');
         NextExecuteOpData.OpB <= (others => '0');
         NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
-        NextExecuteOpData.ALUFlagMask <= (others => '0');
+        NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
         NextExecuteOpData.writeRegEnS <= '0';
         NextExecuteOpData.writeRegSelS <= (others => '0');
         NextExecuteOpData.writeRegEnD <= '0';
@@ -350,22 +363,23 @@ begin
             NextExecuteOpData.OpA <= (others => '0');
             NextExecuteOpData.OpB <= (others => '1');
             NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
-            NextExecuteOpData.ALUFlagMask <= (others => '1');
+            NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
         else
 
             -- ALU
-
-            if std_match(InstReg, Opcodes.OpBCLR) then
+            if std_match(InstReg, Opcodes.OpNOP) then
+                null;
+            elsif std_match(InstReg, Opcodes.OpBCLR) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
             elsif std_match(InstReg, Opcodes.OpBSET) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
             elsif std_match(InstReg, Opcodes.OpADD) then
                 tmp_rd := InstReg(8 downto 4);
@@ -375,7 +389,7 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpADC) then
@@ -386,42 +400,362 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpADIW) then
-                -- ADIW takes 2 cycles
+                -- ADIW takes 2 cycles:
+                -- First, do an ADD with low register and immediate
+                -- Next, do an ADC with high register and zero.
                 if CurState = 0 then
-                    -- Stub function for delaying
+                    -- Keep the instruction register the same
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
+                    -- Do an ADD low register in double register, immediate K
+                    tmp_rd := ("11" & InstReg(5 downto 4) & "0");
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    -- Set immediate value bits. Default to 0, see above default conds.
+                    NextExecuteOpData.OpB(5 downto 4) <= Instreg(7 downto 6);
+                    NextExecuteOpData.OpB(3 downto 0) <= Instreg(3 downto 0);
+                    NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= tmp_rd;
                 else
-                    null;
+                    -- Do an ADC high register in double register, 0
+                    -- This carries the carry from low add into high register
+                    tmp_rd := ("11" & InstReg(5 downto 4) & "1");
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    -- Set to 0 by default statements above, but be explicit about it:
+                    NextExecuteOpData.OpB <= (others => '0');
+                    NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
+                    if alu_SReg(AVR.STATUS_ZERO) = '0' then
+                        -- If the low register was not zero, the result is not zero,
+                        -- so leave zero flag unset.
+                        NextExecuteOpData.ALUFlagMask <= FlagMaskCNVS;
+                    else 
+                        NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                    end if;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= tmp_rd;
                 end if;
-            elsif std_match(InstReg, Opcodes.OpAND) then
+            elsif (std_match(InstReg, Opcodes.OpAND) or
+                   std_match(InstReg, Opcodes.OpANDI)) then
+                -- Common to both AND and ANDI
+                
+                NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                if std_match(InstReg, Opcodes.OpAND) then
+                    -- Opcode is OpAND
+                    tmp_rd := InstReg(8 downto 4);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpB <= reg_DataOutB;
+                else
+                    -- Opcode is OpANDI
+                    tmp_rd := ("1" & InstReg(7 downto 4));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpASR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ASR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpBLD) then
+                -- 
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB(tmp_int) <= (reg_DataOutA(tmp_int) xor alu_SReg(AVR.STATUS_TRANS));
+                NextExecuteOpData.ALUOpCode <= ALUOp.EOR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpBST) then
+                -- BST Rd, b
+                -- Set the SREG T flag to the bit at tmp_int in Rd
+                -- Do this by using the ALUOp.BSET_Op with the single bit from
+                -- Rd assigned to the T slot in OpA, and then only update the
+                -- T position of SREG using flag mask
+                tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= (others => reg_DataOutA(tmp_int));
+                NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskT;
+            elsif std_match(InstReg, Opcodes.OpCOM) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.COM_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpCP) then
+                -- Compare Rd and Rr by doing subtraction
+                -- but not storing result
                 tmp_rd := InstReg(8 downto 4);
                 tmp_rr := InstReg(9) & InstReg(3 downto 0);
                 reg_read_ctrl.SelOutA <= tmp_rd;
                 reg_read_ctrl.SelOutB <= tmp_rr;
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
-                NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
+            elsif std_match(InstReg, Opcodes.OpCPC) then
+                -- Compare with carry Rd and Rr by doing subtraction
+                -- with carry but not storing result
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
+            elsif std_match(InstReg, Opcodes.OpCPI) then
+                -- Compare Rd and immediate by doing subtraction
+                -- but not storing result
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= InstReg(11 downto 8) & InstReg(3 downto 0);
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
+            elsif std_match(InstReg, Opcodes.OpDEC) then
+                -- Subtract Rd by immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Subtract 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
-
-            -- LOAD/STORE
-
+            elsif std_match(InstReg, Opcodes.OpEOR) then
+                -- Compute XOR of Rd and Rr, and store back in Rd
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.EOR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpINC) then
+                -- Increment Rd by adding an immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Add 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpINC) then
+                -- Increment Rd by adding an immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Add 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpLSR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.LSR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpNEG) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutB <= tmp_rd;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif (std_match(InstReg, Opcodes.OpOR) or
+                   std_match(InstReg, Opcodes.OpORI)) then
+                -- Common to both OR and ORI
+                NextExecuteOpData.ALUOpCode <= ALUOp.OR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                if std_match(InstReg, Opcodes.OpOR) then
+                    -- Opcode is OpOR
+                    tmp_rd := InstReg(8 downto 4);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpB <= reg_DataOutB;
+                else
+                    -- Opcode is OpORI
+                    tmp_rd := ("1" & InstReg(7 downto 4));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(Instreg, Opcodes.OpROR) then
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.ROR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSBC) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                -- Implement special behavior for zero flag for SBC
+                -- If the previous result is zero, then update flag
+                -- Otherwise, don't update, therefore leaving flag at 0.
+                if alu_SReg(AVR.STATUS_ZERO) = '1' then
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                else
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskCNVSH;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSBCI) then
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= InstReg(11 downto 8) & InstReg(3 downto 0);
+                NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                -- Implement special behavior for zero flag for SBC
+                -- If the previous result is zero, then update flag
+                -- Otherwise, don't update, therefore leaving flag at 0.
+                if alu_SReg(AVR.STATUS_ZERO) = '1' then
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                else
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskCNVSH;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSBIW) then
+                -- SBIW takes 2 cycles:
+                -- First, do a SUB with low register and immediate
+                -- Next, do an SBC with high register and zero.
+                if CurState = 0 then
+                    -- Keep the instruction register the same
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                    -- Do an ADD low register in double register, immediate K
+                    tmp_rd := ("11" & InstReg(5 downto 4) & "0");
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    -- Set immediate value bits. Default to 0, see above default conds.
+                    NextExecuteOpData.OpB(5 downto 4) <= Instreg(7 downto 6);
+                    NextExecuteOpData.OpB(3 downto 0) <= Instreg(3 downto 0);
+                    NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= tmp_rd;
+                else
+                    -- Do an ADC high register in double register, 0
+                    -- This carries the carry from low add into high register
+                    tmp_rd := ("11" & InstReg(5 downto 4) & "1");
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    -- Set to 0 by default statements above, but be explicit about it:
+                    NextExecuteOpData.OpB <= (others => '0');
+                    NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                    if alu_SReg(AVR.STATUS_ZERO) = '0' then
+                        -- If the low register was not zero, the result is not zero,
+                        -- so leave zero flag unset.
+                        NextExecuteOpData.ALUFlagMask <= FlagMaskCNVS;
+                    else 
+                        NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVS;
+                    end if;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= tmp_rd;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpSUB) then
+                tmp_rd := InstReg(8 downto 4);
+                tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                reg_read_ctrl.SelOutB <= tmp_rr;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= reg_DataOutB;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSUBI) then
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSWAP) then
+                -- Swap low and high nibbles of Rd
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SWAP_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            -------------------
+            -------------------
+            -- LOAD/STORE Instructions
+            -------------------
+            -------------------
             elsif std_match(InstReg, Opcodes.OpIN) then
+                -- Fixed IN Rd, $3F  ; Copies status register to Rd
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= alu_SReg;
-            elsif std_match(InstReg, Opcodes.OpMOV) then
+            elsif std_match(InstReg, Opcodes.OpOut) then
+                -- Fixed OUT $3F, Rr  ; Outputs Rr to the status register
+                -- BSET instruction is Sreg = A or B. By default, B is zeros.
                 reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= reg_DataOutA;
+                if (InstReg(10 downto 9) & InstReg(3 downto 0)) = "111111" then
+                    -- The target for output is the status register
+                    -- Load the register into status register
+                    NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
+                end if;
+                NextExecuteOpData.writeRegEnS <= '0';
+            elsif std_match(InstReg, Opcodes.OpMOV) then
+                reg_read_ctrl.SelOutA <= InstReg(9) & InstReg(3 downto 0);
+                NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.writeRegEnS <= '1';
-                NextExecuteOpData.writeRegSelS <= InstReg(9) & InstReg(3 downto 0);
+                NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
             elsif (std_match(InstReg, Opcodes.OpLD) 
                     or std_match(Instreg, Opcodes.OpLDY)
                     or std_match(InstReg, Opcodes.OpLDZ))
@@ -617,7 +951,7 @@ begin
                     LoadInstReg <= '0';
                 end if;
             else
-                null;
+                assert (reset = '0' or now = 0 ns) report "Unknown instruction " & to_string(InstReg);
             end if;
         end if;
     end process DecodeProc;

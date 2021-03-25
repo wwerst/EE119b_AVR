@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Thu Mar 25 01:34:07 2021
+AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Thu Mar 25 01:33:43 2021
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRAssembler\2.1.51.17\AvrAssembler/Include\m88def.inc'
                  
@@ -1033,10 +1033,7 @@ AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssem
                  ;   and then make sure that instructions don't modify
                  ;   flags they are supposed to leave untouched.
                  
-                 
-                 
-                 ;PREPROCESS TestAdd {r16=Rd, r17=Rd, r18=Rd, X={X, Y, Z}}
-                 start_test_add:
+                 clear_sreg:
 000000 9488
 000001 9498
 000002 94a8
@@ -1045,1105 +1042,574 @@ AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssem
 000005 94d8
 000006 94e8
 000007 94f8          CLR_SREG
-                 test_add_to_zero:
-000008 e000          ldi r16, $00    ; 
-000009 ea1f          ldi r17, $AF    ;
-00000a 0f01          ADD r16, r17    ;
-00000b b72f          IN  r18, $3F    ; Read the Status register
-00000c e0b1          LDI r27, $01    ;
-00000d e0a0          LDI r26, $00    ;
-00000e 930c          ST  X,   r16    ;W AF 0100
-00000f 931c          ST  X,   r17    ;W AF 0100
-000010 932c          ST  X,   r18    ;W 14 0100
-                 
-                  test_add_of_zero:
-000011 ea0f          ldi r16, $AF    ; 
-000012 e010          ldi r17, $00    ;
-000013 0f01          ADD r16, r17    ;
-000014 b72f          IN  r18, $3F    ; Read the Status register
-000015 e0b1          LDI r27, $01    ;
-000016 e0a0          LDI r26, $00    ;
-000017 930c          ST  X,   r16    ;W AF 0100
-000018 931c          ST  X,   r17    ;W 00 0100
-000019 932c          ST  X,   r18    ;W 14 0100
-                 
-                 test_add_overflow:
-00001a eb00          ldi r16, $B0    ; 
-00001b e81f          ldi r17, $8F    ;
-00001c 0f01          ADD r16, r17    ; -- 176 + 143 = 319 = 63 mod 256, carry 1
-00001d b72f          IN  r18, $3F    ; Read the Status register
-00001e e0b1          LDI r27, $01    ;
-00001f e0a0          LDI r26, $00    ;
-000020 930c          ST  X,   r16    ;W 3F 0100
-000021 931c          ST  X,   r17    ;W 8F 0100
-000022 932c          ST  X,   r18    ;W 19 0100
-                 
-                 test_add_overflow_to_zero:
-000023 e70f          ldi r16, $7F    ; 
-000024 e811          ldi r17, $81    ;
-000025 0f01          ADD r16, r17    ; -- 127 + 129 = 0 with carry 1
-000026 b72f          IN  r18, $3F    ; Read the Status register
-000027 e0b1          LDI r27, $01    ;
-000028 e0a0          LDI r26, $00    ;
-000029 930c          ST  X,   r16    ;W 00 0100
-00002a 931c          ST  X,   r17    ;W 81 0100
-00002b 932c          ST  X,   r18    ;W 23 0100
-                 
-                 test_add_zeros:
-00002c e000          ldi r16, $00    ; 
-00002d e010          ldi r17, $00    ;
-00002e 0f01          ADD r16, r17    ; -- 176 + 143 = 319 = 63 mod 256, carry 1
-00002f b72f          IN  r18, $3F    ; Read the Status register
-000030 e0b1          LDI r27, $01    ;
-000031 e0a0          LDI r26, $00    ;
-000032 930c          ST  X,   r16    ;W 00 0100
-000033 931c          ST  X,   r17    ;W 00 0100
-000034 932c          ST  X,   r18    ;W 02 0100
-                 
-                 ;PREPROCESS TestADC
-                 start_test_adc:
-000035 9488
-000036 9498
-000037 94a8
-000038 94b8
-000039 94c8
-00003a 94d8
-00003b 94e8
-00003c 94f8          CLR_SREG
-                 test_adc_to_zero:
-00003d 9488          BCLR SREG_C     ; Clear carry flag
-00003e e000          ldi r16, $00    ; 
-00003f ea1f          ldi r17, $AF    ;
-000040 1f01          ADC r16, r17    ;
-000041 b72f          IN  r18, $3F    ; Read the Status register
-000042 e0b1          LDI r27, $01    ;
-000043 e0a0          LDI r26, $00    ;
-000044 930c          ST  X,   r16    ;W AF 0100
-000045 931c          ST  X,   r17    ;W AF 0100
-000046 932c          ST  X,   r18    ;W 14 0100
-                 
-                  test_adc_of_zero:
-000047 9488          BCLR SREG_C     ; Clear carry flag
-000048 ea0f          ldi r16, $AF    ; 
-000049 e010          ldi r17, $00    ;
-00004a 1f01          ADC r16, r17    ;
-00004b b72f          IN  r18, $3F    ; Read the Status register
-00004c e0b1          LDI r27, $01    ;
-00004d e0a0          LDI r26, $00    ;
-00004e 930c          ST  X,   r16    ;W AF 0100
-00004f 931c          ST  X,   r17    ;W 00 0100
-000050 932c          ST  X,   r18    ;W 14 0100
-                 
-                 test_adc_overflow:
-000051 9488          BCLR SREG_C     ; Clear carry flag
-000052 eb00          ldi r16, $B0    ; 
-000053 e81f          ldi r17, $8F    ;
-000054 1f01          ADC r16, r17    ; -- 176 + 143 = 319 = 63 mod 256, carry 1
-000055 b72f          IN  r18, $3F    ; Read the Status register
-000056 e0b1          LDI r27, $01    ;
-000057 e0a0          LDI r26, $00    ;
-000058 930c          ST  X,   r16    ;W 3F 0100
-000059 931c          ST  X,   r17    ;W 8F 0100
-00005a 932c          ST  X,   r18    ;W 19 0100
-                 
-                 test_adc_overflow_to_zero:
-00005b 9488          BCLR SREG_C     ; Clear carry flag
-00005c e70f          ldi r16, $7F    ; 
-00005d e811          ldi r17, $81    ;
-00005e 1f01          ADC r16, r17    ; -- 127 + 129 = 0 with carry 1
-00005f b72f          IN  r18, $3F    ; Read the Status register
-000060 e0b1          LDI r27, $01    ;
-000061 e0a0          LDI r26, $00    ;
-000062 930c          ST  X,   r16    ;W 00 0100
-000063 931c          ST  X,   r17    ;W 81 0100
-000064 932c          ST  X,   r18    ;W 23 0100
-                 
-                 test_adc_zeros:
-000065 9488          BCLR SREG_C     ; Clear carry flag
-000066 e000          ldi r16, $00    ; 
-000067 e010          ldi r17, $00    ;
-000068 1f01          ADC r16, r17    ; -- 176 + 143 = 319 = 63 mod 256, carry 1
-000069 b72f          IN  r18, $3F    ; Read the Status register
-00006a e0b1          LDI r27, $01    ;
-00006b e0a0          LDI r26, $00    ;
-00006c 930c          ST  X,   r16    ;W 00 0100
-00006d 931c          ST  X,   r17    ;W 00 0100
-00006e 932c          ST  X,   r18    ;W 02 0100
-                 
-                 ; Test adding all zeros with carry flag set
-                 test_adc_with_carry_zeros:
-00006f 9408          BSET SREG_C     ; Set carry flag
-000070 e000          ldi r16, $00    ; 
-000071 e010          ldi r17, $00    ;
-000072 1f01          ADC r16, r17    ; -- 176 + 143 = 319 = 63 mod 256, carry 1
-000073 b72f          IN  r18, $3F    ; Read the Status register
-000074 e0b1          LDI r27, $01    ;
-000075 e0a0          LDI r26, $00    ;
-000076 930c          ST  X,   r16    ;W 01 0100
-000077 931c          ST  X,   r17    ;W 00 0100
-000078 932c          ST  X,   r18    ;W 00 0100
-                 
-                 ; Test adding numbers that add to one with carry set
-                 test_adc_with_carry_overflow_to_one:
-000079 9408          BSET SREG_C     ; Clear carry flag
-00007a e70f          ldi r16, $7F    ; 
-00007b e811          ldi r17, $81    ;
-00007c 1f01          ADC r16, r17    ; -- 127 + 129 = 0 with carry 1
-00007d b72f          IN  r18, $3F    ; Read the Status register
-00007e e0b1          LDI r27, $01    ;
-00007f e0a0          LDI r26, $00    ;
-000080 930c          ST  X,   r16    ;W 01 0100
-000081 931c          ST  X,   r17    ;W 81 0100
-000082 932c          ST  X,   r18    ;W 21 0100
-                 
-                 ; Test adding numbers that add to zero with carry set
-                 test_adc_with_carry_overflow_to_zero:
-000083 9408          BSET SREG_C     ; Clear carry flag
-000084 e70e          ldi r16, $7E    ; 
-000085 e811          ldi r17, $81    ;
-000086 1f01          ADC r16, r17    ; -- 127 + 129 = 0 with carry 1
-000087 b72f          IN  r18, $3F    ; Read the Status register
-000088 e0b1          LDI r27, $01    ;
-000089 e0a0          LDI r26, $00    ;
-00008a 930c          ST  X,   r16    ;W 00 0100
-00008b 931c          ST  X,   r17    ;W 81 0100
-00008c 932c          ST  X,   r18    ;W 23 0100
-                 
-                 ;PREPROCESS TestADIW
-                 ; ADIW Instruction: 
-                 ; Adds an immediate value (0-63) to a register pair and places the result in the register pair.
-                 ; 
-                 
-                 start_test_adiw:
-00008d 9488
-00008e 9498
-00008f 94a8
-000090 94b8
-000091 94c8
-000092 94d8
-000093 94e8
-000094 94f8          CLR_SREG
-                 
-                 test_adiw_zero:
-000095 94d8          BCLR SREG_H       ; Explicitly make clear H flag is clear, even though done above.
-000096 e080          LDI r24, $00
-000097 e090          LDI r25, $00
-000098 9600          ADIW r25:r24, 0
-000099 b72f          IN  r18, $3F      ; Read the Status register
-00009a 9390 0101     STS $0101, r25    ;W 00 0101
-00009c 9380 0100     STS $0100, r24    ;W 00 0100
-00009e 9320 0100     STS $0100, r18    ;W 02 0100
-                 
-                 test_adiw_notouch_hflag:
-                     ; Same test as above, but set the H flag before
-0000a0 9458          BSET SREG_H
-0000a1 e080          LDI r24, $00
-0000a2 e090          LDI r25, $00
-0000a3 9600          ADIW r25:r24, 0
-0000a4 b72f          IN  r18, $3F      ; Read the Status register
-0000a5 9390 0101     STS $0101, r25    ;W 00 0101
-0000a7 9380 0100     STS $0100, r24    ;W 00 0100
-0000a9 9320 0100     STS $0100, r18    ;W 22 0100
-                 
-                 test_adiw_halfcarry_no_effect:
-0000ab 94d8          BCLR SREG_H
-0000ac e08f          LDI r24, $0F
-0000ad e090          LDI r25, $00
-0000ae 9601          ADIW r25:r24, 1
-0000af b72f          IN  r18, $3F      ; Read the Status register
-0000b0 9390 0101     STS $0101, r25    ;W 00 0101
-0000b2 9380 0100     STS $0100, r24    ;W 10 0100
-0000b4 9320 0100     STS $0100, r18    ;W 00 0100
-                 
-                 test_adiw_lowcarry:
-0000b6 ef8f          LDI r24, $FF
-0000b7 e090          LDI r25, $00
-0000b8 9601          ADIW r25:r24, 1
-0000b9 b72f          IN  r18, $3F      ; Read the Status register
-0000ba 9390 0101     STS $0101, r25    ;W 01 0101
-0000bc 9380 0100     STS $0100, r24    ;W 00 0100
-0000be 9320 0100     STS $0100, r18    ;W 00 0100
-                 
-                 test_adiw_typical:
-0000c0 ee8b          LDI r24, 235
-0000c1 e79f          LDI r25, 127
-0000c2 9644          ADIW r25:r24, 20  ; 127*256 + 235 + 20 = 127*256 + 255
-0000c3 b72f          IN  r18, $3F      ; Read the Status register
-0000c4 9390 0101     STS $0101, r25    ;W 7F 0101
-0000c6 9380 0100     STS $0100, r24    ;W FF 0100
-0000c8 9320 0100     STS $0100, r18    ;W 00 0100
-                 
-                 test_adiw_signed_overflow:
-0000ca ee8d          LDI r24, 237
-0000cb e79f          LDI r25, 127
-0000cc 9681          ADIW r25:r24, 33  ; 127*256 + 237 + 33 = 128*256 + 14
-0000cd b72f          IN  r18, $3F      ; Read the Status register
-0000ce 9390 0101     STS $0101, r25    ;W 80 0101
-0000d0 9380 0100     STS $0100, r24    ;W 0E 0100
-0000d2 9320 0100     STS $0100, r18    ;W 0C 0100
-                 
-                 test_adiw_unsigned_overflow:
-0000d4 ec83          LDI r24, 195
-0000d5 ef9f          LDI r25, 255
-0000d6 96cf          ADIW r25:r24, 63  ; 255*256 + 195 + 63 = 1*65536 + 0*256 + 2
-0000d7 b72f          IN  r18, $3F      ; Read the Status register
-0000d8 9390 0101     STS $0101, r25    ;W 00 0101
-0000da 9380 0100     STS $0100, r24    ;W 02 0100
-0000dc 9320 0100     STS $0100, r18    ;W 01 0100
-                 
-                 test_adiw_unsigned_overflow_to_zero:
-0000de ec8e          LDI r24, 206
-0000df ef9f          LDI r25, 255
-0000e0 96c2          ADIW r25:r24, 50  ; 255*256 + 206 + 50 = 1*65536 + 0*256 + 0
-0000e1 b72f          IN  r18, $3F      ; Read the Status register
-0000e2 9390 0101     STS $0101, r25    ;W 00 0101
-0000e4 9380 0100     STS $0100, r24    ;W 00 0100
-0000e6 9320 0100     STS $0100, r18    ;W 03 0100
-                 
-                 ;PREPROCESS TestAND
-                 start_test_and:
-0000e8 9488
-0000e9 9498
-0000ea 94a8
-0000eb 94b8
-0000ec 94c8
-0000ed 94d8
-0000ee 94e8
-0000ef 94f8          CLR_SREG
-                 
-                 test_and_with_zero:
-0000f0 ef41          LDI r20, $F1
-0000f1 e050          LDI r21, $00
-0000f2 2354          AND r21, r20
-0000f3 b72f          IN  r18, $3F      ; Read the Status register
-0000f4 9340 0100     STS $0100, r20    ;W F1 0100
-0000f6 9350 0100     STS $0100, r21    ;W 00 0100
-0000f8 9320 0100     STS $0100, r18    ;W 02 0100
-                 
-                 test_and_result_zero:
-0000fa 9438          BSET SREG_V       ; AND should clear V flag always
-0000fb ea49          LDI r20, $A9
-0000fc e456          LDI r21, $46
-0000fd 2354          AND r21, r20
-0000fe b72f          IN  r18, $3F      ; Read the Status register
-0000ff 9340 0100     STS $0100, r20    ;W A9 0100
-000101 9350 0100     STS $0100, r21    ;W 00 0100
-000103 9320 0100     STS $0100, r18    ;W 02 0100
-                 
-                 test_and_n_flag:
-000105 9438          BSET SREG_V       ; AND should clear V flag always
-000106 ef49          LDI r20, $F9
-000107 e855          LDI r21, $85
-000108 2354          AND r21, r20
-000109 b72f          IN  r18, $3F      ; Read the Status register
-00010a 9340 0100     STS $0100, r20    ;W F9 0100
-00010c 9350 0100     STS $0100, r21    ;W 81 0100
-00010e 9320 0100     STS $0100, r18    ;W 14 0100
-                 
-                 ;PREPROCESS TestANDI
-                 start_test_andi:
-000110 9488
-000111 9498
-000112 94a8
-000113 94b8
-000114 94c8
-000115 94d8
-000116 94e8
-000117 94f8          CLR_SREG
-                 
-                 test_andi_with_zero:
-000118 e050          LDI r21, $00
-000119 7f51          ANDI r21, $F1
-00011a b72f          IN  r18, $3F      ; Read the Status register
-00011b 9350 0100     STS $0100, r21    ;W 00 0100
-00011d 9320 0100     STS $0100, r18    ;W 02 0100
-                 
-                 test_andi_result_zero:
-00011f 9438          BSET SREG_V       ; AND should clear V flag always
-000120 e456          LDI r21, $46
-000121 7a59          ANDI r21, $A9
-000122 b72f          IN  r18, $3F      ; Read the Status register
-000123 9350 0100     STS $0100, r21    ;W 00 0100
-000125 9320 0100     STS $0100, r18    ;W 02 0100
-                 
-                 test_andi_n_flag:
-000127 9438          BSET SREG_V       ; AND should clear V flag always
-000128 e855          LDI r21, $85
-000129 7f59          ANDI r21, $F9
-00012a b72f          IN  r18, $3F      ; Read the Status register
-00012b 9350 0100     STS $0100, r21    ;W 81 0100
-00012d 9320 0100     STS $0100, r18    ;W 14 0100
-                 
-                 ;PREPROCESS TestASR
-                 start_test_asr:
-00012f 9488
-000130 9498
-000131 94a8
-000132 94b8
-000133 94c8
-000134 94d8
-000135 94e8
-000136 94f8          CLR_SREG
-                 
-                 test_asr_high_zero:
-000137 e60a          LDI r16, $6A
-000138 2e30          MOV r3, r16
-                     ; Now, do 8 shifts and check the results regularly.
-000139 9435          ASR r3
-00013a b72f          IN  r18, $3F      ; Read the Status register
-00013b 9230 0100     STS $0100, r3    ;W 35 0100
-00013d 9320 0100     STS $0100, r18    ;W 00 0100
-                 
-00013f 9435          ASR r3
-000140 b72f          IN  r18, $3F      ; Read the Status register
-000141 9230 0100     STS $0100, r3    ;W 1A 0100
-000143 9320 0100     STS $0100, r18    ;W 19 0100
-                 
-000145 9435          ASR r3
-000146 b72f          IN  r18, $3F      ; Read the Status register
-000147 9230 0100     STS $0100, r3    ;W 0D 0100
-000149 9320 0100     STS $0100, r18    ;W 00 0100
-                 
-00014b 9435          ASR r3
-00014c b72f          IN  r18, $3F      ; Read the Status register
-00014d 9230 0100     STS $0100, r3    ;W 06 0100
-00014f 9320 0100     STS $0100, r18    ;W 19 0100
-                 
-                     ; Shift twice in a row
-000151 9435          ASR r3
-000152 9435          ASR r3
-000153 b72f          IN  r18, $3F      ; Read the Status register
-000154 9230 0100     STS $0100, r3    ;W 01 0100
-000156 9320 0100     STS $0100, r18    ;W 19 0100
-                 
-                     ; Shift to zero
-000158 9435          ASR r3
-000159 b72f          IN  r18, $3F      ; Read the Status register
-00015a 9230 0100     STS $0100, r3    ;W 00 0100
-00015c 9320 0100     STS $0100, r18    ;W 1B 0100
-                 
-                     ; Shift at zero
-00015e 9435          ASR r3
-00015f b72f          IN  r18, $3F      ; Read the Status register
-000160 9230 0100     STS $0100, r3    ;W 00 0100
-000162 9320 0100     STS $0100, r18    ;W 02 0100
                  
                  
-                 test_asr_high_one:
-000164 e804          LDI r16, $84
-000165 2e30          MOV r3, r16
-                     ; Now, do 8 shifts and check the results regularly.
-000166 9435          ASR r3
-000167 b72f          IN  r18, $3F      ; Read the Status register
-000168 9230 0100     STS $0100, r3    ;W C2 0100
-00016a 9320 0100     STS $0100, r18    ;W 0C 0100
+                 ;PREPROCESS TestLSR
+                 start_lsr:
+000008 9488
+000009 9498
+00000a 94a8
+00000b 94b8
+00000c 94c8
+00000d 94d8
+00000e 94e8
+00000f 94f8          CLR_SREG
+                 test_lsr:
+000010 ea65          LDI r22, $A5        ; 10100101
                  
-00016c 9435          ASR r3
-00016d b72f          IN  r18, $3F      ; Read the Status register
-00016e 9230 0100     STS $0100, r3    ;W E1 0100
-000170 9320 0100     STS $0100, r18    ;W 0C 0100
+000011 9566          LSR r22
+000012 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000013 9320 0100     STS $0100, r18      ;W 19 0100
+000015 9360 0100     STS $0100, r22      ;W 52 0100
                  
-000172 9435          ASR r3
-000173 b72f          IN  r18, $3F      ; Read the Status register
-000174 9230 0100     STS $0100, r3    ;W F0 0100
-000176 9320 0100     STS $0100, r18    ;W 15 0100
+000017 9566          LSR r22
+000018 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000019 9320 0100     STS $0100, r18      ;W 00 0100
+00001b 9360 0100     STS $0100, r22      ;W 29 0100
                  
-000178 9435          ASR r3
-000179 b72f          IN  r18, $3F      ; Read the Status register
-00017a 9230 0100     STS $0100, r3     ;W F8 0100
-00017c 9320 0100     STS $0100, r18    ;W 0C 0100
+00001d 9566          LSR r22
+00001e b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00001f 9320 0100     STS $0100, r18      ;W 19 0100
+000021 9360 0100     STS $0100, r22      ;W 14 0100
                  
-                     ; Shift twice in a row
-00017e 9435          ASR r3
-00017f 9435          ASR r3
-000180 b72f          IN  r18, $3F      ; Read the Status register
-000181 9230 0100     STS $0100, r3    ;W FE 0100
-000183 9320 0100     STS $0100, r18    ;W 0C 0100
+000023 9566          LSR r22
+000024 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000025 9320 0100     STS $0100, r18      ;W 00 0100
+000027 9360 0100     STS $0100, r22      ;W 0A 0100
                  
-                     ; Shift to zero
-000185 9435          ASR r3
-000186 b72f          IN  r18, $3F      ; Read the Status register
-000187 9230 0100     STS $0100, r3    ;W FF 0100
-000189 9320 0100     STS $0100, r18    ;W 0C 0100
+000029 9566          LSR r22
+00002a b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00002b 9320 0100     STS $0100, r18      ;W 00 0100
+00002d 9360 0100     STS $0100, r22      ;W 05 0100
                  
-                     ; Shift at zero
-00018b 9435          ASR r3
-00018c b72f          IN  r18, $3F      ; Read the Status register
-00018d 9230 0100     STS $0100, r3    ;W FF 0100
-00018f 9320 0100     STS $0100, r18    ;W 15 0100
+00002f 9566          LSR r22
+000030 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000031 9320 0100     STS $0100, r18      ;W 19 0100
+000033 9360 0100     STS $0100, r22      ;W 02 0100
                  
-                 ;PREPROCESS TestBCLR
-                 start_bclr:
-000191 9488
-000192 9498
-000193 94a8
-000194 94b8
-000195 94c8
-000196 94d8
-000197 94e8
-000198 94f8          CLR_SREG
+000035 9566          LSR r22
+000036 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000037 9320 0100     STS $0100, r18      ;W 00 0100
+000039 9360 0100     STS $0100, r22      ;W 01 0100
                  
+00003b 9566          LSR r22
+00003c b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00003d 9320 0100     STS $0100, r18      ;W 1B 0100
+00003f 9360 0100     STS $0100, r22      ;W 00 0100
                  
-                 test_bclr:
-                     ; Go in non-sequential order, clearing bits one-by-one
-000199 ef0f          LDI r16, $FF
-00019a bf0f          OUT SREG_ADDR, r16
+000041 9566          LSR r22
+000042 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000043 9320 0100     STS $0100, r18      ;W 02 0100
+000045 9360 0100     STS $0100, r22      ;W 00 0100
+                 ;PREPROCESS TestNEG
+                 start_neg:
+000047 9488
+000048 9498
+000049 94a8
+00004a 94b8
+00004b 94c8
+00004c 94d8
+00004d 94e8
+00004e 94f8          CLR_SREG
+                 test_neg_zero:
+00004f e080          LDI r24, $00
                  
-                     ; Clear V -- bit 3
-00019b 94b8          BCLR SREG_V
-00019c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00019d 9320 0100     STS $0100, r18      ;W F7 0100
+000050 9581          NEG r24
+000051 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000052 9320 0100     STS $0100, r18      ;W 02 0100
+000054 9380 0100     STS $0100, r24      ;W 00 0100
                  
-                     ; Clear H -- bit 5
-00019f 94d8          BCLR SREG_H
+                 test_neg_max:
+000056 ef8f          LDI r24, $FF
+                 
+000057 9581          NEG r24
+000058 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000059 9320 0100     STS $0100, r18      ;W 21 0100
+00005b 9380 0100     STS $0100, r24      ;W 01 0100
+                 
+                 test_neg_sign_max:
+00005d e78f          LDI r24, $7F
+                 
+00005e 9581          NEG r24
+00005f b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000060 9320 0100     STS $0100, r18      ;W 35 0100
+000062 9380 0100     STS $0100, r24      ;W 81 0100
+                 
+                 test_neg_sign_min:
+000064 e880          LDI r24, $80
+                 
+000065 9581          NEG r24
+000066 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000067 9320 0100     STS $0100, r18      ;W 0D 0100
+000069 9380 0100     STS $0100, r24      ;W 80 0100
+                 ;PREPROCESS TestOR
+                 start_or:
+00006b 9488
+00006c 9498
+00006d 94a8
+00006e 94b8
+00006f 94c8
+000070 94d8
+000071 94e8
+000072 94f8          CLR_SREG
+                 test_or_zeros:
+000073 e040          LDI r20, $00
+000074 e050          LDI r21, $00
+                 
+000075 2b45          OR r20, r21
+                 
+000076 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000077 9320 0100     STS $0100, r18      ;W 02 0100
+000079 9340 0100     STS $0100, r20      ;W 00 0100
+00007b 9350 0100     STS $0100, r21      ;W 00 0100
+                 
+                 test_or_rr_ones:
+00007d e040          LDI r20, $00
+00007e ef5f          LDI r21, $FF
+                 
+00007f 2b45          OR r20, r21
+                 
+000080 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000081 9320 0100     STS $0100, r18      ;W 14 0100
+000083 9340 0100     STS $0100, r20      ;W FF 0100
+000085 9350 0100     STS $0100, r21      ;W FF 0100
+                 
+                 test_or_rd_ones:
+000087 ef4f          LDI r20, $FF
+000088 e050          LDI r21, $00
+                 
+000089 2b45          OR r20, r21
+                 
+00008a b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00008b 9320 0100     STS $0100, r18      ;W 14 0100
+00008d 9340 0100     STS $0100, r20      ;W FF 0100
+00008f 9350 0100     STS $0100, r21      ;W 00 0100
+                 
+                 test_or_both_ones:
+000091 ef4f          LDI r20, $FF
+000092 ef5f          LDI r21, $FF
+                 
+000093 2b45          OR r20, r21
+                 
+000094 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000095 9320 0100     STS $0100, r18      ;W 14 0100
+000097 9340 0100     STS $0100, r20      ;W FF 0100
+000099 9350 0100     STS $0100, r21      ;W FF 0100
+                 
+                 test_or_random:
+00009b e947          LDI r20, $97        ; 10010111
+00009c ea54          LDI r21, $A4        ; 10100100
+                                         ; 10110111
+                 
+00009d 2b45          OR r20, r21
+                 
+00009e b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00009f 9320 0100     STS $0100, r18      ;W 14 0100
+0000a1 9340 0100     STS $0100, r20      ;W B7 0100
+0000a3 9350 0100     STS $0100, r21      ;W A4 0100
+                 ;PREPROCESS TestORI
+                 start_ori:
+0000a5 9488
+0000a6 9498
+0000a7 94a8
+0000a8 94b8
+0000a9 94c8
+0000aa 94d8
+0000ab 94e8
+0000ac 94f8          CLR_SREG
+                 test_ori_zeros:
+0000ad e040          LDI r20, $00
+                 
+0000ae 6040          ORI r20, $00
+                 
+0000af b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000b0 9320 0100     STS $0100, r18      ;W 02 0100
+0000b2 9340 0100     STS $0100, r20      ;W 00 0100
+                 
+                 test_ori_rr_ones:
+0000b4 e040          LDI r20, $00
+                 
+0000b5 6f4f          ORI r20, $FF
+                 
+0000b6 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000b7 9320 0100     STS $0100, r18      ;W 14 0100
+0000b9 9340 0100     STS $0100, r20      ;W FF 0100
+                 
+                 test_ori_rd_ones:
+0000bb ef4f          LDI r20, $FF
+                 
+0000bc 6040          ORI r20, $00
+                 
+0000bd b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000be 9320 0100     STS $0100, r18      ;W 14 0100
+0000c0 9340 0100     STS $0100, r20      ;W FF 0100
+                 
+                 test_ori_both_ones:
+0000c2 ef4f          LDI r20, $FF
+                 
+0000c3 6f4f          ORI r20, $FF
+                 
+0000c4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000c5 9320 0100     STS $0100, r18      ;W 14 0100
+0000c7 9340 0100     STS $0100, r20      ;W FF 0100
+                 
+                 test_ori_random:
+0000c9 e947          LDI r20, $97        ; 10010111
+                 
+0000ca 6a44          ORI r20, $A4
+                 
+0000cb b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000cc 9320 0100     STS $0100, r18      ;W 14 0100
+0000ce 9340 0100     STS $0100, r20      ;W B7 0100
+                 ;PREPROCESS TestROR
+                 start_ror:
+0000d0 9488
+0000d1 9498
+0000d2 94a8
+0000d3 94b8
+0000d4 94c8
+0000d5 94d8
+0000d6 94e8
+0000d7 94f8          CLR_SREG
+                 test_ror_norm:
+                     ; This test just shifts data through a few times
+                     ; During which carry flag is set and cleared
+0000d8 9408          BSET SREG_C
+0000d9 ea65          LDI r22, $A5        ; Load with random value = 165
+                 
+0000da 9567          ROR r22
+0000db b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000dc 9320 0100     STS $0100, r18      ;W 15 0100
+0000de 9360 0100     STS $0100, r22      ;W D2 0100
+                 
+0000e0 9567          ROR r22
+0000e1 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000e2 9320 0100     STS $0100, r18      ;W 0C 0100
+0000e4 9360 0100     STS $0100, r22      ;W E9 0100
+                 
+0000e6 9567          ROR r22
+0000e7 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000e8 9320 0100     STS $0100, r18      ;W 19 0100
+0000ea 9360 0100     STS $0100, r22      ;W 74 0100
+                 
+0000ec 9567          ROR r22
+0000ed b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000ee 9320 0100     STS $0100, r18      ;W 0C 0100
+0000f0 9360 0100     STS $0100, r22      ;W BA 0100
+                 
+0000f2 9566          LSR r22
+0000f3 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000f4 9320 0100     STS $0100, r18      ;W 00 0100
+0000f6 9360 0100     STS $0100, r22      ;W 5D 0100
+                 test_ror_to_zero:
+0000f8 9488          BCLR SREG_C
+0000f9 e061          LDI r22, $01        ; Load with random value = 165
+                 
+0000fa 9567          ROR r22
+0000fb b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0000fc 9320 0100     STS $0100, r18      ;W 1B 0100
+0000fe 9360 0100     STS $0100, r22      ;W 00 0100
+                 
+000100 9567          ROR r22
+000101 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000102 9320 0100     STS $0100, r18      ;W 0C 0100
+000104 9360 0100     STS $0100, r22      ;W 80 0100
+                 
+                 ;PREPROCESS TestSBC
+                 start_sbc:
+000106 9488
+000107 9498
+000108 94a8
+000109 94b8
+00010a 94c8
+00010b 94d8
+00010c 94e8
+00010d 94f8          CLR_SREG
+                 test_sbc_nocarry_to_zero:
+00010e 9418          BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+00010f ea0f          ldi r16, $AF        ; 
+000110 ea1f          ldi r17, $AF        ;
+000111 0b01          SBC r16, r17        ;
+000112 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000113 9320 0100     STS $0100, r18      ;W 02 0100
+000115 9300 0100     STS $0100, r16      ;W 00 0100
+000117 9310 0100     STS $0100, r17      ;W AF 0100
+                 
+                  test_sbc_nocarry_of_zero:
+000119 9498          BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                                         ; the result is zero, the flag shouldn't be
+                                         ; set at end of this test.
+00011a e000          ldi r16, $00        ; 
+00011b e010          ldi r17, $00        ;
+00011c 0b01          SBC r16, r17        ;
+00011d b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00011e 9320 0100     STS $0100, r18      ;W 00 0100
+000120 9300 0100     STS $0100, r16      ;W 00 0100
+000122 9310 0100     STS $0100, r17      ;W 00 0100
+                 
+                  test_sbc_withcarry_to_zero:
+000124 9418          BSET SREG_Z
+000125 9408          BSET SREG_C
+000126 ef01          ldi r16, $F1        ; 
+000127 ef10          ldi r17, $F0        ;
+000128 0b01          SBC r16, r17        ;
+000129 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00012a 9320 0100     STS $0100, r18      ;W 02 0100
+00012c 9300 0100     STS $0100, r16      ;W 00 0100
+00012e 9310 0100     STS $0100, r17      ;W F0 0100
+                 
+                  test_sbc_carry_underflow_of_zero:
+000130 9408          BSET SREG_C
+000131 e000          ldi r16, $00        ; 
+000132 e010          ldi r17, $00        ;
+000133 0b01          SBC r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+000134 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000135 9320 0100     STS $0100, r18      ;W 35 0100
+000137 9300 0100     STS $0100, r16      ;W FF 0100
+000139 9310 0100     STS $0100, r17      ;W 00 0100
+                 
+                  test_sbc_carry_underflow_rand:
+00013b 9408          BSET SREG_C
+00013c e304          ldi r16, $34        ; 
+00013d e710          ldi r17, $70        ;
+00013e 0b01          SBC r16, r17        ;
+00013f b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000140 9320 0100     STS $0100, r18      ;W 15 0100
+000142 9300 0100     STS $0100, r16      ;W C3 0100
+000144 9310 0100     STS $0100, r17      ;W 70 0100
+                 
+                 ;PREPROCESS TestSBCI
+                 start_sbci:
+000146 9488
+000147 9498
+000148 94a8
+000149 94b8
+00014a 94c8
+00014b 94d8
+00014c 94e8
+00014d 94f8          CLR_SREG
+                 test_sbci_nocarry_to_zero:
+00014e 9418          BSET SREG_Z         ; The zero flag is cascaded from previous zero flag
+00014f ea0f          ldi r16, $AF        ;
+000150 4a0f          SBCI r16, $AF       ;
+000151 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000152 9320 0100     STS $0100, r18      ;W 02 0100
+000154 9300 0100     STS $0100, r16      ;W 00 0100
+                 
+                  test_sbci_nocarry_of_zero:
+000156 9498          BCLR SREG_Z         ; The zero flag is cascaded, so even though
+                                         ; the result is zero, the flag shouldn't be
+                                         ; set at end of this test.
+000157 e000          ldi r16, $00        ;
+000158 4000          SBCI r16, $00        ;
+000159 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00015a 9320 0100     STS $0100, r18      ;W 00 0100
+00015c 9300 0100     STS $0100, r16      ;W 00 0100
+                 
+                  test_sbci_withcarry_to_zero:
+00015e 9418          BSET SREG_Z
+00015f 9408          BSET SREG_C
+000160 ef01          ldi r16, $F1        ;
+000161 4f00          SBCI r16, $F0        ;
+000162 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000163 9320 0100     STS $0100, r18      ;W 02 0100
+000165 9300 0100     STS $0100, r16      ;W 00 0100
+                 
+                  test_sbci_carry_underflow_of_zero:
+000167 9408          BSET SREG_C
+000168 e000          ldi r16, $00        ;
+000169 4000          SBCI r16, $00        ; 0 - 0 - 1 = -1 = 0xFF
+00016a b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00016b 9320 0100     STS $0100, r18      ;W 35 0100
+00016d 9300 0100     STS $0100, r16      ;W FF 0100
+                 
+                  test_sbci_carry_underflow_rand:
+00016f 9408          BSET SREG_C
+000170 e304          ldi r16, $34        ;
+000171 4700          SBCI r16, $70        ;
+000172 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000173 9320 0100     STS $0100, r18      ;W 15 0100
+000175 9300 0100     STS $0100, r16      ;W C3 0100
+                 ;PREPROCESS TestSBIW
+                 start_sbiw:
+000177 9488
+000178 9498
+000179 94a8
+00017a 94b8
+00017b 94c8
+00017c 94d8
+00017d 94e8
+00017e 94f8          CLR_SREG
+                 test_sbiw_normal:
+00017f e093          LDI r25, $03
+000180 e386          LDI r24, $36        ; r25:r24 = 0x0336
+                 
+000181 97c9          SBIW r25:r24, $39   ; Result = 0x02FD
+000182 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000183 9320 0100     STS $0100, r18      ;W 00 0100
+000185 9390 0100     STS $0100, r25      ;W 02 0100
+000187 9380 0100     STS $0100, r24      ;W FD 0100
+                 
+                 test_sbiw_to_zero:
+000189 e090          LDI r25, $00
+00018a e28f          LDI r24, $2F        ; r25:r24 = 0x002F
+                 
+00018b 978f          SBIW r25:r24, $2F   ; Result = 0x0000
+00018c b72f          IN  r18, SREG_ADDR  ; Read the Status register
+00018d 9320 0100     STS $0100, r18      ;W 02 0100
+00018f 9390 0100     STS $0100, r25      ;W 00 0100
+000191 9380 0100     STS $0100, r24      ;W 00 0100
+                 
+                 test_sbiw_signed_underflow:
+000193 e890          LDI r25, $80
+000194 e085          LDI r24, $05        ; r25:r24 = 0x002F
+                 
+000195 9740          SBIW r25:r24, $10   ; Result = 0x7FF5
+000196 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000197 9320 0100     STS $0100, r18      ;W 18 0100
+000199 9390 0100     STS $0100, r25      ;W 7F 0100
+00019b 9380 0100     STS $0100, r24      ;W F5 0100
+                 
+                 test_sbiw_underflow:
+00019d e090          LDI r25, $00
+00019e e28f          LDI r24, $2F        ; r25:r24 = 0x002F
+                 
+00019f 97c9          SBIW r25:r24, $39   ; Result = 0xFFF6
 0001a0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001a1 9320 0100     STS $0100, r18      ;W D7 0100
-                 
-                     ; Clear T -- bit 6
-0001a3 94e8          BCLR SREG_T
-0001a4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001a5 9320 0100     STS $0100, r18      ;W 97 0100
-                 
-                     ; Clear Z -- bit 1
-0001a7 9498          BCLR SREG_Z
-0001a8 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001a9 9320 0100     STS $0100, r18      ;W 95 0100
-                 
-                     ; Clear N -- bit 2
-0001ab 94a8          BCLR SREG_N
-0001ac b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001ad 9320 0100     STS $0100, r18      ;W 91 0100
-                 
-                     ; Clear C -- bit 0
-0001af 9488          BCLR SREG_C
-0001b0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001b1 9320 0100     STS $0100, r18      ;W 90 0100
-                 
-                     ; Clear I -- bit 7
-0001b3 94f8          BCLR SREG_I
-0001b4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001b5 9320 0100     STS $0100, r18      ;W 10 0100
-                 
-                     ; Clear S -- bit 4
-0001b7 94c8          BCLR SREG_S
-0001b8 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0001b9 9320 0100     STS $0100, r18      ;W 00 0100
-                 
-                 ;PREPROCESS TestBLD
-                 start_bld:
-0001bb 9488
-0001bc 9498
-0001bd 94a8
-0001be 94b8
-0001bf 94c8
-0001c0 94d8
-0001c1 94e8
-0001c2 94f8          CLR_SREG
-                 test_bld:
-                     ; Go through and write 1s and 0s from T flag to reg
-                     ; Start with target bit as bit 0
-0001c3 e010          LDI r17, $00
-0001c4 94e8          BCLR SREG_T
-0001c5 f910          BLD r17, 0          ; Write 0 to target bit
-0001c6 9310 0100     STS $0100, r17      ;W 00 0100
-0001c8 9468          BSET SREG_T         ; Set the T bit
-0001c9 f910          BLD r17, 0          ; Write 1 to target bit
-0001ca 9310 0100     STS $0100, r17      ;W 01 0100
-0001cc f910          BLD r17, 0          ; Write 1 again to make sure no toggle
-0001cd 9310 0100     STS $0100, r17      ;W 01 0100
-                 
-                     ; Now, we repeat the above for bits 1-7
-                 
-                     ; Target bit 1
-0001cf e010          LDI r17, $00
-0001d0 94e8          BCLR SREG_T
-0001d1 f911          BLD r17, 1          ; Write 0 to target bit
-0001d2 9310 0100     STS $0100, r17      ;W 00 0100
-0001d4 9468          BSET SREG_T         ; Set the T bit
-0001d5 f911          BLD r17, 1          ; Write 1 to target bit
-0001d6 9310 0100     STS $0100, r17      ;W 02 0100
-0001d8 f911          BLD r17, 1          ; Write 1 again to make sure no toggle
-0001d9 9310 0100     STS $0100, r17      ;W 02 0100
-                 
-                     ; Target bit 2
-0001db e010          LDI r17, $00
-0001dc 94e8          BCLR SREG_T
-0001dd f912          BLD r17, 2          ; Write 0 to target bit
-0001de 9310 0100     STS $0100, r17      ;W 00 0100
-0001e0 9468          BSET SREG_T         ; Set the T bit
-0001e1 f912          BLD r17, 2          ; Write 1 to target bit
-0001e2 9310 0100     STS $0100, r17      ;W 04 0100
-0001e4 f912          BLD r17, 2          ; Write 1 again to make sure no toggle
-0001e5 9310 0100     STS $0100, r17      ;W 04 0100
-                 
-                     ; Target bit 3
-0001e7 e010          LDI r17, $00
-0001e8 94e8          BCLR SREG_T
-0001e9 f913          BLD r17, 3          ; Write 0 to target bit
-0001ea 9310 0100     STS $0100, r17      ;W 00 0100
-0001ec 9468          BSET SREG_T         ; Set the T bit
-0001ed f913          BLD r17, 3          ; Write 1 to target bit
-0001ee 9310 0100     STS $0100, r17      ;W 08 0100
-0001f0 f913          BLD r17, 3          ; Write 1 again to make sure no toggle
-0001f1 9310 0100     STS $0100, r17      ;W 08 0100
-                 
-                     ; Target bit 4
-0001f3 e010          LDI r17, $00
-0001f4 94e8          BCLR SREG_T
-0001f5 f914          BLD r17, 4          ; Write 0 to target bit
-0001f6 9310 0100     STS $0100, r17      ;W 00 0100
-0001f8 9468          BSET SREG_T         ; Set the T bit
-0001f9 f914          BLD r17, 4          ; Write 1 to target bit
-0001fa 9310 0100     STS $0100, r17      ;W 10 0100
-0001fc f914          BLD r17, 4          ; Write 1 again to make sure no toggle
-0001fd 9310 0100     STS $0100, r17      ;W 10 0100
-                 
-                     ; Target bit 5
-0001ff e010          LDI r17, $00
-000200 94e8          BCLR SREG_T
-000201 f915          BLD r17, 5          ; Write 0 to target bit
-000202 9310 0100     STS $0100, r17      ;W 00 0100
-000204 9468          BSET SREG_T         ; Set the T bit
-000205 f915          BLD r17, 5          ; Write 1 to target bit
-000206 9310 0100     STS $0100, r17      ;W 20 0100
-000208 f915          BLD r17, 5          ; Write 1 again to make sure no toggle
-000209 9310 0100     STS $0100, r17      ;W 20 0100
-                 
-                     ; Target bit 6
-00020b e010          LDI r17, $00
-00020c 94e8          BCLR SREG_T
-00020d f916          BLD r17, 6          ; Write 0 to target bit
-00020e 9310 0100     STS $0100, r17      ;W 00 0100
-000210 9468          BSET SREG_T         ; Set the T bit
-000211 f916          BLD r17, 6          ; Write 1 to target bit
-000212 9310 0100     STS $0100, r17      ;W 40 0100
-000214 f916          BLD r17, 6          ; Write 1 again to make sure no toggle
-000215 9310 0100     STS $0100, r17      ;W 40 0100
-                 
-                     ; Target bit 7
-000217 e010          LDI r17, $00
-000218 94e8          BCLR SREG_T
-000219 f917          BLD r17, 7          ; Write 0 to target bit
-00021a 9310 0100     STS $0100, r17      ;W 00 0100
-00021c 9468          BSET SREG_T         ; Set the T bit
-00021d f917          BLD r17, 7          ; Write 1 to target bit
-00021e 9310 0100     STS $0100, r17      ;W 80 0100
-000220 f917          BLD r17, 7          ; Write 1 again to make sure no toggle
-000221 9310 0100     STS $0100, r17      ;W 80 0100
-                 
-                 ;PREPROCESS TestBSET
-                 
-                 ; This implements testing for both BSET and BCLR
-                 start_bset:
-000223 9488
-000224 9498
-000225 94a8
-000226 94b8
-000227 94c8
-000228 94d8
-000229 94e8
-00022a 94f8          CLR_SREG
-                 test_bset:
-                     ; Go in non-sequential order, setting bits one-by-one
-00022b e000          LDI r16, $00
-00022c bf0f          OUT SREG_ADDR, r16
-                 
-                     ; Clear V -- bit 3
-00022d 9438          BSET SREG_V
-00022e b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00022f 9320 0100     STS $0100, r18      ;W 08 0100
-                 
-                     ; Clear H -- bit 5
-000231 9458          BSET SREG_H
-000232 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000233 9320 0100     STS $0100, r18      ;W 28 0100
-                 
-                     ; Clear T -- bit 6
-000235 9468          BSET SREG_T
-000236 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000237 9320 0100     STS $0100, r18      ;W 68 0100
-                 
-                     ; Clear Z -- bit 1
-000239 9418          BSET SREG_Z
-00023a b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00023b 9320 0100     STS $0100, r18      ;W 6A 0100
-                 
-                     ; Clear N -- bit 2
-00023d 9428          BSET SREG_N
-00023e b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00023f 9320 0100     STS $0100, r18      ;W 6E 0100
-                 
-                     ; Clear C -- bit 0
-000241 9408          BSET SREG_C
-000242 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000243 9320 0100     STS $0100, r18      ;W 6F 0100
-                 
-                     ; Clear I -- bit 7
-000245 9478          BSET SREG_I
-000246 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000247 9320 0100     STS $0100, r18      ;W EF 0100
-                 
-                     ; Clear S -- bit 4
-000249 9448          BSET SREG_S
-00024a b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00024b 9320 0100     STS $0100, r18      ;W FF 0100
-                 
-                 ;PREPROCESS TestBST
-                 start_bst:
-00024d 9488
-00024e 9498
-00024f 94a8
-000250 94b8
-000251 94c8
-000252 94d8
-000253 94e8
-000254 94f8          CLR_SREG
-                 
-                 test_bst:
-                     ; Go through and read 1s and 0s into T flag
-000255 e041          LDI r20, $01
-000256 94e8          BCLR SREG_T
-000257 fb41          BST r20, 1          ; Zero bit read in
-000258 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000259 9320 0100     STS $0100, r18      ;W 00 0100
-00025b fb40          BST r20, 0          ; One bit read in
-00025c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00025d 9320 0100     STS $0100, r18      ;W 40 0100
-00025f 9340 0100     STS $0100, r20      ;W 01 0100
-                 
-000261 e042          LDI r20, $02
-000262 94e8          BCLR SREG_T
-000263 fb40          BST r20, 0          ; Zero bit read in
-000264 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000265 9320 0100     STS $0100, r18      ;W 00 0100
-000267 fb41          BST r20, 1
-000268 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000269 9320 0100     STS $0100, r18      ;W 40 0100
-00026b 9340 0100     STS $0100, r20      ;W 02 0100
-                 
-00026d e044          LDI r20, $04
-00026e 94e8          BCLR SREG_T
-00026f fb47          BST r20, 7          ; Zero bit read in
-000270 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000271 9320 0100     STS $0100, r18      ;W 00 0100
-000273 fb42          BST r20, 2
-000274 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000275 9320 0100     STS $0100, r18      ;W 40 0100
-000277 9340 0100     STS $0100, r20      ;W 04 0100
-                 
-000279 e048          LDI r20, $08
-00027a 94e8          BCLR SREG_T
-00027b fb46          BST r20, 6          ; Zero bit read in
-00027c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00027d 9320 0100     STS $0100, r18      ;W 00 0100
-00027f fb43          BST r20, 3
-000280 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000281 9320 0100     STS $0100, r18      ;W 40 0100
-000283 9340 0100     STS $0100, r20      ;W 08 0100
-                 
-000285 e140          LDI r20, $10
-000286 94e8          BCLR SREG_T
-000287 fb45          BST r20, 5          ; Zero bit read in
-000288 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000289 9320 0100     STS $0100, r18      ;W 00 0100
-00028b fb44          BST r20, 4
-00028c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00028d 9320 0100     STS $0100, r18      ;W 40 0100
-00028f 9340 0100     STS $0100, r20      ;W 10 0100
-                 
-000291 e240          LDI r20, $20
-000292 94e8          BCLR SREG_T
-000293 fb44          BST r20, 4          ; Zero bit read in
-000294 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000295 9320 0100     STS $0100, r18      ;W 00 0100
-000297 fb45          BST r20, 5
-000298 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000299 9320 0100     STS $0100, r18      ;W 40 0100
-00029b 9340 0100     STS $0100, r20      ;W 20 0100
-                 
-00029d e440          LDI r20, $40
-00029e 94e8          BCLR SREG_T
-00029f fb43          BST r20, 3          ; Zero bit read in
-0002a0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002a1 9320 0100     STS $0100, r18      ;W 00 0100
-0002a3 fb46          BST r20, 6
-0002a4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002a5 9320 0100     STS $0100, r18      ;W 40 0100
-0002a7 9340 0100     STS $0100, r20      ;W 40 0100
-                 
-0002a9 e840          LDI r20, $80
-0002aa 94e8          BCLR SREG_T
-0002ab fb42          BST r20, 2          ; Zero bit read in
-0002ac b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002ad 9320 0100     STS $0100, r18      ;W 00 0100
-0002af fb47          BST r20, 7
-0002b0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002b1 9320 0100     STS $0100, r18      ;W 40 0100
-0002b3 9340 0100     STS $0100, r20      ;W 80 0100
-                 
-                 ;PREPROCESS TestCOM
-                 start_com:
-0002b5 9488
-0002b6 9498
-0002b7 94a8
-0002b8 94b8
-0002b9 94c8
-0002ba 94d8
-0002bb 94e8
-0002bc 94f8          CLR_SREG
-                 
-                 ; All of the following tests for COM start with
-                 ; a value, check complement, and then take complement
-                 ; back to original value, check that.
-                 test_com_zero:
-0002bd e060          LDI r22, $00        ;
-0002be 2e66          MOV r6, r22
-0002bf 9460          COM r6
-                     ; Check result
-0002c0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002c1 9260 0100     STS $0100, r6       ;W FF 0100
-0002c3 9320 0100     STS $0100, r18      ;W 15 0100
-                     ; Complement back to original value
-0002c5 9460          COM r6
-0002c6 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002c7 9260 0100     STS $0100, r6       ;W 00 0100
-0002c9 9320 0100     STS $0100, r18      ;W 03 0100
-                 
-                 test_com_one:
-0002cb e061          LDI r22, $01        ;
-0002cc 2e66          MOV r6, r22
-0002cd 9460          COM r6
-                     ; Check result
-0002ce b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002cf 9260 0100     STS $0100, r6       ;W FE 0100
-0002d1 9320 0100     STS $0100, r18      ;W 15 0100
-                     ; Complement back to original value
-0002d3 9460          COM r6
-0002d4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002d5 9260 0100     STS $0100, r6       ;W 01 0100
-0002d7 9320 0100     STS $0100, r18      ;W 01 0100
-                 
-                 test_com_other:
-0002d9 e664          LDI r22, $64        ; Value is 100
-0002da 2e66          MOV r6, r22
-0002db 9460          COM r6
-                     ; Check result
-0002dc b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002dd 9260 0100     STS $0100, r6       ;W 9B 0100
-0002df 9320 0100     STS $0100, r18      ;W 15 0100
-                     ; Complement back to original value
-0002e1 9460          COM r6
-0002e2 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002e3 9260 0100     STS $0100, r6       ;W 64 0100
-0002e5 9320 0100     STS $0100, r18      ;W 01 0100
-                 
-                 ;PREPROCESS TestCP
-                 start_cp:
-0002e7 9488
-0002e8 9498
-0002e9 94a8
-0002ea 94b8
-0002eb 94c8
-0002ec 94d8
-0002ed 94e8
-0002ee 94f8          CLR_SREG
-                 test_cp_no_mutate:
-0002ef e860          LDI r22, $80
-0002f0 2e46          MOV r4, r22
-0002f1 ea75          LDI r23, $A5
-0002f2 2e77          MOV r7, r23
-0002f3 1447          CP r4, r7
-                 
-0002f4 9240 0100     STS $0100, r4       ;W 80 0100
-0002f6 9270 0100     STS $0100, r7       ;W A5 0100
-                 
-                 test_cp_greater:
-0002f8 ec68          LDI r22, $C8
-0002f9 2e46          MOV r4, r22
-0002fa e476          LDI r23, $46
-0002fb 2e77          MOV r7, r23
-0002fc 1447          CP r4, r7           ; Compare 200 - 70
-                 
-0002fd b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0002fe 9320 0100     STS $0100, r18      ;W 14 0100
-                 
-                 test_cp_less:
-000300 e06a          LDI r22, $0A
-000301 2e46          MOV r4, r22
-000302 e77f          LDI r23, $7F
-000303 2e77          MOV r7, r23
-000304 1447          CP r4, r7           ; Compare 10 - 127
-                 
-000305 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000306 9320 0100     STS $0100, r18      ;W 35 0100
-                 
-                 test_cp_equal:
-000308 e16f          LDI r22, $1F
-000309 2e46          MOV r4, r22
-00030a e17f          LDI r23, $1F
-00030b 2e77          MOV r7, r23
-00030c 1447          CP r4, r7           ; Compare 31 - 31
-                 
-00030d b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00030e 9320 0100     STS $0100, r18      ;W 02 0100
-                 
-                 ;PREPROCESS TestCPC
-                 start_cpc:
-000310 9488
-000311 9498
-000312 94a8
-000313 94b8
-000314 94c8
-000315 94d8
-000316 94e8
-000317 94f8          CLR_SREG
-                 
-                 test_cpc_no_carry_equal:
-000318 9488          BCLR SREG_C
-000319 9418          BSET SREG_Z
-00031a e33f          LDI r19, $3F
-00031b e34f          LDI r20, $3F
-00031c 0734          CPC r19, r20
-00031d b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00031e 9320 0100     STS $0100, r18      ;W 02 0100
-                 
-                 test_cpc_no_carry_not_equal:
-000320 9488          BCLR SREG_C
-000321 9418          BSET SREG_Z
-000322 e430          LDI r19, $40
-000323 e34f          LDI r20, $3F
-000324 0734          CPC r19, r20
-000325 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000326 9320 0100     STS $0100, r18      ;W 20 0100
-                 
-                 test_cpc_carry_equal:
-000328 9408          BSET SREG_C
-000329 9418          BSET SREG_Z
-00032a e430          LDI r19, $40
-00032b e34f          LDI r20, $3F
-00032c 0734          CPC r19, r20
-00032d b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00032e 9320 0100     STS $0100, r18      ;W 22 0100
-                 
-                 test_cpc_carry_not_equal:
-000330 9408          BSET SREG_C
-000331 9418          BSET SREG_Z
-000332 e33f          LDI r19, $3F
-000333 e34f          LDI r20, $3F
-000334 0734          CPC r19, r20
-000335 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000336 9320 0100     STS $0100, r18      ;W 35 0100
-                 
-                 ;PREPROCESS TestCPI
-                 
-                 ; Similar test sequence to CP instruction
-                 start_cpi:
-000338 9488
-000339 9498
-00033a 94a8
-00033b 94b8
-00033c 94c8
-00033d 94d8
-00033e 94e8
-00033f 94f8          CLR_SREG
-                 test_cpi_no_mutate:
-000340 e880          LDI r24, $80
-000341 3a85          CPI r24, $A5
-                 
-000342 9380 0100     STS $0100, r24       ;W 80 0100
-                 
-                 test_cpi_greater:
-000344 ec88          LDI r24, $C8
-000345 3486          CPI r24, $46           ; Compare 200 - 70
-                 
-000346 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000347 9320 0100     STS $0100, r18      ;W 14 0100
-                 
-                 test_cpi_less:
-000349 e08a          LDI r24, $0A
-00034a 378f          CPI r24, $7F           ; Compare 10 - 127
-                 
-00034b b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00034c 9320 0100     STS $0100, r18      ;W 35 0100
-                 
-                 test_cpi_equal:
-00034e e18f          LDI r24, $1F
-00034f 318f          CPI r24, $1F           ; Compare 31 - 31
-                 
-000350 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000351 9320 0100     STS $0100, r18      ;W 02 0100
-                 ;PREPROCESS TestDEC
-                 start_dec:
-000353 9488
-000354 9498
-000355 94a8
-000356 94b8
-000357 94c8
-000358 94d8
-000359 94e8
-00035a 94f8          CLR_SREG
-                 test_dec_positive:
-00035b e0b2          LDI r27, $02        ; Initialize to 2
-                 
-00035c 95ba          DEC r27
-00035d b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00035e 9320 0100     STS $0100, r18      ;W 00 0100
-000360 93b0 0100     STS $0100, r27      ;W 01 0100
-                 
-000362 95ba          DEC r27
-000363 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000364 9320 0100     STS $0100, r18      ;W 02 0100
-000366 93b0 0100     STS $0100, r27      ;W 00 0100
-                 
-000368 95ba          DEC r27
-000369 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00036a 9320 0100     STS $0100, r18      ;W 14 0100
-00036c 93b0 0100     STS $0100, r27      ;W FF 0100
-                 
-00036e 95ba          DEC r27
-00036f b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000370 9320 0100     STS $0100, r18      ;W 14 0100
-000372 93b0 0100     STS $0100, r27      ;W FE 0100
-                 
-                 test_dec_negative:
-000374 e8b1          LDI r27, $81        ; Initialize to -127
-                 
-000375 95ba          DEC r27
-000376 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000377 9320 0100     STS $0100, r18      ;W 14 0100
-000379 93b0 0100     STS $0100, r27      ;W 80 0100
-                 
-00037b 95ba          DEC r27
-00037c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00037d 9320 0100     STS $0100, r18      ;W 18 0100
-00037f 93b0 0100     STS $0100, r27      ;W 7F 0100
-                 
-000381 95ba          DEC r27
-000382 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000383 9320 0100     STS $0100, r18      ;W 00 0100
-000385 93b0 0100     STS $0100, r27      ;W 7E 0100
-                 
-                 ;PREPROCESS TestEOR
-                 start_eor:
-000387 9488
-000388 9498
-000389 94a8
-00038a 94b8
-00038b 94c8
-00038c 94d8
-00038d 94e8
-00038e 94f8          CLR_SREG
-                 test_eor_zeros:
-00038f e040          LDI r20, $00
-000390 e050          LDI r21, $00
-                 
-000391 2745          EOR r20, r21
-                 
-000392 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-000393 9320 0100     STS $0100, r18      ;W 02 0100
-000395 9340 0100     STS $0100, r20      ;W 00 0100
-000397 9350 0100     STS $0100, r21      ;W 00 0100
-                 
-                 test_eor_rr_ones:
-000399 e040          LDI r20, $00
-00039a ef5f          LDI r21, $FF
-                 
-00039b 2745          EOR r20, r21
-                 
-00039c b72f          IN  r18, SREG_ADDR  ; Read the Status register
-00039d 9320 0100     STS $0100, r18      ;W 14 0100
-00039f 9340 0100     STS $0100, r20      ;W FF 0100
-0003a1 9350 0100     STS $0100, r21      ;W FF 0100
-                 
-                 test_eor_rd_ones:
-0003a3 ef4f          LDI r20, $FF
-0003a4 e050          LDI r21, $00
-                 
-0003a5 2745          EOR r20, r21
-                 
-0003a6 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003a7 9320 0100     STS $0100, r18      ;W 14 0100
-0003a9 9340 0100     STS $0100, r20      ;W FF 0100
-0003ab 9350 0100     STS $0100, r21      ;W 00 0100
-                 
-                 test_eor_both_ones:
-0003ad ef4f          LDI r20, $FF
-0003ae ef5f          LDI r21, $FF
-                 
-0003af 2745          EOR r20, r21
-                 
-0003b0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003b1 9320 0100     STS $0100, r18      ;W 02 0100
-0003b3 9340 0100     STS $0100, r20      ;W 00 0100
-0003b5 9350 0100     STS $0100, r21      ;W FF 0100
-                 
-                 test_eor_random:
-0003b7 e947          LDI r20, $97        ; 10010111
-0003b8 ea54          LDI r21, $A4        ; 10100100
-                                         ; 00110011
-                 
-0003b9 2745          EOR r20, r21
-                 
-0003ba b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003bb 9320 0100     STS $0100, r18      ;W 00 0100
-0003bd 9340 0100     STS $0100, r20      ;W 33 0100
-0003bf 9350 0100     STS $0100, r21      ;W A4 0100
-                 
-                 ;PREPROCESS TestINC
-                 start_inc:
-0003c1 9488
-0003c2 9498
-0003c3 94a8
-0003c4 94b8
-0003c5 94c8
-0003c6 94d8
-0003c7 94e8
-0003c8 94f8          CLR_SREG
-                 test_inc_unsigned:
-0003c9 efbe          LDI r27, $FE        ; Initialize to 254
-                 
-0003ca 95b3          INC r27
-0003cb b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003cc 9320 0100     STS $0100, r18      ;W 14 0100
-0003ce 93b0 0100     STS $0100, r27      ;W FF 0100
-                 
-0003d0 95b3          INC r27
-0003d1 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003d2 9320 0100     STS $0100, r18      ;W 02 0100
-0003d4 93b0 0100     STS $0100, r27      ;W 00 0100
-                 
-0003d6 95b3          INC r27
-0003d7 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003d8 9320 0100     STS $0100, r18      ;W 00 0100
-0003da 93b0 0100     STS $0100, r27      ;W 01 0100
-                 
-0003dc 95b3          INC r27
-0003dd b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003de 9320 0100     STS $0100, r18      ;W 00 0100
-0003e0 93b0 0100     STS $0100, r27      ;W 02 0100
-                 
-                 test_inc_signed:
-0003e2 e7be          LDI r27, $7E        ; Initialize to 126
-                 
-0003e3 95b3          INC r27
-0003e4 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003e5 9320 0100     STS $0100, r18      ;W 00 0100
-0003e7 93b0 0100     STS $0100, r27      ;W 7F 0100
-                 
-0003e9 95b3          INC r27
-0003ea b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003eb 9320 0100     STS $0100, r18      ;W 0C 0100
-0003ed 93b0 0100     STS $0100, r27      ;W 80 0100
-                 
-0003ef 95b3          INC r27
-0003f0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
-0003f1 9320 0100     STS $0100, r18      ;W 14 0100
-0003f3 93b0 0100     STS $0100, r27      ;W 81 0100
+0001a1 9320 0100     STS $0100, r18      ;W 15 0100
+0001a3 9390 0100     STS $0100, r25      ;W FF 0100
+0001a5 9380 0100     STS $0100, r24      ;W F6 0100
+                 
+                 
+                 
+                 
+                 ;PREPROCESS TestSUB
+                 start_sub:
+0001a7 9488
+0001a8 9498
+0001a9 94a8
+0001aa 94b8
+0001ab 94c8
+0001ac 94d8
+0001ad 94e8
+0001ae 94f8          CLR_SREG
+                 
+                 test_sub_to_zero:
+0001af ea0f          ldi r16, $AF        ; 
+0001b0 ea1f          ldi r17, $AF        ;
+0001b1 1b01          SUB r16, r17        ;
+0001b2 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001b3 9320 0100     STS $0100, r18      ;W 02 0100
+0001b5 9300 0100     STS $0100, r16      ;W 00 0100
+0001b7 9310 0100     STS $0100, r17      ;W AF 0100
+                 
+                 test_sub_of_zero:
+0001b9 e000          ldi r16, $00        ; 
+0001ba e010          ldi r17, $00        ;
+0001bb 1b01          SUB r16, r17        ;
+0001bc b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001bd 9320 0100     STS $0100, r18      ;W 02 0100
+0001bf 9300 0100     STS $0100, r16      ;W 00 0100
+0001c1 9310 0100     STS $0100, r17      ;W 00 0100
+                 
+                 test_sub_underflow_of_zero:
+0001c3 e000          ldi r16, $00        ; 
+0001c4 e015          ldi r17, $05        ;
+0001c5 1b01          SUB r16, r17        ; 0 - 0 - 1 = -1 = 0xFF
+0001c6 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001c7 9320 0100     STS $0100, r18      ;W 35 0100
+0001c9 9300 0100     STS $0100, r16      ;W FB 0100
+0001cb 9310 0100     STS $0100, r17      ;W 05 0100
+                 
+                 test_sub_normal:
+0001cd e803          ldi r16, $83        ; 
+0001ce e611          ldi r17, $61        ;
+0001cf 1b01          SUB r16, r17        ;
+0001d0 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001d1 9320 0100     STS $0100, r18      ;W 18 0100
+0001d3 9300 0100     STS $0100, r16      ;W 22 0100
+0001d5 9310 0100     STS $0100, r17      ;W 61 0100
+                 
+                 test_sub_underflow_rand:
+0001d7 e304          ldi r16, $34        ; 
+0001d8 e710          ldi r17, $70        ;
+0001d9 1b01          SUB r16, r17        ;
+0001da b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001db 9320 0100     STS $0100, r18      ;W 15 0100
+0001dd 9300 0100     STS $0100, r16      ;W C4 0100
+0001df 9310 0100     STS $0100, r17      ;W 70 0100
+                 
+                 ;PREPROCESS TestSUBI
+                 start_subi:
+0001e1 9488
+0001e2 9498
+0001e3 94a8
+0001e4 94b8
+0001e5 94c8
+0001e6 94d8
+0001e7 94e8
+0001e8 94f8          CLR_SREG
+                 
+                 test_subi_to_zero:
+0001e9 ea0f          ldi r16, $AF        ;
+0001ea 5a0f          SUBI r16, $AF        ;
+0001eb b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001ec 9320 0100     STS $0100, r18      ;W 02 0100
+0001ee 9300 0100     STS $0100, r16      ;W 00 0100
+                 
+                 test_subi_of_zero:
+0001f0 e000          ldi r16, $00        ;
+0001f1 5000          SUBI r16, $00        ;
+0001f2 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001f3 9320 0100     STS $0100, r18      ;W 02 0100
+0001f5 9300 0100     STS $0100, r16      ;W 00 0100
+                 
+                 test_subi_underflow_of_zero:
+0001f7 e000          ldi r16, $00        ;
+0001f8 5005          SUBI r16, $05        ; 0 - 0 - 1 = -1 = 0xFF
+0001f9 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+0001fa 9320 0100     STS $0100, r18      ;W 35 0100
+0001fc 9300 0100     STS $0100, r16      ;W FB 0100
+                 
+                 test_subi_normal:
+0001fe e803          ldi r16, $83        ;
+0001ff 5601          SUBI r16, $61        ;
+000200 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000201 9320 0100     STS $0100, r18      ;W 18 0100
+000203 9300 0100     STS $0100, r16      ;W 22 0100
+                 
+                 test_subi_underflow_rand:
+000205 e304          ldi r16, $34        ;
+000206 5700          SUBI r16, $70        ;
+000207 b72f          IN  r18, SREG_ADDR  ; Read the Status register
+000208 9320 0100     STS $0100, r18      ;W 15 0100
+00020a 9300 0100     STS $0100, r16      ;W C4 0100
+                 
+                 ;PREPROCESS TestSWAP
+                 start_swap:
+00020c 9488
+00020d 9498
+00020e 94a8
+00020f 94b8
+000210 94c8
+000211 94d8
+000212 94e8
+000213 94f8          CLR_SREG
+                 test_swap:
+000214 e314          LDI r17, $34
+000215 9512          SWAP r17
+000216 9310 0100     STS $0100, r17      ;W 43 0100
+                 
+000218 e76f          LDI r22, $7F
+000219 2e46          MOV r4, r22
+00021a 9442          SWAP r4
+00021b 2d74          MOV r23, r4
+00021c 9370 0100     STS $0100, r23      ;W F7 0100
                  
                  
                  test_success:
-0003f5 0000          NOP;
-0003f6 0000          NOP;
+00021e 0000          NOP;
+00021f 0000          NOP;
                  
                  ; test_failure:
                  ;     NOP         ; Put a breakpoint on this line
@@ -2167,39 +1633,39 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega88" register use summary:
-r0 :   0 r1 :   0 r2 :   0 r3 :  32 r4 :   9 r5 :   0 r6 :  15 r7 :   9 
+r0 :   0 r1 :   0 r2 :   0 r3 :   0 r4 :   3 r5 :   0 r6 :   0 r7 :   0 
 r8 :   0 r9 :   0 r10:   0 r11:   0 r12:   0 r13:   0 r14:   0 r15:   0 
-r16:  47 r17:  95 r18: 216 r19:   8 r20:  64 r21:  33 r22:  14 r23:   8 
-r24:  33 r25:  24 r26:  13 r27:  45 r28:   0 r29:   0 r30:   0 r31:   0 
-x  :  39 y  :   0 z  :   0 
-Registers used: 17 out of 35 (48.6%)
+r16:  60 r17:  33 r18: 108 r19:   0 r20:  30 r21:  15 r22:  37 r23:   2 
+r24:  24 r25:  12 r26:   0 r27:   0 r28:   0 r29:   0 r30:   0 r31:   0 
+x  :   0 y  :   0 z  :   0 
+Registers used: 10 out of 35 (28.6%)
 
 "ATmega88" instruction use summary:
-.lds  :   0 .sts  :   0 adc   :   8 add   :   5 adiw  :   8 and   :   3 
-andi  :   3 asr   :  16 bclr  : 169 bld   :  24 brbc  :   0 brbs  :   0 
+.lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
+andi  :   0 asr   :   0 bclr  :  99 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   0 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
-brvs  :   0 bset  :  30 bst   :  16 cbi   :   0 cbr   :   0 clc   :   0 
+brvs  :   0 bset  :  11 bst   :   0 cbi   :   0 cbr   :   0 clc   :   0 
 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 clt   :   0 
-clv   :   0 clz   :   0 com   :   6 cp    :   4 cpc   :   4 cpi   :   4 
-cpse  :   0 dec   :   7 eor   :   5 fmul  :   0 fmuls :   0 fmulsu:   0 
-icall :   0 ijmp  :   0 in    : 108 inc   :   7 ld    :   0 ldd   :   0 
-ldi   : 134 lds   :   0 lpm   :   0 lsl   :   0 lsr   :   0 mov   :  13 
-movw  :   0 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   2 
-or    :   0 ori   :   0 out   :   2 pop   :   0 push  :   0 rcall :   0 
-ret   :   0 reti  :   0 rjmp  :   0 rol   :   0 ror   :   0 sbc   :   0 
-sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   0 sbr   :   0 
+clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   0 
+cpse  :   0 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 
+icall :   0 ijmp  :   0 in    :  54 inc   :   0 ld    :   0 ldd   :   0 
+ldi   :  62 lds   :   0 lpm   :   0 lsl   :   0 lsr   :  10 mov   :   2 
+movw  :   0 mul   :   0 muls  :   0 mulsu :   0 neg   :   4 nop   :   2 
+or    :   5 ori   :   5 out   :   0 pop   :   0 push  :   0 rcall :   0 
+ret   :   0 reti  :   0 rjmp  :   0 rol   :   0 ror   :   6 sbc   :   5 
+sbci  :   5 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   4 sbr   :   0 
 sbrc  :   0 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
-spm   :   0 st    :  39 std   :   0 sts   : 199 sub   :   0 subi  :   0 
-swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 24 out of 111 (21.6%)
+spm   :   0 st    :   0 std   :   0 sts   : 129 sub   :   5 subi  :   5 
+swap  :   2 tst   :   0 wdr   :   0 
+Instructions used: 18 out of 111 (16.2%)
 
 "ATmega88" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x0007ee   2030      0   2030    8192  24.8%
+[.cseg] 0x000000 0x000440   1088      0   1088    8192  13.3%
 [.dseg] 0x000100 0x000100      0      0      0    1024   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 

@@ -68,3 +68,7 @@ jobs:
       run: |
         make alu_tests | tee alu_test_result.txt
         cat alu_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"
+    - name: Run CPU ALU Instruction Tests
+      run: |
+        make cpu_alu_tests | tee cpu_alu_test_result.txt
+        cat cpu_alu_test_result.txt | grep -c -i -E "Alert|error|failed" | grep -q "^0$"
