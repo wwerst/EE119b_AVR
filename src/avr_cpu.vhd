@@ -720,6 +720,15 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpSWAP) then
+                -- Swap low and high nibbles of Rd
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.ALUOpCode <= ALUOp.SWAP_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
