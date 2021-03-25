@@ -40,6 +40,11 @@ cpu_tests: import cpu_test_vector_files
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd
 
+cpu_alu_tests: import cpu_test_vector_files
+	ghdl -m --std=08 --workdir=work avr_cpu_tb
+	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/alu_test_part1_tv.txt"
+# 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/alu_test_part2_tv.txt"
+
 clean:
 	rm -r work/*.cf || true
 	rm *.vcd        || true

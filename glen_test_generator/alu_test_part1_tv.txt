@@ -1260,9 +1260,3 @@ XXXX 0100 ZZ 1 1 XXXX XX             STS $0100, r18      ;W 14 0100
 XXXX 0100 ZZ 1 1 XXXX XX             STS $0100, r27      ;W 81 0100
 03F5 0000 ZZ 1 1 XXXX XX             NOP;
 03F6 0000 ZZ 1 1 XXXX XX             NOP;
-03F7 0000 ZZ 1 1 XXXX XX             NOP         ; Put a breakpoint on this line
-03F8 9508 ZZ 1 1 XXXX XX             RET         ; Return to the point where failure occurred, for debugging
-XXXX 9508 ZZ 1 1 XXXX XX             RET         ; Return to the point where failure occurred, for debugging
-XXXX 9508 ZZ 1 1 XXXX XX             RET         ; Return to the point where failure occurred, for debugging
-XXXX 9508 ZZ 1 1 XXXX XX             RET         ; Return to the point where failure occurred, for debugging
-03F9 0000 ZZ 1 1 XXXX XX             NOP;

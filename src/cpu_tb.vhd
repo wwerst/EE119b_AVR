@@ -18,7 +18,14 @@ use ieee.std_logic_textio.all;
 
 use work.AVR;
 
+library osvvm;
+use osvvm.CoveragePkg.all;
+use osvvm.AlertLogPkg.all;
+
 entity avr_cpu_tb is
+    generic (
+        test_vector_filename : string := "glen_test_generator/alu_test_part1_tv.txt"
+    );
 end avr_cpu_tb;
 
 architecture testbench of avr_cpu_tb is
@@ -96,7 +103,7 @@ begin
 
     -- stimulus and check process
     test_p: process
-        file vectorsf: text is "glen_test_generator/alu_test_part1_tv.txt";
+        file vectorsf: text is test_vector_filename;
         variable linenum: integer := 0;
         variable asmCodeLine: line;
         variable error_cnt: integer := 0;
@@ -153,7 +160,7 @@ begin
                 dataDB_match := nonstd_match(dataDB, veDataDB);
                 if not (progAB_match and dataAB_match and dataRd_match and dataWr_match and dataDB_match) then
                     error_cnt := error_cnt + 1;
-                    report "A test error occurred at line " & to_string(linenum);
+                    AffirmIf(FALSE, "A test error occurred at line " & to_string(linenum));
                     assert progAB_match report "progAB mismatch, expect " & to_hex(veProgAB) & " got " & to_hex(progAB) severity error;
                     assert dataAB_match report "dataAB mismatch, expect " & to_hex(veDataAB) & " got " & to_hex(dataAB) severity error;
                     assert dataRd_match report "Rd mismatch, expect " & to_string(veDataRd) & " got " & to_string(dataRd) severity error;
