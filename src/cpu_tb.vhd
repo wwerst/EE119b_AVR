@@ -41,6 +41,7 @@ architecture testbench of avr_cpu_tb is
     constant CLK_PERIOD : time := 1 ms;
     signal clk          : std_logic := '0';
     signal done         : boolean := FALSE;
+    constant MAX_ERROR_COUNT : integer := 20;
 
     -- cpu signals
     signal ProgDB  :  std_logic_vector(15 downto 0);   -- program memory data bus
@@ -61,6 +62,13 @@ architecture testbench of avr_cpu_tb is
             return std_match(a, b);
         end if;
     end nonstd_match;
+
+    function to_hex(slv : std_logic_vector) return string is
+        variable l : line;
+    begin
+        hwrite(l, slv);
+        return l.all;
+    end to_hex;
 
 begin
     clock_p: process begin
@@ -88,8 +96,9 @@ begin
 
     -- stimulus and check process
     test_p: process
-        file vectorsf: text is "glen_test_generator/cpuvec.txt";
+        file vectorsf: text is "glen_test_generator/alu_test_part1_tv.txt";
         variable linenum: integer := 0;
+        variable error_cnt: integer := 0;
         variable l: line;
         variable fileok: boolean;
 
@@ -99,6 +108,8 @@ begin
         variable veProgAB, veDataAB: std_logic_vector(15 downto 0);
         variable veDataWr, veDataRd: std_logic;
         variable veDataDB: std_logic_vector(7 downto 0);
+
+        variable progAB_match, dataAB_match, dataRd_match, dataWr_match, dataDB_match: boolean;
     begin
         INT0 <= '0';
         INT1 <= '0';
@@ -133,17 +144,27 @@ begin
                 -- DataRd
                 -- DataDB (inout)
 
-                assert nonstd_match(progAB, veProgAB) report "progAB mismatch, expect " & to_string(veProgAB) & " got " & to_string(progAB) severity error;
-                assert nonstd_match(dataAB, veDataAB) report "dataAB mismatch" severity error;
-                assert std_match(dataRd, veDataRd) report "Rd mismatch" severity error;
-                assert std_match(dataWr, veDataWr) report "Wr mismatch, expect " & to_string(veDataWr) severity error;
-                if veDataWr = '0' then
-                    assert nonstd_match(dataDB, veDataDB) report "dataDB mismatch on cpu write" severity error;
+                progAB_match := nonstd_match(progAB, veProgAB);
+                dataAB_match := nonstd_match(dataAB, veDataAB);
+                dataRd_match := std_match(dataRd, veDataRd);
+                dataWr_match := std_match(dataWr, veDataWr);
+                dataDB_match := nonstd_match(dataDB, veDataDB);
+                if not (progAB_match and dataAB_match and dataRd_match and dataWr_match and dataDB_match) then
+                    error_cnt := error_cnt + 1;
+                    report "A test error occurred at line " & to_string(linenum);
+                    assert progAB_match report "progAB mismatch, expect " & to_hex(veProgAB) & " got " & to_hex(progAB) severity error;
+                    assert dataAB_match report "dataAB mismatch, expect " & to_hex(veDataAB) & " got " & to_hex(dataAB) severity error;
+                    assert dataRd_match report "Rd mismatch, expect " & to_string(veDataRd) & " got " & to_string(dataRd) severity error;
+                    assert dataWr_match report "Wr mismatch, expect " & to_string(veDataWr) & " got " & to_string(dataWr) severity error;
+                    if veDataWr = '0' then
+                        assert dataDB_match report "dataDB mismatch on cpu write, expect " & to_hex(veDataDB) & " got " & to_hex(DataDB) severity error;
+                    end if;
                 end if;
                 
-                --if linenum > 500 then
-                --    exit;
-                --end if;
+                if error_cnt >= MAX_ERROR_COUNT then
+                    report "Stopping testing early due to high error count";
+                    exit;
+                end if;
 
             end if;
         end loop;
