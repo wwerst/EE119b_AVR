@@ -98,6 +98,7 @@ begin
     test_p: process
         file vectorsf: text is "glen_test_generator/alu_test_part1_tv.txt";
         variable linenum: integer := 0;
+        variable asmCodeLine: line;
         variable error_cnt: integer := 0;
         variable l: line;
         variable fileok: boolean;
@@ -131,6 +132,7 @@ begin
                 read(l, veDataWr);
                 hread(l, veDataAB);
                 hread(l, veDataDB);
+                asmCodeLine := l;
 
                 progDB <= vProgDB;
                 dataDB <= vDataDB;

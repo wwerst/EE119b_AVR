@@ -213,9 +213,12 @@ architecture dataflow of AVR_CPU is
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
 
+    constant FlagMaskAll    :  AVR.word_t := "11111111";
+    constant FlagMaskNone   :  AVR.word_t := "00000000";
     constant FlagMaskZCNVSH :  AVR.word_t := "00111111";
     constant FlagMaskZCNVS  :  AVR.word_t := "00011111";
     constant FlagMaskCNVS   :  AVR.word_t := "00011101";
+    constant FlagMaskZNVS   :  AVR.word_t := "00011110";
 
 
 
@@ -336,7 +339,7 @@ begin
         NextExecuteOpData.OpA <= (others => '0');
         NextExecuteOpData.OpB <= (others => '0');
         NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
-        NextExecuteOpData.ALUFlagMask <= (others => '0');
+        NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
         NextExecuteOpData.writeRegEnS <= '0';
         NextExecuteOpData.writeRegSelS <= (others => '0');
         NextExecuteOpData.writeRegEnD <= '0';
@@ -355,7 +358,7 @@ begin
             NextExecuteOpData.OpA <= (others => '0');
             NextExecuteOpData.OpB <= (others => '1');
             NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
-            NextExecuteOpData.ALUFlagMask <= (others => '1');
+            NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
         else
 
             -- ALU
@@ -364,13 +367,13 @@ begin
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
             elsif std_match(InstReg, Opcodes.OpBSET) then
                 tmp_int := to_integer(unsigned(InstReg(6 downto 4)));
                 NextExecuteOpData.OpA <= alu_SReg;
                 NextExecuteOpData.OpB(tmp_int) <= '1';
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
             elsif std_match(InstReg, Opcodes.OpADD) then
                 tmp_rd := InstReg(8 downto 4);
@@ -380,7 +383,7 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpADC) then
@@ -391,7 +394,7 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(InstReg, Opcodes.OpADIW) then
@@ -441,12 +444,12 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
-                NextExecuteOpData.ALUFlagMask <= (others => '1');
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            
 
             -- LOAD/STORE
-
             elsif std_match(InstReg, Opcodes.OpIN) then
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
