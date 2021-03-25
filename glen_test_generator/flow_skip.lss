@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Thu Mar 25 03:56:20 2021
+AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Thu Mar 25 06:01:44 2021
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRAssembler\2.1.51.17\AvrAssembler/Include\m88def.inc'
                  
@@ -990,362 +990,164 @@ AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssem
 000001 e0e0          LDI     r30    ,$00     ;
                  
                  ; skip a LD (1 word) instruction
-000002 930f          PUSH    r16             ;
-000003 e000          LDI     r16    ,$00     ;
-000004 9300 0000     STS     $0000  ,r16     ;
-000006 910f          POP     r16             ;
-000007 9170 0000     LDS     r23    ,$0000   ;R 00 0000   set r23 to 0
-000009 930f          PUSH    r16             ;
-00000a e000          LDI     r16    ,$00     ;
-00000b 9300 0000     STS     $0000  ,r16     ;
-00000d 910f          POP     r16             ;
-00000e 9100 0000     LDS     r16    ,$0000   ;R 00 0000   set r16 to 0
-000010 1370          CPSE    r23    ,r16     ;
-000011 8000          LD      r0     ,Z       ;S           0 == 0
+000002 9150 0000     LDS     r21    ,$0000   ;R 00 0000   set r21 to 0
+000004 9040 0000     LDS     r4     ,$0000   ;R 00 0000   set r4 to 0
+000006 1154          CPSE    r21    ,r4      ;
+000007 8000          LD      r0     ,Z       ;S           0 == 0
                  
                  ; don't skip a LD instruction
-000012 930f          PUSH    r16             ;
-000013 e000          LDI     r16    ,$00     ;
-000014 9300 0000     STS     $0000  ,r16     ;
-000016 910f          POP     r16             ;
-000017 9000 0000     LDS     r0     ,$0000   ;R 00 0000   set r0 to 0
-000019 930f          PUSH    r16             ;
-00001a ea06          LDI     r16    ,$A6     ;
-00001b 9300 0000     STS     $0000  ,r16     ;
-00001d 910f          POP     r16             ;
-00001e 9090 0000     LDS     r9     ,$0000   ;R A6 0000   set r9 to 166
-000020 1009          CPSE    r0     ,r9      ;
-000021 8000          LD      r0     ,Z       ;R 00 0000   0 != 166
+000008 9010 0000     LDS     r1     ,$0000   ;R 00 0000   set r1 to 0
+00000a 9180 0000     LDS     r24    ,$0000   ;R 8C 0000   set r24 to 140
+00000c 1218          CPSE    r1     ,r24     ;
+00000d 8000          LD      r0     ,Z       ;R 97 0000   0 != 140
                  
                  ; skip a STS (2 word) instruction
-000022 930f          PUSH    r16             ;
-000023 e000          LDI     r16    ,$00     ;
-000024 9300 0000     STS     $0000  ,r16     ;
-000026 910f          POP     r16             ;
-000027 91b0 0000     LDS     r27    ,$0000   ;R 00 0000   set r27 to 0
-000029 930f          PUSH    r16             ;
-00002a e000          LDI     r16    ,$00     ;
-00002b 9300 0000     STS     $0000  ,r16     ;
-00002d 910f          POP     r16             ;
-00002e 9090 0000     LDS     r9     ,$0000   ;R 00 0000   set r9 to 0
-000030 11b9          CPSE    r27    ,r9      ;
-000031 9200 0000     STS     $0000  ,r0      ;S           0 == 0
+00000e 9080 0000     LDS     r8     ,$0000   ;R 00 0000   set r8 to 0
+000010 9050 0000     LDS     r5     ,$0000   ;R 00 0000   set r5 to 0
+000012 1085          CPSE    r8     ,r5      ;
+000013 9200 0000     STS     $0000  ,r0      ;S           0 == 0
                  
                  ; don't skip a STS instruction
-000033 930f          PUSH    r16             ;
-000034 e60a          LDI     r16    ,$6A     ;
-000035 9300 0000     STS     $0000  ,r16     ;
-000037 910f          POP     r16             ;
-000038 9060 0000     LDS     r6     ,$0000   ;R 6A 0000   set r6 to 106
-00003a 930f          PUSH    r16             ;
-00003b ef0f          LDI     r16    ,$FF     ;
-00003c 9300 0000     STS     $0000  ,r16     ;
-00003e 910f          POP     r16             ;
-00003f 90c0 0000     LDS     r12    ,$0000   ;R FF 0000   set r12 to 255
-000041 106c          CPSE    r6     ,r12     ;
-000042 9200 0000     STS     $0000  ,r0      ;W FF 0000   106 != 255
+000015 9180 0000     LDS     r24    ,$0000   ;R AD 0000   set r24 to 173
+000017 9040 0000     LDS     r4     ,$0000   ;R FF 0000   set r4 to 255
+000019 1184          CPSE    r24    ,r4      ;
+00001a 9200 0000     STS     $0000  ,r0      ;W 97 0000   173 != 255
                  
                  
                  ;PREPROCESS TestSBRC
-000044 e0f0          LDI     r31    ,$00     ;
-000045 e0e0          LDI     r30    ,$00     ;
+00001c e0f0          LDI     r31    ,$00     ;
+00001d e0e0          LDI     r30    ,$00     ;
                  
                  ; skip a LD (1 word) instruction
-000046 930f          PUSH    r16             ;
-000047 ef00          LDI     r16    ,$F0     ;
-000048 9300 0000     STS     $0000  ,r16     ;
-00004a 910f          POP     r16             ;
-00004b 9140 0000     LDS     r20    ,$0000   ;R F0 0000   set r20 to 240
-00004d fd40          SBRC    r20    ,0       ;
-00004e 8000          LD      r0     ,Z       ;S           bit 0 of 11110000 is clear
+00001e 9180 0000     LDS     r24    ,$0000   ;R F0 0000   set r24 to 240
+000020 fd80          SBRC    r24    ,0       ;
+000021 8000          LD      r0     ,Z       ;S           bit 0 of 11110000 is clear
                  
                  ; don't skip a LD instruction
-00004f 930f          PUSH    r16             ;
-000050 e00f          LDI     r16    ,$0F     ;
-000051 9300 0000     STS     $0000  ,r16     ;
-000053 910f          POP     r16             ;
-000054 90e0 0000     LDS     r14    ,$0000   ;R 0F 0000   set r14 to 15
-000056 fce3          SBRC    r14    ,3       ;
-000057 8000          LD      r0     ,Z       ;R 00 0000   bit 3 of 00001111 is set
+000022 91d0 0000     LDS     r29    ,$0000   ;R 0F 0000   set r29 to 15
+000024 fdd3          SBRC    r29    ,3       ;
+000025 8000          LD      r0     ,Z       ;R 73 0000   bit 3 of 00001111 is set
                  
                  ; skip a STS (2 word) instruction
-000058 930f          PUSH    r16             ;
-000059 ef00          LDI     r16    ,$F0     ;
-00005a 9300 0000     STS     $0000  ,r16     ;
-00005c 910f          POP     r16             ;
-00005d 91c0 0000     LDS     r28    ,$0000   ;R F0 0000   set r28 to 240
-00005f fdc1          SBRC    r28    ,1       ;
-000060 9200 0000     STS     $0000  ,r0      ;S           bit 1 of 11110000 is clear
+000026 9120 0000     LDS     r18    ,$0000   ;R F0 0000   set r18 to 240
+000028 fd21          SBRC    r18    ,1       ;
+000029 9200 0000     STS     $0000  ,r0      ;S           bit 1 of 11110000 is clear
                  
                  ; don't skip a STS instruction
-000062 930f          PUSH    r16             ;
-000063 e00f          LDI     r16    ,$0F     ;
-000064 9300 0000     STS     $0000  ,r16     ;
-000066 910f          POP     r16             ;
-000067 9040 0000     LDS     r4     ,$0000   ;R 0F 0000   set r4 to 15
-000069 fc42          SBRC    r4     ,2       ;
-00006a 9200 0000     STS     $0000  ,r0      ;W FF 0000   bit 2 of 00001111 is set
+00002b 9030 0000     LDS     r3     ,$0000   ;R 0F 0000   set r3 to 15
+00002d fc32          SBRC    r3     ,2       ;
+00002e 9200 0000     STS     $0000  ,r0      ;W 73 0000   bit 2 of 00001111 is set
                  
                  
                  ;PREPROCESS TestSBRS
-00006c e0f0          LDI     r31    ,$00     ;
-00006d e0e0          LDI     r30    ,$00     ;
+000030 e0f0          LDI     r31    ,$00     ;
+000031 e0e0          LDI     r30    ,$00     ;
                  
                  ; don't skip a LD (1 word) instruction
-00006e 930f          PUSH    r16             ;
-00006f ef00          LDI     r16    ,$F0     ;
-000070 9300 0000     STS     $0000  ,r16     ;
-000072 910f          POP     r16             ;
-000073 90e0 0000     LDS     r14    ,$0000   ;R F0 0000   set r14 to 240
-000075 fce4          SBRC    r14    ,4       ;
-000076 8000          LD      r0     ,Z       ;S           bit 4 of 11110000 is set
+000032 9130 0000     LDS     r19    ,$0000   ;R F0 0000   set r19 to 240
+000034 ff34          SBRS    r19    ,4       ;
+000035 8000          LD      r0     ,Z       ;S           bit 4 of 11110000 is set
                  
                  ; skip a LD instruction
-000077 930f          PUSH    r16             ;
-000078 e00f          LDI     r16    ,$0F     ;
-000079 9300 0000     STS     $0000  ,r16     ;
-00007b 910f          POP     r16             ;
-00007c 9050 0000     LDS     r5     ,$0000   ;R 0F 0000   set r5 to 15
-00007e fc57          SBRC    r5     ,7       ;
-00007f 8000          LD      r0     ,Z       ;R 00 0000   bit 7 of 00001111 is clear
+000036 90e0 0000     LDS     r14    ,$0000   ;R 0F 0000   set r14 to 15
+000038 fee7          SBRS    r14    ,7       ;
+000039 8000          LD      r0     ,Z       ;R 2A 0000   bit 7 of 00001111 is clear
                  
                  ; don't skip a STS (2 word) instruction
-000080 930f          PUSH    r16             ;
-000081 ef00          LDI     r16    ,$F0     ;
-000082 9300 0000     STS     $0000  ,r16     ;
-000084 910f          POP     r16             ;
-000085 9040 0000     LDS     r4     ,$0000   ;R F0 0000   set r4 to 240
-000087 fc45          SBRC    r4     ,5       ;
-000088 9200 0000     STS     $0000  ,r0      ;S           bit 5 of 11110000 is set
+00003a 9020 0000     LDS     r2     ,$0000   ;R F0 0000   set r2 to 240
+00003c fe25          SBRS    r2     ,5       ;
+00003d 9200 0000     STS     $0000  ,r0      ;S           bit 5 of 11110000 is set
                  
                  ; skip a STS instruction
-00008a 930f          PUSH    r16             ;
-00008b e00f          LDI     r16    ,$0F     ;
-00008c 9300 0000     STS     $0000  ,r16     ;
-00008e 910f          POP     r16             ;
-00008f 9150 0000     LDS     r21    ,$0000   ;R 0F 0000   set r21 to 15
-000091 fd56          SBRC    r21    ,6       ;
-000092 9200 0000     STS     $0000  ,r0      ;W FF 0000   bit 6 of 00001111 is clear
+00003f 9010 0000     LDS     r1     ,$0000   ;R 0F 0000   set r1 to 15
+000041 fe16          SBRS    r1     ,6       ;
+000042 9200 0000     STS     $0000  ,r0      ;W 2A 0000   bit 6 of 00001111 is clear
                  
                  
                  ;PREPROCESS TestNOP
                  
                  ; set some random values in registers
-000094 9408          BSET    0               ;
-000095 9498          BCLR    1               ;
-000096 9428          BSET    2               ;
-000097 9438          BSET    3               ;
-000098 9448          BSET    4               ;
-000099 9458          BSET    5               ;
-00009a 9468          BSET    6               ;
-00009b 94f8          BCLR    7               ;
-00009c 930f          PUSH    r16             ;
-00009d eb02          LDI     r16    ,$B2     ;
-00009e 9300 0000     STS     $0000  ,r16     ;
-0000a0 910f          POP     r16             ;
-0000a1 9000 0000     LDS     r0     ,$0000   ;R B2 0000   set r0 to 178
-0000a3 930f          PUSH    r16             ;
-0000a4 e709          LDI     r16    ,$79     ;
-0000a5 9300 0000     STS     $0000  ,r16     ;
-0000a7 910f          POP     r16             ;
-0000a8 9010 0000     LDS     r1     ,$0000   ;R 79 0000   set r1 to 121
-0000aa 930f          PUSH    r16             ;
-0000ab e204          LDI     r16    ,$24     ;
-0000ac 9300 0000     STS     $0000  ,r16     ;
-0000ae 910f          POP     r16             ;
-0000af 9020 0000     LDS     r2     ,$0000   ;R 24 0000   set r2 to 36
-0000b1 930f          PUSH    r16             ;
-0000b2 e308          LDI     r16    ,$38     ;
-0000b3 9300 0000     STS     $0000  ,r16     ;
-0000b5 910f          POP     r16             ;
-0000b6 9030 0000     LDS     r3     ,$0000   ;R 38 0000   set r3 to 56
-0000b8 930f          PUSH    r16             ;
-0000b9 ed0d          LDI     r16    ,$DD     ;
-0000ba 9300 0000     STS     $0000  ,r16     ;
-0000bc 910f          POP     r16             ;
-0000bd 9040 0000     LDS     r4     ,$0000   ;R DD 0000   set r4 to 221
-0000bf 930f          PUSH    r16             ;
-0000c0 ef00          LDI     r16    ,$F0     ;
-0000c1 9300 0000     STS     $0000  ,r16     ;
-0000c3 910f          POP     r16             ;
-0000c4 9050 0000     LDS     r5     ,$0000   ;R F0 0000   set r5 to 240
-0000c6 930f          PUSH    r16             ;
-0000c7 eb08          LDI     r16    ,$B8     ;
-0000c8 9300 0000     STS     $0000  ,r16     ;
-0000ca 910f          POP     r16             ;
-0000cb 9060 0000     LDS     r6     ,$0000   ;R B8 0000   set r6 to 184
-0000cd 930f          PUSH    r16             ;
-0000ce eb06          LDI     r16    ,$B6     ;
-0000cf 9300 0000     STS     $0000  ,r16     ;
-0000d1 910f          POP     r16             ;
-0000d2 9070 0000     LDS     r7     ,$0000   ;R B6 0000   set r7 to 182
-0000d4 930f          PUSH    r16             ;
-0000d5 e003          LDI     r16    ,$03     ;
-0000d6 9300 0000     STS     $0000  ,r16     ;
-0000d8 910f          POP     r16             ;
-0000d9 9080 0000     LDS     r8     ,$0000   ;R 03 0000   set r8 to 3
-0000db 930f          PUSH    r16             ;
-0000dc e70b          LDI     r16    ,$7B     ;
-0000dd 9300 0000     STS     $0000  ,r16     ;
-0000df 910f          POP     r16             ;
-0000e0 9090 0000     LDS     r9     ,$0000   ;R 7B 0000   set r9 to 123
-0000e2 930f          PUSH    r16             ;
-0000e3 e504          LDI     r16    ,$54     ;
-0000e4 9300 0000     STS     $0000  ,r16     ;
-0000e6 910f          POP     r16             ;
-0000e7 90a0 0000     LDS     r10    ,$0000   ;R 54 0000   set r10 to 84
-0000e9 930f          PUSH    r16             ;
-0000ea e102          LDI     r16    ,$12     ;
-0000eb 9300 0000     STS     $0000  ,r16     ;
-0000ed 910f          POP     r16             ;
-0000ee 90b0 0000     LDS     r11    ,$0000   ;R 12 0000   set r11 to 18
-0000f0 930f          PUSH    r16             ;
-0000f1 ed02          LDI     r16    ,$D2     ;
-0000f2 9300 0000     STS     $0000  ,r16     ;
-0000f4 910f          POP     r16             ;
-0000f5 90c0 0000     LDS     r12    ,$0000   ;R D2 0000   set r12 to 210
-0000f7 930f          PUSH    r16             ;
-0000f8 e60f          LDI     r16    ,$6F     ;
-0000f9 9300 0000     STS     $0000  ,r16     ;
-0000fb 910f          POP     r16             ;
-0000fc 90d0 0000     LDS     r13    ,$0000   ;R 6F 0000   set r13 to 111
-0000fe 930f          PUSH    r16             ;
-0000ff e007          LDI     r16    ,$07     ;
-000100 9300 0000     STS     $0000  ,r16     ;
-000102 910f          POP     r16             ;
-000103 90e0 0000     LDS     r14    ,$0000   ;R 07 0000   set r14 to 7
-000105 930f          PUSH    r16             ;
-000106 e20f          LDI     r16    ,$2F     ;
-000107 9300 0000     STS     $0000  ,r16     ;
-000109 910f          POP     r16             ;
-00010a 90f0 0000     LDS     r15    ,$0000   ;R 2F 0000   set r15 to 47
-00010c 930f          PUSH    r16             ;
-00010d e903          LDI     r16    ,$93     ;
-00010e 9300 0000     STS     $0000  ,r16     ;
-000110 910f          POP     r16             ;
-000111 9100 0000     LDS     r16    ,$0000   ;R 93 0000   set r16 to 147
-000113 930f          PUSH    r16             ;
-000114 e60f          LDI     r16    ,$6F     ;
-000115 9300 0000     STS     $0000  ,r16     ;
-000117 910f          POP     r16             ;
-000118 9110 0000     LDS     r17    ,$0000   ;R 6F 0000   set r17 to 111
-00011a 930f          PUSH    r16             ;
-00011b e908          LDI     r16    ,$98     ;
-00011c 9300 0000     STS     $0000  ,r16     ;
-00011e 910f          POP     r16             ;
-00011f 9120 0000     LDS     r18    ,$0000   ;R 98 0000   set r18 to 152
-000121 930f          PUSH    r16             ;
-000122 ea0b          LDI     r16    ,$AB     ;
-000123 9300 0000     STS     $0000  ,r16     ;
-000125 910f          POP     r16             ;
-000126 9130 0000     LDS     r19    ,$0000   ;R AB 0000   set r19 to 171
-000128 930f          PUSH    r16             ;
-000129 ef0f          LDI     r16    ,$FF     ;
-00012a 9300 0000     STS     $0000  ,r16     ;
-00012c 910f          POP     r16             ;
-00012d 9140 0000     LDS     r20    ,$0000   ;R FF 0000   set r20 to 255
-00012f 930f          PUSH    r16             ;
-000130 ea04          LDI     r16    ,$A4     ;
-000131 9300 0000     STS     $0000  ,r16     ;
-000133 910f          POP     r16             ;
-000134 9150 0000     LDS     r21    ,$0000   ;R A4 0000   set r21 to 164
-000136 930f          PUSH    r16             ;
-000137 ea07          LDI     r16    ,$A7     ;
-000138 9300 0000     STS     $0000  ,r16     ;
-00013a 910f          POP     r16             ;
-00013b 9160 0000     LDS     r22    ,$0000   ;R A7 0000   set r22 to 167
-00013d 930f          PUSH    r16             ;
-00013e e908          LDI     r16    ,$98     ;
-00013f 9300 0000     STS     $0000  ,r16     ;
-000141 910f          POP     r16             ;
-000142 9170 0000     LDS     r23    ,$0000   ;R 98 0000   set r23 to 152
-000144 930f          PUSH    r16             ;
-000145 ec05          LDI     r16    ,$C5     ;
-000146 9300 0000     STS     $0000  ,r16     ;
-000148 910f          POP     r16             ;
-000149 9180 0000     LDS     r24    ,$0000   ;R C5 0000   set r24 to 197
-00014b 930f          PUSH    r16             ;
-00014c e608          LDI     r16    ,$68     ;
-00014d 9300 0000     STS     $0000  ,r16     ;
-00014f 910f          POP     r16             ;
-000150 9190 0000     LDS     r25    ,$0000   ;R 68 0000   set r25 to 104
-000152 930f          PUSH    r16             ;
-000153 e808          LDI     r16    ,$88     ;
-000154 9300 0000     STS     $0000  ,r16     ;
-000156 910f          POP     r16             ;
-000157 91a0 0000     LDS     r26    ,$0000   ;R 88 0000   set r26 to 136
-000159 930f          PUSH    r16             ;
-00015a e30d          LDI     r16    ,$3D     ;
-00015b 9300 0000     STS     $0000  ,r16     ;
-00015d 910f          POP     r16             ;
-00015e 91b0 0000     LDS     r27    ,$0000   ;R 3D 0000   set r27 to 61
-000160 930f          PUSH    r16             ;
-000161 e80b          LDI     r16    ,$8B     ;
-000162 9300 0000     STS     $0000  ,r16     ;
-000164 910f          POP     r16             ;
-000165 91c0 0000     LDS     r28    ,$0000   ;R 8B 0000   set r28 to 139
-000167 930f          PUSH    r16             ;
-000168 e304          LDI     r16    ,$34     ;
-000169 9300 0000     STS     $0000  ,r16     ;
-00016b 910f          POP     r16             ;
-00016c 91d0 0000     LDS     r29    ,$0000   ;R 34 0000   set r29 to 52
-00016e 930f          PUSH    r16             ;
-00016f e802          LDI     r16    ,$82     ;
-000170 9300 0000     STS     $0000  ,r16     ;
-000172 910f          POP     r16             ;
-000173 91e0 0000     LDS     r30    ,$0000   ;R 82 0000   set r30 to 130
-000175 930f          PUSH    r16             ;
-000176 ec07          LDI     r16    ,$C7     ;
-000177 9300 0000     STS     $0000  ,r16     ;
-000179 910f          POP     r16             ;
-00017a 91f0 0000     LDS     r31    ,$0000   ;R C7 0000   set r31 to 199
+000044 9408          BSET    0               ;
+000045 9418          BSET    1               ;
+000046 9428          BSET    2               ;
+000047 9438          BSET    3               ;
+000048 9448          BSET    4               ;
+000049 94d8          BCLR    5               ;
+00004a 9468          BSET    6               ;
+00004b 94f8          BCLR    7               ;
+00004c 9000 0000     LDS     r0     ,$0000   ;R 8E 0000   set r0 to 142
+00004e 9010 0000     LDS     r1     ,$0000   ;R 03 0000   set r1 to 3
+000050 9020 0000     LDS     r2     ,$0000   ;R 51 0000   set r2 to 81
+000052 9030 0000     LDS     r3     ,$0000   ;R D8 0000   set r3 to 216
+000054 9040 0000     LDS     r4     ,$0000   ;R AE 0000   set r4 to 174
+000056 9050 0000     LDS     r5     ,$0000   ;R 8E 0000   set r5 to 142
+000058 9060 0000     LDS     r6     ,$0000   ;R 4F 0000   set r6 to 79
+00005a 9070 0000     LDS     r7     ,$0000   ;R 6E 0000   set r7 to 110
+00005c 9080 0000     LDS     r8     ,$0000   ;R AC 0000   set r8 to 172
+00005e 9090 0000     LDS     r9     ,$0000   ;R 34 0000   set r9 to 52
+000060 90a0 0000     LDS     r10    ,$0000   ;R 2F 0000   set r10 to 47
+000062 90b0 0000     LDS     r11    ,$0000   ;R C2 0000   set r11 to 194
+000064 90c0 0000     LDS     r12    ,$0000   ;R 31 0000   set r12 to 49
+000066 90d0 0000     LDS     r13    ,$0000   ;R B7 0000   set r13 to 183
+000068 90e0 0000     LDS     r14    ,$0000   ;R B0 0000   set r14 to 176
+00006a 90f0 0000     LDS     r15    ,$0000   ;R 87 0000   set r15 to 135
+00006c 9100 0000     LDS     r16    ,$0000   ;R 16 0000   set r16 to 22
+00006e 9110 0000     LDS     r17    ,$0000   ;R EB 0000   set r17 to 235
+000070 9120 0000     LDS     r18    ,$0000   ;R 3F 0000   set r18 to 63
+000072 9130 0000     LDS     r19    ,$0000   ;R C1 0000   set r19 to 193
+000074 9140 0000     LDS     r20    ,$0000   ;R 28 0000   set r20 to 40
+000076 9150 0000     LDS     r21    ,$0000   ;R 96 0000   set r21 to 150
+000078 9160 0000     LDS     r22    ,$0000   ;R B9 0000   set r22 to 185
+00007a 9170 0000     LDS     r23    ,$0000   ;R 62 0000   set r23 to 98
+00007c 9180 0000     LDS     r24    ,$0000   ;R 23 0000   set r24 to 35
+00007e 9190 0000     LDS     r25    ,$0000   ;R 17 0000   set r25 to 23
+000080 91a0 0000     LDS     r26    ,$0000   ;R 74 0000   set r26 to 116
+000082 91b0 0000     LDS     r27    ,$0000   ;R 94 0000   set r27 to 148
+000084 91c0 0000     LDS     r28    ,$0000   ;R 28 0000   set r28 to 40
+000086 91d0 0000     LDS     r29    ,$0000   ;R 77 0000   set r29 to 119
+000088 91e0 0000     LDS     r30    ,$0000   ;R 33 0000   set r30 to 51
+00008a 91f0 0000     LDS     r31    ,$0000   ;R C2 0000   set r31 to 194
                  
                  ; do a whole lot of nothing
-00017c 0000          NOP                     ;
-00017d 0000          NOP                     ;
-00017e 0000          NOP                     ;
+00008c 0000          NOP                     ;
+00008d 0000          NOP                     ;
+00008e 0000          NOP                     ;
                  
                  ; check that indeed nothing happened
-00017f 9200 0000     STS     $0000  ,r0      ;W B2 0000   r0 should be 178
-000181 9210 0000     STS     $0000  ,r1      ;W 79 0000   r1 should be 121
-000183 9220 0000     STS     $0000  ,r2      ;W 24 0000   r2 should be 36
-000185 9230 0000     STS     $0000  ,r3      ;W 38 0000   r3 should be 56
-000187 9240 0000     STS     $0000  ,r4      ;W DD 0000   r4 should be 221
-000189 9250 0000     STS     $0000  ,r5      ;W F0 0000   r5 should be 240
-00018b 9260 0000     STS     $0000  ,r6      ;W B8 0000   r6 should be 184
-00018d 9270 0000     STS     $0000  ,r7      ;W B6 0000   r7 should be 182
-00018f 9280 0000     STS     $0000  ,r8      ;W 03 0000   r8 should be 3
-000191 9290 0000     STS     $0000  ,r9      ;W 7B 0000   r9 should be 123
-000193 92a0 0000     STS     $0000  ,r10     ;W 54 0000   r10 should be 84
-000195 92b0 0000     STS     $0000  ,r11     ;W 12 0000   r11 should be 18
-000197 92c0 0000     STS     $0000  ,r12     ;W D2 0000   r12 should be 210
-000199 92d0 0000     STS     $0000  ,r13     ;W 6F 0000   r13 should be 111
-00019b 92e0 0000     STS     $0000  ,r14     ;W 07 0000   r14 should be 7
-00019d 92f0 0000     STS     $0000  ,r15     ;W 2F 0000   r15 should be 47
-00019f 9300 0000     STS     $0000  ,r16     ;W 93 0000   r16 should be 147
-0001a1 9310 0000     STS     $0000  ,r17     ;W 6F 0000   r17 should be 111
-0001a3 9320 0000     STS     $0000  ,r18     ;W 98 0000   r18 should be 152
-0001a5 9330 0000     STS     $0000  ,r19     ;W AB 0000   r19 should be 171
-0001a7 9340 0000     STS     $0000  ,r20     ;W FF 0000   r20 should be 255
-0001a9 9350 0000     STS     $0000  ,r21     ;W A4 0000   r21 should be 164
-0001ab 9360 0000     STS     $0000  ,r22     ;W A7 0000   r22 should be 167
-0001ad 9370 0000     STS     $0000  ,r23     ;W 98 0000   r23 should be 152
-0001af 9380 0000     STS     $0000  ,r24     ;W C5 0000   r24 should be 197
-0001b1 9390 0000     STS     $0000  ,r25     ;W 68 0000   r25 should be 104
-0001b3 93a0 0000     STS     $0000  ,r26     ;W 88 0000   r26 should be 136
-0001b5 93b0 0000     STS     $0000  ,r27     ;W 3D 0000   r27 should be 61
-0001b7 93c0 0000     STS     $0000  ,r28     ;W 8B 0000   r28 should be 139
-0001b9 93d0 0000     STS     $0000  ,r29     ;W 34 0000   r29 should be 52
-0001bb 93e0 0000     STS     $0000  ,r30     ;W 82 0000   r30 should be 130
-0001bd 93f0 0000     STS     $0000  ,r31     ;W C7 0000   r31 should be 199
-0001bf f438          BRBC    0      ,done    ;            bit 0 of status should be set
-0001c0 f031          BRBS    1      ,done    ;            bit 1 of status should be clear
-0001c1 f42a          BRBC    2      ,done    ;            bit 2 of status should be set
-0001c2 f423          BRBC    3      ,done    ;            bit 3 of status should be set
-0001c3 f41c          BRBC    4      ,done    ;            bit 4 of status should be set
-0001c4 f415          BRBC    5      ,done    ;            bit 5 of status should be set
-0001c5 f40e          BRBC    6      ,done    ;            bit 6 of status should be set
-0001c6 f007          BRBS    7      ,done    ;            bit 7 of status should be clear
+00008f 9200 0000     STS     $0000  ,r0      ;W 8E 0000   r0 should be 142
+000091 9210 0000     STS     $0000  ,r1      ;W 03 0000   r1 should be 3
+000093 9220 0000     STS     $0000  ,r2      ;W 51 0000   r2 should be 81
+000095 9230 0000     STS     $0000  ,r3      ;W D8 0000   r3 should be 216
+000097 9240 0000     STS     $0000  ,r4      ;W AE 0000   r4 should be 174
+000099 9250 0000     STS     $0000  ,r5      ;W 8E 0000   r5 should be 142
+00009b 9260 0000     STS     $0000  ,r6      ;W 4F 0000   r6 should be 79
+00009d 9270 0000     STS     $0000  ,r7      ;W 6E 0000   r7 should be 110
+00009f 9280 0000     STS     $0000  ,r8      ;W AC 0000   r8 should be 172
+0000a1 9290 0000     STS     $0000  ,r9      ;W 34 0000   r9 should be 52
+0000a3 92a0 0000     STS     $0000  ,r10     ;W 2F 0000   r10 should be 47
+0000a5 92b0 0000     STS     $0000  ,r11     ;W C2 0000   r11 should be 194
+0000a7 92c0 0000     STS     $0000  ,r12     ;W 31 0000   r12 should be 49
+0000a9 92d0 0000     STS     $0000  ,r13     ;W B7 0000   r13 should be 183
+0000ab 92e0 0000     STS     $0000  ,r14     ;W B0 0000   r14 should be 176
+0000ad 92f0 0000     STS     $0000  ,r15     ;W 87 0000   r15 should be 135
+0000af 9300 0000     STS     $0000  ,r16     ;W 16 0000   r16 should be 22
+0000b1 9310 0000     STS     $0000  ,r17     ;W EB 0000   r17 should be 235
+0000b3 9320 0000     STS     $0000  ,r18     ;W 3F 0000   r18 should be 63
+0000b5 9330 0000     STS     $0000  ,r19     ;W C1 0000   r19 should be 193
+0000b7 9340 0000     STS     $0000  ,r20     ;W 28 0000   r20 should be 40
+0000b9 9350 0000     STS     $0000  ,r21     ;W 96 0000   r21 should be 150
+0000bb 9360 0000     STS     $0000  ,r22     ;W B9 0000   r22 should be 185
+0000bd 9370 0000     STS     $0000  ,r23     ;W 62 0000   r23 should be 98
+0000bf 9380 0000     STS     $0000  ,r24     ;W 23 0000   r24 should be 35
+0000c1 9390 0000     STS     $0000  ,r25     ;W 17 0000   r25 should be 23
+0000c3 93a0 0000     STS     $0000  ,r26     ;W 74 0000   r26 should be 116
+0000c5 93b0 0000     STS     $0000  ,r27     ;W 94 0000   r27 should be 148
+0000c7 93c0 0000     STS     $0000  ,r28     ;W 28 0000   r28 should be 40
+0000c9 93d0 0000     STS     $0000  ,r29     ;W 77 0000   r29 should be 119
+0000cb 93e0 0000     STS     $0000  ,r30     ;W 33 0000   r30 should be 51
+0000cd 93f0 0000     STS     $0000  ,r31     ;W C2 0000   r31 should be 194
+0000cf b72f          IN      r18    ,$3F     ; Read the Status register
+0000d0 9320 0000     STS     $0000  ,r18     ;W 5F 0000   Status register should be 5F from earlier
                  done:
 
 
@@ -1364,16 +1166,16 @@ counted separately from r26..r31 here.
 .dseg memory usage only counts static data declared with .byte
 
 "ATmega88" register use summary:
-r0 :  16 r1 :   2 r2 :   2 r3 :   2 r4 :   6 r5 :   4 r6 :   4 r7 :   2 
-r8 :   2 r9 :   6 r10:   2 r11:   2 r12:   4 r13:   2 r14:   6 r15:   2 
-r16: 196 r17:   2 r18:   2 r19:   2 r20:   4 r21:   4 r22:   2 r23:   4 
-r24:   2 r25:   2 r26:   2 r27:   4 r28:   4 r29:   2 r30:   5 r31:   5 
+r0 :  14 r1 :   6 r2 :   4 r3 :   4 r4 :   6 r5 :   4 r6 :   2 r7 :   2 
+r8 :   4 r9 :   2 r10:   2 r11:   2 r12:   2 r13:   2 r14:   4 r15:   2 
+r16:   2 r17:   2 r18:   6 r19:   4 r20:   2 r21:   4 r22:   2 r23:   2 
+r24:   8 r25:   2 r26:   2 r27:   2 r28:   2 r29:   4 r30:   5 r31:   5 
 x  :   0 y  :   0 z  :   6 
 Registers used: 33 out of 35 (94.3%)
 
 "ATmega88" instruction use summary:
 .lds  :   0 .sts  :   0 adc   :   0 add   :   0 adiw  :   0 and   :   0 
-andi  :   0 asr   :   0 bclr  :   2 bld   :   0 brbc  :   6 brbs  :   2 
+andi  :   0 asr   :   0 bclr  :   2 bld   :   0 brbc  :   0 brbs  :   0 
 brcc  :   0 brcs  :   0 break :   0 breq  :   0 brge  :   0 brhc  :   0 
 brhs  :   0 brid  :   0 brie  :   0 brlo  :   0 brlt  :   0 brmi  :   0 
 brne  :   0 brpl  :   0 brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 
@@ -1381,22 +1183,22 @@ brvs  :   0 bset  :   6 bst   :   0 cbi   :   0 cbr   :   0 clc   :   0
 clh   :   0 cli   :   0 cln   :   0 clr   :   0 cls   :   0 clt   :   0 
 clv   :   0 clz   :   0 com   :   0 cp    :   0 cpc   :   0 cpi   :   0 
 cpse  :   4 dec   :   0 eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 
-icall :   0 ijmp  :   0 in    :   0 inc   :   0 ld    :   6 ldd   :   0 
-ldi   :  54 lds   :  48 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   0 
+icall :   0 ijmp  :   0 in    :   1 inc   :   0 ld    :   6 ldd   :   0 
+ldi   :   6 lds   :  48 lpm   :   0 lsl   :   0 lsr   :   0 mov   :   0 
 movw  :   0 mul   :   0 muls  :   0 mulsu :   0 neg   :   0 nop   :   4 
-or    :   0 ori   :   0 out   :   0 pop   :  48 push  :  48 rcall :   0 
+or    :   0 ori   :   0 out   :   0 pop   :   0 push  :   0 rcall :   0 
 ret   :   0 reti  :   0 rjmp  :   0 rol   :   0 ror   :   0 sbc   :   0 
 sbci  :   0 sbi   :   0 sbic  :   0 sbis  :   0 sbiw  :   0 sbr   :   0 
-sbrc  :   8 sbrs  :   0 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
+sbrc  :   4 sbrs  :   4 sec   :   0 seh   :   0 sei   :   0 sen   :   0 
 ser   :   0 ses   :   0 set   :   0 sev   :   0 sez   :   0 sleep :   0 
-spm   :   0 st    :   0 std   :   0 sts   :  86 sub   :   0 subi  :   0 
+spm   :   0 st    :   0 std   :   0 sts   :  39 sub   :   0 subi  :   0 
 swap  :   0 tst   :   0 wdr   :   0 
-Instructions used: 13 out of 111 (11.7%)
+Instructions used: 11 out of 111 (9.9%)
 
 "ATmega88" memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000390    912      0    912    8192  11.1%
+[.cseg] 0x000000 0x0001a6    422      0    422    8192   5.2%
 [.dseg] 0x000100 0x000100      0      0      0    1024   0.0%
 [.eseg] 0x000000 0x000000      0      0      0     512   0.0%
 

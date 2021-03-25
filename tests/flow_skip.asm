@@ -1,7 +1,7 @@
 
 ; Tests the flow control skip instructions and NOP
-THIS FILE IS GENERATED
-for explanations or modifications, see notebook flowskip.ipynb
+; THIS FILE IS GENERATED
+; for explanations or modifications, see notebook flowskip.ipynb
 
 
 
@@ -166,13 +166,7 @@ for explanations or modifications, see notebook flowskip.ipynb
     STS     $0000  ,r29     ;W 77 0000   r29 should be 119
     STS     $0000  ,r30     ;W 33 0000   r30 should be 51
     STS     $0000  ,r31     ;W C2 0000   r31 should be 194
-    BRBC    0      ,done    ;            bit 0 of status should be set
-    BRBC    1      ,done    ;            bit 1 of status should be set
-    BRBC    2      ,done    ;            bit 2 of status should be set
-    BRBC    3      ,done    ;            bit 3 of status should be set
-    BRBC    4      ,done    ;            bit 4 of status should be set
-    BRBS    5      ,done    ;            bit 5 of status should be clear
-    BRBC    6      ,done    ;            bit 6 of status should be set
-    BRBS    7      ,done    ;            bit 7 of status should be clear
+    IN      r18    ,$3F     ; Read the Status register
+    STS     $0000  ,r18     ;W 5F 0000   Status register should be 5F from earlier
 done:
     NOP                     ;
