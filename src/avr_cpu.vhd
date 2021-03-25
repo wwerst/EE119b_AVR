@@ -528,6 +528,16 @@ begin
                 NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 -- No writeback of result
+            elsif std_match(InstReg, Opcodes.OpCPI) then
+                -- Compare Rd and immediate by doing subtraction
+                -- but not storing result
+                tmp_rd := ("1" & InstReg(7 downto 4));
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= InstReg(11 downto 8) & InstReg(3 downto 0);
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                -- No writeback of result
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
