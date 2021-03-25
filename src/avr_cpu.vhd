@@ -417,10 +417,16 @@ begin
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                 NextExecuteOpData.OpA <= alu_SReg;
+            elsif std_match(InstReg, Opcodes.OpMOV) then
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= InstReg(9) & InstReg(3 downto 0);
             elsif (std_match(InstReg, Opcodes.OpLD) 
                     or std_match(Instreg, Opcodes.OpLDY)
                     or std_match(InstReg, Opcodes.OpLDZ))
-                    and not(std_match(InstReg, Opcodes.OpLDS))
+                    and not(std_match(InstReg, Opcodes.OpLDS)
+                    or std_match(InstReg, Opcodes.OpPOP))
             then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
@@ -471,6 +477,7 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDDY)
                     or std_match(InstReg, Opcodes.OpLDDZ)
+                    or std_match(InstReg, Opcodes.OpPOP)
             then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
@@ -479,16 +486,20 @@ begin
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
-                elsif CurState = 1 then
                 end if;
                 if std_match(InstReg, Opcodes.OpLDDY) then
                     reg_read_ctrl.SelOutD <= "10";
                     dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
-                    NextExecuteOpData.writeRegSelD <= "11";
                 elsif std_match(InstReg, Opcodes.OpLDDZ) then
                     reg_read_ctrl.SelOutD <= "11";
                     dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
-                    NextExecuteOpData.writeRegSelD <= "11";
+                elsif std_match(InstReg, Opcodes.OpPOP) then
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    if CurState = 0 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    elsif CurState = 1 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDI) then
                 -- Pass immediate through ALU into write unit
@@ -509,24 +520,87 @@ begin
                     dau_ctrl.SrcSel <= DAU.SRC_PDB;
                     LoadInstReg <= '0';
                 end if;
-            elsif std_match(InstReg, Opcodes.OpSTX) then
+            elsif (std_match(InstReg, Opcodes.OpST)
+                    or std_match(InstReg, Opcodes.OpSTY)
+                    or std_match(InstReg, Opcodes.OpSTZ))
+                    and not(std_match(InstReg, Opcodes.OpSTS)
+                    or std_match(InstReg, Opcodes.OpPUSH))
+            then
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                DataDB <= reg_DataOutA;
                 if CurState = 0 then
                     -- First cycle for store instruction.
                     -- On first cycle, do the following:
                     -- Put the address on the Data bus (already connected to double width output)
                     -- Put the data on the Data bus
                     -- Stop the InstReg from incrementing
-                    reg_read_ctrl.SelOutD <= "01";
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
-                    iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
                     startDataWr <= '0';
-                else
+                elsif CurState = 1 then
+                    NextExecuteOpData.writeRegEnD <= '1';
+                end if;
+                if std_match(InstReg, Opcodes.OpSTX) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
                     reg_read_ctrl.SelOutD <= "01";
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
+                    NextExecuteOpData.writeRegSelD <= "01";
+                elsif std_match(InstReg, Opcodes.OpSTXI) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    reg_read_ctrl.SelOutD <= "01";
+                    NextExecuteOpData.writeRegSelD <= "01";
+                elsif std_match(InstReg, Opcodes.OpSTXD) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    reg_read_ctrl.SelOutD <= "01";
+                    NextExecuteOpData.writeRegSelD <= "01";
+                elsif std_match(InstReg, Opcodes.OpSTY) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    reg_read_ctrl.SelOutD <= "10";
+                    NextExecuteOpData.writeRegSelD <= "10";
+                elsif std_match(InstReg, Opcodes.OpSTYI) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    reg_read_ctrl.SelOutD <= "10";
+                    NextExecuteOpData.writeRegSelD <= "10";
+                elsif std_match(InstReg, Opcodes.OpSTYD) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    reg_read_ctrl.SelOutD <= "10";
+                    NextExecuteOpData.writeRegSelD <= "10";
+                elsif std_match(InstReg, Opcodes.OpSTZ) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    reg_read_ctrl.SelOutD <= "11";
+                    NextExecuteOpData.writeRegSelD <= "11";
+                elsif std_match(InstReg, Opcodes.OpSTZI) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    reg_read_ctrl.SelOutD <= "11";
+                    NextExecuteOpData.writeRegSelD <= "11";
+                elsif std_match(InstReg, Opcodes.OpSTZD) then
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    reg_read_ctrl.SelOutD <= "11";
+                    NextExecuteOpData.writeRegSelD <= "11";
+                end if;
+            elsif std_match(InstReg, Opcodes.OpSTDY)
+                    or std_match(InstReg, Opcodes.OpSTDZ)
+                    or std_match(InstReg, Opcodes.OpPUSH)
+            then
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                DataDB <= reg_DataOutA;
+                if CurState = 0 then
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                    startDataWr <= '0';
+                end if;
+                if std_match(InstReg, Opcodes.OpSTDY) then
+                    reg_read_ctrl.SelOutD <= "10";
+                    dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
+                elsif std_match(InstReg, Opcodes.OpSTDZ) then
+                    reg_read_ctrl.SelOutD <= "11";
+                    dau_ctrl.OffsetSel <= DAU.OFF_ARRAY;
+                elsif std_match(InstReg, Opcodes.OpPUSH) then
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    if CurState = 0 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
+                    elsif CurState = 1 then
+                        dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTS) then
                 if CurState = 0 then

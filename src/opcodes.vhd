@@ -77,8 +77,10 @@ package opcodes is
    constant OpSTX    :  opcode_word := "1001001-----1100";   -- ST X, Rr
    constant OpSTXI   :  opcode_word := "1001001-----1101";   -- ST X+, Rr
    constant OpSTXD   :  opcode_word := "1001001-----1110";   -- ST -X, Rr
+   constant OpSTY    :  opcode_word := "1000001-----1000";   -- ST Y, Rr
    constant OpSTYI   :  opcode_word := "1001001-----1001";   -- ST Y+, Rr
    constant OpSTYD   :  opcode_word := "1001001-----1010";   -- ST -Y, Rr
+   constant OpSTZ    :  opcode_word := "1000001-----0000";   -- ST Z, Rr
    constant OpSTZI   :  opcode_word := "1001001-----0001";   -- ST Z+, Rr
    constant OpSTZD   :  opcode_word := "1001001-----0010";   -- ST -Z, Rr
    constant OpSTS    :  opcode_word := "1001001-----0000";   -- STS m, Rr
