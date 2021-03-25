@@ -176,7 +176,7 @@ architecture dataflow of AVR_CPU is
 
 
     signal InstReg: std_logic_vector(15 downto 0);
-    signal InstPayload: std_logic_vector(15 downto 0);
+    signal ProgDBSync: std_logic_vector(15 downto 0);
 
     signal LoadInstReg: std_logic;
 
@@ -287,12 +287,15 @@ begin
         if rising_edge(clock) then
             if reset = '0' then
                 InstReg <= (others => '0');
+                ProgDBSync <= (others => '0');
                 CurState <= 0;
             elsif LoadInstReg then
                 InstReg <= ProgDB;
+                ProgDBSync <= ProgDB;
                 CurState <= 0;
             else
                 CurState <= CurState + 1;
+                ProgDBSync <= ProgDB;
             end if;
         end if;
     end process InstrLatchProc;
@@ -729,6 +732,105 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            -------------------
+            -------------------
+            -- Skip Instructions
+            -------------------
+            -------------------
+            elsif std_match(InstReg, Opcodes.OpCPSE) then
+                -- Compare Rd and Rr by doing subtraction
+                -- but not storing result
+                if CurState = 0 then
+                    tmp_rd := InstReg(8 downto 4);
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    if reg_DataOutA = reg_DataOutB then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                elsif CurState = 1 then
+                    -- We are at first word of skipped instruction.
+                    -- Check if this is a two-word instruction
+                    -- TODO(WHW): This is examining the next instruction,
+                    -- not current instruction registered, 
+                    if (std_match(ProgDBSync, Opcodes.OpLDS) or
+                        std_match(ProgDBSync, Opcodes.OpSTS) or
+                        std_match(ProgDBSync, Opcodes.OpJMP) or
+                        std_match(ProgDBSync, Opcodes.OpCALL)) then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                else
+                    null;
+                    -- CurState is 2.
+                    -- All instructions are at most 2 words,
+                    -- so always continue to next instruction now.
+                end if;
+            elsif std_match(InstReg, Opcodes.OpSBRC) then
+                -- Compare Rd and Rr by doing subtraction
+                -- but not storing result
+                if CurState = 0 then
+                    tmp_rd := InstReg(8 downto 4);
+                    tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    if reg_DataOutA(tmp_int) = '0' then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                elsif CurState = 1 then
+                    -- We are at first word of skipped instruction.
+                    -- Check if this is a two-word instruction
+                    -- TODO(WHW): This is examining the next instruction,
+                    -- not current instruction registered, 
+                    if (std_match(ProgDBSync, Opcodes.OpLDS) or
+                        std_match(ProgDBSync, Opcodes.OpSTS) or
+                        std_match(ProgDBSync, Opcodes.OpJMP) or
+                        std_match(ProgDBSync, Opcodes.OpCALL)) then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                else
+                    null;
+                    -- CurState is 2.
+                    -- All instructions are at most 2 words,
+                    -- so always continue to next instruction now.
+                end if;
+            elsif std_match(InstReg, Opcodes.OpSBRS) then
+                -- Compare Rd and Rr by doing subtraction
+                -- but not storing result
+                if CurState = 0 then
+                    tmp_rd := InstReg(8 downto 4);
+                    tmp_int := to_integer(unsigned(InstReg(2 downto 0)));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    if reg_DataOutA(tmp_int) = '1' then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                elsif CurState = 1 then
+                    -- We are at first word of skipped instruction.
+                    -- Check if this is a two-word instruction
+                    -- TODO(WHW): This is examining the next instruction,
+                    -- not current instruction registered, 
+                    if (std_match(ProgDBSync, Opcodes.OpLDS) or
+                        std_match(ProgDBSync, Opcodes.OpSTS) or
+                        std_match(ProgDBSync, Opcodes.OpJMP) or
+                        std_match(ProgDBSync, Opcodes.OpCALL)) then
+                        LoadInstReg <= '0';
+                    else
+                        LoadInstReg <= '1';
+                    end if;
+                else
+                    null;
+                    -- CurState is 2.
+                    -- All instructions are at most 2 words,
+                    -- so always continue to next instruction now.
+                end if;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
