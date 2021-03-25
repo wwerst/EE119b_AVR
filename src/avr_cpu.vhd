@@ -447,8 +447,6 @@ begin
                 
                 NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
-                NextExecuteOpData.writeRegEnS <= '1';
-                NextExecuteOpData.writeRegSelS <= tmp_rd;
                 if std_match(InstReg, Opcodes.OpAND) then
                     -- Opcode is OpAND
                     tmp_rd := InstReg(8 downto 4);
@@ -464,6 +462,8 @@ begin
                     NextExecuteOpData.OpA <= reg_DataOutA;
                     NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
                 end if;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(Instreg, Opcodes.OpASR) then
                 tmp_rd := InstReg(8 downto 4);
                 reg_read_ctrl.SelOutA <= tmp_rd;
@@ -594,6 +594,28 @@ begin
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif (std_match(InstReg, Opcodes.OpOR) or
+                   std_match(InstReg, Opcodes.OpORI)) then
+                -- Common to both OR and ORI
+                NextExecuteOpData.ALUOpCode <= ALUOp.OR_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                if std_match(InstReg, Opcodes.OpOR) then
+                    -- Opcode is OpOR
+                    tmp_rd := InstReg(8 downto 4);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpB <= reg_DataOutB;
+                else
+                    -- Opcode is OpORI
+                    tmp_rd := ("1" & InstReg(7 downto 4));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                end if;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             -------------------
