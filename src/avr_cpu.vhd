@@ -538,7 +538,21 @@ begin
                 NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZCNVSH;
                 -- No writeback of result
-            -- LOAD/STORE
+            elsif std_match(InstReg, Opcodes.OpDEC) then
+                -- Subtract Rd by immediate value of 1
+                tmp_rd := InstReg(8 downto 4);
+                reg_read_ctrl.SelOutA <= tmp_rd;
+                NextExecuteOpData.OpA <= reg_DataOutA;
+                NextExecuteOpData.OpB <= "00000001"; -- Subtract 1
+                NextExecuteOpData.ALUOpCode <= ALUOp.SUB_Op;
+                NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
+                NextExecuteOpData.writeRegEnS <= '1';
+                NextExecuteOpData.writeRegSelS <= tmp_rd;
+            -------------------
+            -------------------
+            -- LOAD/STORE Instructions
+            -------------------
+            -------------------
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
                 NextExecuteOpData.writeRegEnS <= '1';
