@@ -41,7 +41,7 @@ architecture testbench of avr_cpu_tb is
     constant CLK_PERIOD : time := 1 ms;
     signal clk          : std_logic := '0';
     signal done         : boolean := FALSE;
-    constant MAX_ERROR_COUNT : integer := 20;
+    constant MAX_ERROR_COUNT : integer := 2;
 
     -- cpu signals
     signal ProgDB  :  std_logic_vector(15 downto 0);   -- program memory data bus

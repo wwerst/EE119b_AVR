@@ -436,19 +436,29 @@ begin
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= tmp_rd;
                 end if;
-            elsif std_match(InstReg, Opcodes.OpAND) then
-                tmp_rd := InstReg(8 downto 4);
-                tmp_rr := InstReg(9) & InstReg(3 downto 0);
-                reg_read_ctrl.SelOutA <= tmp_rd;
-                reg_read_ctrl.SelOutB <= tmp_rr;
-                NextExecuteOpData.OpA <= reg_DataOutA;
-                NextExecuteOpData.OpB <= reg_DataOutB;
+            elsif (std_match(InstReg, Opcodes.OpAND) or
+                   std_match(InstReg, Opcodes.OpANDI)) then
+                -- Common to both AND and ANDI
+                
                 NextExecuteOpData.ALUOpCode <= ALUOp.AND_Op;
                 NextExecuteOpData.ALUFlagMask <= FlagMaskZNVS;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
-            
-
+                if std_match(InstReg, Opcodes.OpAND) then
+                    -- Opcode is OpAND
+                    tmp_rd := InstReg(8 downto 4);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpB <= reg_DataOutB;
+                else
+                    -- Opcode is OpANDI
+                    tmp_rd := ("1" & InstReg(7 downto 4));
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    NextExecuteOpData.OpB <= (InstReg(11 downto 8) & InstReg(3 downto 0));
+                end if;
             -- LOAD/STORE
             elsif std_match(InstReg, Opcodes.OpIN) then
                 NextExecuteOpData.writeRegEnS <= '1';
