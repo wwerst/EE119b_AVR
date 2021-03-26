@@ -347,14 +347,7 @@ entity  Multiplier  is
 end  Multiplier;
 
 
-architecture  structural  of  Multiplier  is
-begin
-    -- TODO(WHW): Implement structural multiplier, using wallace tree etc
-
-end structural;
-
-
-architecture  behavioral  of  Multiplier  is
+architecture dataflow  of  Multiplier  is
     signal UnsignedOpA : unsigned(wordsize - 1 downto 0);
     signal UnsignedOpB : unsigned(wordsize - 1 downto 0);
     signal UnsignedMulResult : unsigned(2*wordsize - 1 downto 0);
@@ -365,6 +358,8 @@ begin
     UnsignedOpA <= unsigned(MulOpA);
     UnsignedOpB <= unsigned(MulOpB);
 
+    -- Implementation infers Xilinx DSP Slice or slice logic, determined by optimizer.
+    -- See ISE Page 87: https://www.xilinx.com/support/documentation/sw_manuals/xilinx14_7/sim.pdf
     UnsignedMulResult <= UnsignedOpA * UnsignedOpB;
     SLVMulResult <= std_logic_vector(UnsignedMulResult);
     
@@ -379,7 +374,7 @@ begin
     Zero <= '1' when SLVMulResult = (SLVMulResult'range => '0') else
             '0';
 
-end  behavioral;
+end dataflow;
 
 
 --
