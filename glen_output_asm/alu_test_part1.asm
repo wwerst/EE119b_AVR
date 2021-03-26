@@ -1046,8 +1046,8 @@ test_success:
     NOP;
     NOP;
 
-; test_failure:
-;     NOP         ; Put a breakpoint on this line
-;     RET         ; Return to the point where failure occurred, for debugging
-;     NOP;
+test_failure:
+    NOP         ; Put a breakpoint on this line
+;    RET          RET inst not allowed ; Return to the point where failure occurred, for debugging
+    NOP;
 

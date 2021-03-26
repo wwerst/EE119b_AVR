@@ -15,7 +15,6 @@ cpu_test_vector_files: lst2test
 	cd glen_test_generator; ./lst2test < data_move_test.lss > data_move_test_tv.txt
 	cd glen_test_generator; ./lst2test < flow_skip.lss > flow_skip_tv.txt
 	cd glen_test_generator; ./lst2test < flow_cond_branch.lss > flow_cond_branch_tv.txt
-	cd glen_test_generator; ./lst2test < flow_uncond_branch.lss > flow_uncond_branch_tv.txt
 
 import: clean
 	mkdir -p work
