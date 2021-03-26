@@ -347,6 +347,13 @@ entity  Multiplier  is
 end  Multiplier;
 
 
+architecture  structural  of  Multiplier  is
+begin
+    -- TODO(WHW): Implement structural multiplier, using wallace tree etc
+
+end structural;
+
+
 architecture  behavioral  of  Multiplier  is
     signal UnsignedOpA : unsigned(wordsize - 1 downto 0);
     signal UnsignedOpB : unsigned(wordsize - 1 downto 0);
