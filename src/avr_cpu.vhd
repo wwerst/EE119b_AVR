@@ -324,6 +324,7 @@ begin
         variable tmp_int : integer;
         variable tmp_rd  : std_logic_vector(4 downto 0);
         variable tmp_rr  : std_logic_vector(4 downto 0);
+        variable tmpaddr : AVR.addr_t;
     begin
         -- Minimum instructions needed to start testing:
         -- BCLR
@@ -850,12 +851,12 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpJMP) then
                 if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                -- TODO check what should actually be happening on each cycle
+                elsif CurState = 1 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_PDB;
-                    LoadInstReg <= '0';
-                -- not sure why this takes three cycles
-                elsif CurState = 1 then
-                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
                 end if;
             elsif std_match(InstReg, Opcodes.OpRJMP) then
@@ -868,6 +869,108 @@ begin
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_Z;
                     reg_read_ctrl.SelOutD <= "11";
+                    LoadInstReg <= '0';
+                end if;
+            -- TODO ok how is this timing supposed to work
+            elsif std_match(InstReg, Opcodes.OpCALL) then
+                -- TODO output PC+2
+                tmpaddr := std_logic_vector(to_unsigned(to_integer(unsigned(ProgAB))+1, 16));
+                if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    dataDB <= tmpaddr(15 downto 8);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    dataDB <= tmpaddr(7 downto 0);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 2 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
+                    LoadInstReg <= '0';
+                elsif CurState = 3 then
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRCALL) then
+                if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    dataDB <= ProgAB(15 downto 8);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    dataDB <= ProgAB(7 downto 0);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 2 then
+                end if;
+            elsif std_match(InstReg, Opcodes.OpICALL) then
+                if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    dataDB <= ProgAB(15 downto 8);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_Z;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_NEGONE;
+                    reg_read_ctrl.SelOutD <= "11";
+                    dataDB <= ProgAB(7 downto 0);
+                    startDataWr <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 2 then
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRET) then
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.OFF_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                    reg_read_ctrl.SelOutD <= "11";
+                    LoadInstReg <= '0';
+                elsif CurState = 2 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRETI) then
+                NextExecuteOpData.OpA <= alu_SReg;
+                NextExecuteOpData.OpB(AVR.STATUS_INT) <= '1';
+                NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
+                NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.OFF_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.srcSel <= DAU.SRC_STACK;
+                    dau_ctrl.offsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                    reg_read_ctrl.SelOutD <= "11";
+                    LoadInstReg <= '0';
+                elsif CurState = 2 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
                 end if;
 
