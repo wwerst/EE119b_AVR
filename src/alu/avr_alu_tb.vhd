@@ -86,7 +86,11 @@ architecture testbench of alu_tb is
         GenCross(GenBin(to_integer(unsigned(ALUOp.LSR_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.ROR_Op))), randomWordBin, randomWordBin) &
         GenCross(GenBin(to_integer(unsigned(ALUOp.SWAP_Op))), randomWordBin, randomWordBin) &
-        GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin)
+        GenCross(GenBin(to_integer(unsigned(ALUOp.ASR_Op))), randomWordBin, randomWordBin) &
+
+        -- Multiplier ops
+        GenCross(GenBin(to_integer(unsigned(ALUOp.MULL_Op))), randomWordBin, randomWordBin) & 
+        GenCross(GenBin(to_integer(unsigned(ALUOp.MULH_Op))), randomWordBin, randomWordBin)
     );
 
     shared variable AluCov : CovPType;
@@ -229,6 +233,12 @@ begin
                 when ALUOp.ASR_Op =>
                     expect_slv := UUT_ALUOpA(UUT_ALUOpA'high) & UUT_ALUOpA(UUT_ALUOpA'high downto 1);
                     AffirmIf(tb_id, expect_slv = UUT_Result, " ASR op incorrect");
+                when ALUOp.MULL_Op =>
+                    expect_int := (opa_int * opb_int) mod 256;
+                    AffirmIf(tb_id, expect_int = res_int, " MULL op incorrect");
+                when ALUOp.MULH_Op =>
+                    expect_int := (opa_int * opb_int) / 256;
+                    AffirmIf(tb_id, expect_int = res_int, " MULH op incorrect");
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;
@@ -410,6 +420,16 @@ begin
 
                     expect_sreg(AVR.STATUS_OVER) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_CARRY);
                     expect_sreg(AVR.STATUS_SIGN) := expect_sreg(AVR.STATUS_NEG) xor expect_sreg(AVR.STATUS_OVER);
+                when ALUOp.MULL_Op =>
+                    -- Compute C and Z
+                    exp_res_uint := opa_uint * opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 32768 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint = 0 else '0';
+                when ALUOp.MULH_Op =>
+                    -- Compute C and Z
+                    exp_res_uint := opa_uint * opb_uint;
+                    expect_sreg(AVR.STATUS_CARRY) := '1' when exp_res_uint >= 32768 else '0';
+                    expect_sreg(AVR.STATUS_ZERO) := '1' when exp_res_uint = 0 else '0';
                 when others =>
                     AffirmIf(tb_id, FALSE, " Unexpected opcode sent ");
             end case;

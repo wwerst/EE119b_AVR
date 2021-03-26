@@ -65,12 +65,20 @@ package  ALUConstants  is
    constant SCmd_RRC   : std_logic_vector(2 downto 0) := "111";
 
 
+--  Multiplier command constants
+--  The implementation is hardcoded into multiplier entity. Do not change.
+
+   constant MulCMD_LOW  : std_logic := '0';
+   constant MulCMD_HIGH : std_logic := '1'; 
+
+
 --  ALU command constants
 --     may be freely changed
 
    constant ALUCmd_FBLOCK  : std_logic_vector(1 downto 0) := "00";
    constant ALUCmd_ADDER   : std_logic_vector(1 downto 0) := "01";
    constant ALUCmd_SHIFT   : std_logic_vector(1 downto 0) := "10";
+   constant ALUCmd_MUL     : std_logic_vector(1 downto 0) := "11";
 
 
 end package;
@@ -297,6 +305,75 @@ begin
 end  structural;
 
 
+--
+--  Multiplier
+--
+--  This is the multiplier for doing addition in the ALU.
+--
+--  Generics:
+--    wordsize - width of the adder in bits (default 8)
+--
+--  Inputs:
+--    MulOpA - first operand
+--    MulOpB - second operand
+--    MulResultSel - If 1 then result is high word, else the result is low word.
+--
+--  Outputs:
+--    MulResult -  word of result
+--    MulResultH - High word of result
+--    Cout       - carry out for multiplication. Equal to high bit of result.
+--
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+use work.ALUConstants.all;
+
+entity  Multiplier  is
+
+    generic (
+        wordsize : integer := 8      -- default width is 8-bits
+    );
+
+    port(
+        MulOpA        : in   std_logic_vector(wordsize - 1 downto 0);   -- first operand
+        MulOpB        : in   std_logic_vector(wordsize - 1 downto 0);   -- second operand
+        MulResultSel  : in  std_logic;                                  -- Select result word
+        MulResult     : out  std_logic_vector(wordsize - 1 downto 0);   -- Result word. High word if ResultSel = 1, else low word
+        Cout          : out  std_logic;                                 -- carry out. Equal to the high bit of high word.
+        Zero          : out  std_logic                                  -- Zero flag. 1 if all result is zero.
+    );
+
+end  Multiplier;
+
+
+architecture  behavioral  of  Multiplier  is
+    signal UnsignedOpA : unsigned(wordsize - 1 downto 0);
+    signal UnsignedOpB : unsigned(wordsize - 1 downto 0);
+    signal UnsignedMulResult : unsigned(2*wordsize - 1 downto 0);
+    signal SLVMulResult  : std_logic_vector(2*wordsize - 1 downto 0);
+    signal LowResult  : std_logic_vector(wordsize - 1 downto 0);
+    signal HighResult : std_logic_vector(wordsize - 1 downto 0);
+begin
+    UnsignedOpA <= unsigned(MulOpA);
+    UnsignedOpB <= unsigned(MulOpB);
+
+    UnsignedMulResult <= UnsignedOpA * UnsignedOpB;
+    SLVMulResult <= std_logic_vector(UnsignedMulResult);
+    
+    HighResult <= SLVMulResult(2*wordsize - 1 downto wordsize);
+    LowResult <= SLVMulResult(wordsize - 1 downto 0);
+
+    MulResult <= HighResult when MulResultSel = '1' else
+                 LowResult  when MulResultSel = '0' else
+                 (others => 'X');
+
+    Cout <= SLVMulResult(15);
+    Zero <= '1' when SLVMulResult = (SLVMulResult'range => '0') else
+            '0';
+
+end  behavioral;
+
 
 --
 --  Shifter
@@ -411,6 +488,7 @@ end  dataflow;
 --    FCmd     - F-Block operation to perform (4 bits)
 --    CinCmd   - adder carry in operation for carry in (2 bits)
 --    SCmd     - shift operation to perform (3 bits)
+--    MulCmd   - Multiplication result to select (1 bit)
 --    ALUCmd   - ALU operation to perform - selects result (2 bits)
 --
 --  Outputs:
@@ -439,6 +517,7 @@ entity  ALU  is
         FCmd     : in      std_logic_vector(3 downto 0);              -- F-Block operation
         CinCmd   : in      std_logic_vector(1 downto 0);              -- carry in operation
         SCmd     : in      std_logic_vector(2 downto 0);              -- shift operation
+        MulCmd   : in      std_logic;                                 -- MUL result select
         ALUCmd   : in      std_logic_vector(1 downto 0);              -- ALU result select
         Result   : buffer  std_logic_vector(wordsize - 1 downto 0);   -- ALU result
         Cout     : out     std_logic;                                 -- carry out
@@ -481,6 +560,21 @@ architecture  structural  of  ALU  is
         );
     end component;
 
+    component Multiplier
+        generic (
+            wordsize : integer := 8      -- default width is 8-bits
+        );
+
+        port(
+            MulOpA        : in   std_logic_vector(wordsize - 1 downto 0);   -- first operand
+            MulOpB        : in   std_logic_vector(wordsize - 1 downto 0);   -- second operand
+            MulResultSel  : in  std_logic;                                  -- Select result word
+            MulResult     : out  std_logic_vector(wordsize - 1 downto 0);   -- Result word. High word if ResultSel = 1, else low word
+            Cout          : out  std_logic;                                 -- carry out. Equal to the high bit of high word.
+            Zero          : out  std_logic                                  -- Zero flag. 1 if all result is zero.
+        );
+    end component;
+
     component  Shifter
         generic(
             wordsize : integer
@@ -497,9 +591,13 @@ architecture  structural  of  ALU  is
     signal  FBRes   : std_logic_vector(wordsize - 1 downto 0);  -- F-Block result
     signal  AddRes  : std_logic_vector(wordsize - 1 downto 0);  -- adder result
     signal  ShRes   : std_logic_vector(wordsize - 1 downto 0);  -- shifter result
+    signal  MulRes  : std_logic_vector(wordsize - 1 downto 0);  -- multiplier result
 
     signal  AddCout : std_logic;                                -- adder carry out
     signal  ShCout  : std_logic;                                -- shifter carry out
+    signal  MulCout : std_logic;                                -- multiplier carry out
+
+    signal  MulZero : std_logic;                                -- special multiplier zero flag to check both high and low regs
 
 begin
 
@@ -509,6 +607,9 @@ begin
     Add1:  Adder    generic map (wordsize)
                     port map  (ALUOpA, FBRes, Cin, CinCmd,
                                AddRes, AddCout, HalfCout, Overflow);
+    Mul1:  Multiplier generic map (wordsize)
+                    port map  (ALUOpA, ALUOpB, MulCmd,
+                               MulRes, MulCout, MulZero);
     Sh1:   Shifter  generic map (wordsize)
                     port map  (ALUOpA, Cin, SCmd, ShRes, ShCout);
 
@@ -516,16 +617,19 @@ begin
     Result  <=  FBRes   when  ALUCmd = ALUCmd_FBLOCK  else  -- want F-Block
                 AddRes  when  ALUCmd = ALUCmd_ADDER   else  -- want adder
                 ShRes   when  ALUCmd = ALUCmd_SHIFT   else  -- want shifter
+                MulRes  when  ALUCmd = ALUCmd_MUL     else  -- want multiplier
                 (others => 'X');                            -- unknown command
 
     -- figure out the carry out
     COut  <=  '0'      when  ALUCmd = ALUCmd_FBLOCK  else   -- want F-Block
               AddCout  when  ALUCmd = ALUCmd_ADDER   else   -- want adder
               ShCout   when  ALUCmd = ALUCmd_SHIFT   else   -- want shifter
+              MulCout  when  ALUCmd = ALUCmd_MUL     else   -- want multiplier
               'X';                                          -- unknown command
 
     -- zero flag is set when the result is 0
-    Zero  <=  '1'  when  Result = (Result'range => '0')  else
+    Zero  <=  mulZero when ALUCmd = ALUCmd_MUL else
+              '1'  when  Result = (Result'range => '0')  else
               '0';
 
     -- compute the sign flag value
