@@ -57,6 +57,11 @@ class ASMFileReader(object):
                 mem_val = assert_args[0].strip('$')
 
                 prev_line.comment = f';W {mem_val} {mem_addr}'
+            elif line.op_code == 'RET':
+                
+                line.comment = (";" + line.code + " RET inst not allowed " + line.comment)
+                line.code = ""
+                output_lines.append(line)
             else:
                 output_lines.append(line)
 

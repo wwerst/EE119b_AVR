@@ -15,7 +15,6 @@ cpu_test_vector_files: lst2test
 	cd glen_test_generator; ./lst2test < data_move_test.lss > data_move_test_tv.txt
 	cd glen_test_generator; ./lst2test < flow_skip.lss > flow_skip_tv.txt
 	cd glen_test_generator; ./lst2test < flow_cond_branch.lss > flow_cond_branch_tv.txt
-	cd glen_test_generator; ./lst2test < flow_uncond_branch.lss > flow_uncond_branch_tv.txt
 
 import: clean
 	mkdir -p work
@@ -61,7 +60,7 @@ cpu_flow_cond_branch_tests: import cpu_test_vector_files
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/flow_cond_branch_tv.txt"
 
-cpu_flow_uncond_branch_tests: import cpu_test_vector_files
+cpu_flow_uncond_branch_tests: import
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/flow_uncond_branch_tv.txt"
 

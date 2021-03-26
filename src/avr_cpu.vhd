@@ -125,6 +125,13 @@ architecture dataflow of AVR_CPU is
     -- Double register output
     signal reg_DataOutD    : AVR.reg_d_data_t;
 
+    -- Single register delayed outputs
+    -- Used for MUL instruction to remember the previous values
+    -- for registers, for cases when input registers are being
+    -- overwritten.
+    signal reg_DataOutA_delay : AVR.reg_s_data_t;
+    signal reg_DataOutB_delay : AVR.reg_s_data_t;
+
     type reg_write_ctrl_t is record
         -- Single register input select
         EnableInS   : std_logic;
@@ -220,6 +227,7 @@ architecture dataflow of AVR_CPU is
     constant FlagMaskCNVS   :  AVR.word_t := "00011101";
     constant FlagMaskCNVSH  :  AVR.word_t := "00111101";
     constant FlagMaskZNVS   :  AVR.word_t := "00011110";
+    constant FlagMaskZC     :  AVR.word_t := "00000011";
     constant FlagMaskT      :  AVR.word_t := "01000000";
 
 
@@ -307,10 +315,20 @@ begin
         end if;
     end process;
 
+    RegReadDelayProc: process(clock)
+    begin
+        if rising_edge(clock) then
+            reg_DataOutA_delay <= reg_DataOutA;
+            reg_DataOutB_delay <= reg_DataOutB;
+        end if;
+    end process;
+
 
     decodeReg16d <= to_integer(unsigned(InstReg(7 downto 4))) + 16;
     decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
     dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
+    iau_branch <= InstReg(9 downto 3);
+    iau_jump <= InstReg(11 downto 0);
 
     -- Combinational logic that calculates the following:
     --   iau_ctrl: Controls what the next address that is fetched is.
@@ -732,6 +750,39 @@ begin
                 NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
+            elsif std_match(InstReg, Opcodes.OpMUL) then
+                -- MUL takes 2 cycles:
+                -- First, do a MULL
+                -- Next, do a MULH
+                if CurState = 0 then
+                    -- Keep the instruction register the same
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                    -- Do a MULL with Rd and Rr
+                    tmp_rd := InstReg(8 downto 4);
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpA <= reg_DataOutA;
+                    NextExecuteOpData.OpB <= reg_DataOutB;
+                    NextExecuteOpData.ALUOpCode <= ALUOp.MULL_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZC;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= "00000";
+                else
+                    -- Do a MULH with Rd and Rr
+                    tmp_rd := InstReg(8 downto 4);
+                    tmp_rr := InstReg(9) & InstReg(3 downto 0);
+                    reg_read_ctrl.SelOutA <= tmp_rd;
+                    reg_read_ctrl.SelOutB <= tmp_rr;
+                    NextExecuteOpData.OpA <= reg_DataOutA_delay;
+                    NextExecuteOpData.OpB <= reg_DataOutB_delay;
+                    NextExecuteOpData.ALUOpCode <= ALUOp.MULH_Op;
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskZC;
+                    NextExecuteOpData.writeRegEnS <= '1';
+                    NextExecuteOpData.writeRegSelS <= "00001";
+                end if;
             -------------------
             -------------------
             -- Skip Instructions
@@ -831,6 +882,44 @@ begin
                     -- All instructions are at most 2 words,
                     -- so always continue to next instruction now.
                 end if;
+            -------------------
+            -------------------
+            -- Branch
+            -------------------
+            -------------------
+            elsif std_match(InstReg, Opcodes.OpBRBC) then
+                if CurState = 0 and std_match(alu_Sreg(to_integer(unsigned(InstReg(2 downto 0)))), '0') then
+                    iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpBRBS) then
+                if CurState = 0 and std_match(alu_Sreg(to_integer(unsigned(InstReg(2 downto 0)))), '1') then
+                    iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpJMP) then
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
+                    LoadInstReg <= '0';
+                -- not sure why this takes three cycles
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRJMP) then
+                if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpIJMP) then
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_Z;
+                    reg_read_ctrl.SelOutD <= "11";
+                    LoadInstReg <= '0';
+                end if;
+
             -------------------
             -------------------
             -- LOAD/STORE Instructions

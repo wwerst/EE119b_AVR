@@ -671,6 +671,123 @@ test_swap:
     STS $0100, r23      ;W
     ASSERT $F7, $0100
 
+start_mul:
+    CLR_SREG
+test_mul_1:
+    LDI r23, $13
+    LDI r30, $39
+    MUL r30, r23        ; 0x13 * 0x39 = 0x043B
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r23      ;W
+    ASSERT $13, $0100   ; Check Rd is unchanged
+    STS $0100, r30      ;W
+    ASSERT $39, $0100   ; Check Rr is unchanged
+    STS $0100, r1      ;W
+    ASSERT $04, $0100   ; Check high byte of mul
+    STS $0100, r0      ;W
+    ASSERT $3B, $0100   ; Check low byte of mul
+
+test_mul_2:
+    LDI r29, $00
+    LDI r19, $AF
+    MUL r29, r19        ; 0x00 * 0xAF = 0x0000
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $02, $0100   ; Check flags, Z=1
+    STS $0100, r29      ;W
+    ASSERT $00, $0100   ; Check Rd is unchanged
+    STS $0100, r19      ;W
+    ASSERT $AF, $0100   ; Check Rr is unchanged
+    STS $0100, r1       ;W
+    ASSERT $00, $0100   ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $00, $0100   ; Check low byte of mul
+
+test_mul_3:
+    LDI r29, $9F
+    LDI r19, $A3
+    MUL r29, r19        ; 0x9F * 0xA3 = 0x653D
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r29      ;W
+    ASSERT $9F, $0100   ; Check Rd is unchanged
+    STS $0100, r19      ;W
+    ASSERT $A3, $0100   ; Check Rr is unchanged
+    STS $0100, r1       ;W
+    ASSERT $65, $0100   ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $3D, $0100   ; Check low byte of mul
+
+test_mul_max_nocarry:
+    LDI r29, $D9        ; 217
+    LDI r19, $97        ; 151
+    MOV r9, r29
+    MOV r21, r19
+    MUL r9, r21        ; 217 * 151 = 0x7FFF
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $00, $0100   ; Check flags
+    STS $0100, r9       ;W
+    ASSERT $D9, $0100   ; Check Rd is unchanged
+    STS $0100, r21      ;W
+    ASSERT $97, $0100   ; Check Rr is unchanged
+    STS $0100, r1       ;W
+    ASSERT $7F, $0100   ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $FF, $0100   ; Check low byte of mul
+
+test_mul_barely_carry:
+    LDI r29, $88        ; 136
+    LDI r19, $F1        ; 241
+    MOV r3, r29
+    MOV r2, r19
+    MUL r3, r2        ; 136 * 241 = 0x8008
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $01, $0100   ; Check flags
+    STS $0100, r3       ;W
+    ASSERT $88, $0100   ; Check Rd is unchanged
+    STS $0100, r2       ;W
+    ASSERT $F1, $0100   ; Check Rr is unchanged
+    STS $0100, r1       ;W
+    ASSERT $80, $0100     ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $08, $0100   ; Check low byte of mul
+
+test_mul_max:
+    LDI r29, $FF        ; 255
+    LDI r19, $FF        ; 255
+    MOV r13, r29
+    MOV r8, r19
+    MUL r13, r8        ; 255 * 255 = 0xFE01
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $01, $0100   ; Check flags
+    STS $0100, r13      ;W
+    ASSERT $FF, $0100   ; Check Rd is unchanged
+    STS $0100, r8       ;W
+    ASSERT $FF, $0100   ; Check Rr is unchanged
+    STS $0100, r1       ;W
+    ASSERT $FE, $0100     ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $01, $0100   ; Check low byte of mul
+
+test_mul_to_r0r1:
+    LDI r21, $8B        ; 139
+    LDI r20, $EE        ; 238
+    MOV r1, r21
+    MOV r0, r20
+    MUL r1, r0        ; 139 * 238 = 0x813A
+    IN r18, SREG_ADDR
+    STS $0100, r18      ;W
+    ASSERT $01, $0100   ; Check flags
+    STS $0100, r1       ;W
+    ASSERT $81, $0100   ; Check high byte of mul
+    STS $0100, r0       ;W
+    ASSERT $3A, $0100   ; Check low byte of mul
 
 test_success:
     NOP;

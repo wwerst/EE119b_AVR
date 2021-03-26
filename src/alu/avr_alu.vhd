@@ -39,6 +39,7 @@ package ALUOp is
     constant FBLOCK : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_FBLOCK;
     constant ADDER  : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_ADDER;
     constant SHIFT  : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_SHIFT;
+    constant MULTER : std_logic_vector(1 downto 0) := ALUConstants.ALUCmd_MUL;
 
     subtype ALUOP_t is std_logic_vector(6 downto 0);
     --  |   6   5 | 4   3   2   1 | 0    |
@@ -74,6 +75,11 @@ package ALUOp is
     constant ROR_Op : ALUOP_t := SHIFT  & ALUConstants.SCmd_RRC     & "00"; -- Rotate right through carry. Note the AVR instruct ROR is RRC.
     constant SWAP_Op: ALUOP_t := SHIFT  & ALUConstants.SCmd_SWAP    & "00"; -- Swap
     constant ASR_Op : ALUOP_t := SHIFT  & ALUConstants.SCmd_ASR     & "00"; -- R = A[7] concat A >> 1
+
+    -- Multiply sub-ops:
+
+    constant MULL_Op : ALUOP_t := MULTER & ALUConstants.MulCMD_LOW   & "0000";
+    constant MULH_Op : ALUOP_t := MULTER & ALUConstants.MulCMD_HIGH  & "0000";
 
 end package;
 
@@ -132,6 +138,7 @@ architecture dataflow of avr_alu is
             FCmd     : in      std_logic_vector(3 downto 0);              -- F-Block operation
             CinCmd   : in      std_logic_vector(1 downto 0);              -- carry in operation
             SCmd     : in      std_logic_vector(2 downto 0);              -- shift operation
+            MulCmd   : in      std_logic;                                 -- MUL result select
             ALUCmd   : in      std_logic_vector(1 downto 0);              -- ALU result select
             Result   : buffer  std_logic_vector(wordsize - 1 downto 0);   -- ALU result
             Cout     : out     std_logic;                                 -- carry out
@@ -157,6 +164,7 @@ architecture dataflow of avr_alu is
     signal fcmd: std_logic_vector(3 downto 0);
     signal cincmd: std_logic_vector(1 downto 0);
     signal scmd: std_logic_vector(2 downto 0);
+    signal mulcmd: std_logic;
     signal ALUCmd: std_logic_vector(1 downto 0);
 
     signal adderSubCmd: std_logic;
@@ -186,6 +194,8 @@ begin
     -- only matters if using shifter.
     scmd <= aluopselect(4 downto 2);
 
+    mulcmd <= aluopselect(4);
+
     -- firstly, everything needs to get sent through a ALU
     alu_c: ALU generic map (wordsize => AVR.WORDSIZE)
         port map (
@@ -195,6 +205,7 @@ begin
             FCmd     => fcmd,
             CinCmd   => CinCmd,
             SCmd     => SCmd,
+            MulCmd   => mulcmd,
             ALUCmd   => ALUCmd,
             Result   => result_signal,
             Cout     => carry,
@@ -209,6 +220,7 @@ begin
     over_avr <= over                  when ALUCmd = ALUOp.Adder   else 
                 '0'                   when ALUCmd = ALUOp.FBLOCK  else
                 neg_avr xor carry_avr when ALUCmd = ALUOp.SHIFT else
+                '0'                   when ALUCmd = ALUOp.MULTER else
                 'X';
 
     neg_avr <= sign;
@@ -217,6 +229,7 @@ begin
     hcarry_avr <= hcarry xor adderSubCmd when ALUCmd = ALUOp.Adder   else
                   ALUOpA(3)              when ALUCmd = ALUOp.SHIFT   else
                   '0'                    when ALUCmd = ALUOp.FBLOCK  else
+                  '0'                   when ALUCmd = ALUOp.MULTER else
                   hcarry;
 
     zero_avr <= zero;
