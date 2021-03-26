@@ -61,7 +61,7 @@ cpu_flow_cond_branch_tests: import cpu_test_vector_files
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/flow_cond_branch_tv.txt"
 
-cpu_flow_uncond_branch_tests: import cpu_test_vector_files
+cpu_flow_uncond_branch_tests: import
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="glen_test_generator/flow_uncond_branch_tv.txt"
 

@@ -848,6 +848,28 @@ begin
                     iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
                     LoadInstReg <= '0';
                 end if;
+            elsif std_match(InstReg, Opcodes.OpJMP) then
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
+                    LoadInstReg <= '0';
+                -- not sure why this takes three cycles
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRJMP) then
+                if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpIJMP) then
+                if CurState = 0 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_Z;
+                    reg_read_ctrl.SelOutD <= "11";
+                    LoadInstReg <= '0';
+                end if;
 
             -------------------
             -------------------
