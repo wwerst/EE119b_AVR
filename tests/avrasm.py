@@ -57,6 +57,10 @@ class Instruction:
         """expect the instruction to be skipped (skip instructions)"""
         self.check = ("S",)
         return self
+    def branch(self):
+        """expect the instruction to be a taken branch"""
+        self.check = ("J",)
+        return self
 
     def __getitem__(self, label):
         """set a label on the instruction (for calls/jmps)"""

@@ -311,6 +311,8 @@ begin
     decodeReg16d <= to_integer(unsigned(InstReg(7 downto 4))) + 16;
     decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
     dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
+    iau_branch <= InstReg(9 downto 3);
+    iau_jump <= InstReg(11 downto 0);
 
     -- Combinational logic that calculates the following:
     --   iau_ctrl: Controls what the next address that is fetched is.
@@ -831,6 +833,22 @@ begin
                     -- All instructions are at most 2 words,
                     -- so always continue to next instruction now.
                 end if;
+            -------------------
+            -------------------
+            -- Branch
+            -------------------
+            -------------------
+            elsif std_match(InstReg, Opcodes.OpBRBC) then
+                if CurState = 0 and std_match(alu_Sreg(to_integer(unsigned(InstReg(2 downto 0)))), '0') then
+                    iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
+                    LoadInstReg <= '0';
+                end if;
+            elsif std_match(InstReg, Opcodes.OpBRBS) then
+                if CurState = 0 and std_match(alu_Sreg(to_integer(unsigned(InstReg(2 downto 0)))), '1') then
+                    iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
+                    LoadInstReg <= '0';
+                end if;
+
             -------------------
             -------------------
             -- LOAD/STORE Instructions
