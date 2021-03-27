@@ -150,6 +150,7 @@ architecture dataflow of AVR_CPU is
     component AvrDau is
         port(
             clk         : in  std_logic;
+            reset       : in  std_logic;
             SrcSel      : in  DAU.source_t;
             PDB         : in  std_logic_vector(15 downto 0);
             reg         : in  std_logic_vector(15 downto 0);
@@ -183,9 +184,11 @@ architecture dataflow of AVR_CPU is
 
 
     signal InstReg: std_logic_vector(15 downto 0);
+    signal InstPayload: std_logic_vector(15 downto 0);
     signal ProgDBSync: std_logic_vector(15 downto 0);
 
     signal LoadInstReg: std_logic;
+    signal LoadInstPayload: std_logic;
 
     signal decodeReg16d : integer range 0 to 31;
     signal decodeReg32d : integer range 0 to 31;
@@ -219,6 +222,8 @@ architecture dataflow of AVR_CPU is
     end record;
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
+
+    signal SyncReset : std_logic;
 
     constant FlagMaskAll    :  AVR.word_t := "11111111";
     constant FlagMaskNone   :  AVR.word_t := "00000000";
@@ -259,7 +264,7 @@ begin
         SrcSel    => iau_ctrl.srcSel,
         branch    => iau_branch,
         jump      => iau_jump,
-        PDB       => ProgDB,
+        PDB       => InstPayload,
         DDB       => DataDB,
         Z         => reg_DataOutD,
         OffsetSel => iau_ctrl.offsetSel,
@@ -268,6 +273,7 @@ begin
 
     dau_u: AvrDau port map (
         clk       => clock,
+        reset     => reset,
         SrcSel    => dau_ctrl.SrcSel,
         PDB       => ProgDB,
         reg       => reg_DataOutD,
@@ -297,18 +303,40 @@ begin
                 InstReg <= (others => '0');
                 ProgDBSync <= (others => '0');
                 CurState <= 0;
-            elsif LoadInstReg then
-                InstReg <= ProgDB;
-                ProgDBSync <= ProgDB;
-                CurState <= 0;
             else
-                CurState <= CurState + 1;
                 ProgDBSync <= ProgDB;
+                if LoadInstReg then
+                    InstReg <= ProgDB;
+                    CurState <= 0;
+                else
+                    CurState <= CurState + 1;
+                end if;
+                if LoadInstPayload then
+                    InstPayload <= ProgDB;
+                end if;
             end if;
         end if;
     end process InstrLatchProc;
 
+
+    SyncResetProc: process(clock)
+    begin
+        if rising_edge(clock) then
+            SyncReset <= reset;
+        end if;
+    end process SyncResetProc;
+
     process(clock) begin
+        -- Writes and reads are sent at the falling clock
+        -- edge, and then the write signal is cleared at the
+        -- rising edge. Thus, the timing requirement is that
+        -- the data address is computed and output within 1/2
+        -- clock cycle + setup time, and then the write/read occurs
+        -- within the half clock cycle before the 
+        if rising_edge(clock) then
+            DataRd <= '1';
+            DataWr <= '1';
+        end if;
         if falling_edge(clock) then
             DataRd <= startDataRd;
             DataWr <= startDataWr;
@@ -328,7 +356,7 @@ begin
     decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
     dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
     iau_branch <= InstReg(9 downto 3);
-    iau_jump <= InstReg(11 downto 0);
+    iau_jump <= InstPayload(11 downto 0);
 
     -- Combinational logic that calculates the following:
     --   iau_ctrl: Controls what the next address that is fetched is.
@@ -377,10 +405,12 @@ begin
 
         -- Control signal for previous pipeline stage
         LoadInstReg <= '1';
+        LoadInstPayload <= '1';
 
-        if Reset = '0' then
+        if SyncReset = '0' then
             -- Clear the status register
-            --iau_ctrl.srcSel <= IAU.SRC_ZERO;
+            iau_ctrl.srcSel <= IAU.SRC_ZERO;
+            iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
             NextExecuteOpData.OpA <= (others => '0');
             NextExecuteOpData.OpB <= (others => '1');
             NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
@@ -884,7 +914,7 @@ begin
                 end if;
             -------------------
             -------------------
-            -- Branch
+            -- Conditional Branch
             -------------------
             -------------------
             elsif std_match(InstReg, Opcodes.OpBRBC) then
@@ -897,29 +927,178 @@ begin
                     iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
                     LoadInstReg <= '0';
                 end if;
+            -------------------
+            -------------------
+            -- Unconditional Branch (Jumps)
+            -------------------
+            -------------------
             elsif std_match(InstReg, Opcodes.OpJMP) then
                 if CurState = 0 then
-                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
-                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
+                    -- Load the memory address
+                    
                     LoadInstReg <= '0';
                 -- not sure why this takes three cycles
                 elsif CurState = 1 then
-                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
                     LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                elsif CurState = 2 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
                 end if;
             elsif std_match(InstReg, Opcodes.OpRJMP) then
                 if CurState = 0 then
-                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
+                    -- Increment by 1 here, it will load an
+                    -- irrelevant instruction, but simplifies
+                    -- the generation of pc+k+1 on next cycle.
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
                     LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
                 end if;
             elsif std_match(InstReg, Opcodes.OpIJMP) then
+                reg_read_ctrl.SelOutD <= "11";
                 if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_Z;
-                    reg_read_ctrl.SelOutD <= "11";
-                    LoadInstReg <= '0';
                 end if;
-
+            -------------------
+            -------------------
+            -- Unconditional Branch (Calls and Returns)
+            -------------------
+            -------------------
+            elsif std_match(InstReg, Opcodes.OpCall) then
+                if CurState = 0 then
+                    -- Steps on Cycle 0 (ProgAB is PC+1):
+                    -- Identify call instruction (implicit by being in this if)
+                    -- Set InstReg to persist
+                    -- Set InstPayload to load on next clock
+                    -- Leave IAU to increment, so next clock will be PC+2
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    -- Steps on Cycle 1 (ProgAB is PC+2):
+                    -- Set IAU to hold pc in place
+                    -- Write PC+2[15:8] to stack
+                    -- InstPayload is loaded as target address
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
+                    DataDB <= ProgAB(15 downto 8);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 2 then
+                    -- Steps on Cycle 2 (ProgAB is PC+2):
+                    -- Write PC+2[7:0] to stack
+                    -- Set IAU to update pc to target address
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(7 downto 0);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                else -- CurState = 3
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRCall) then
+                if CurState = 0 then
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
+                    DataDB <= ProgAB(15 downto 8);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(7 downto 0);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                    
+                elsif CurState = 2 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;                    
+                end if;
+            elsif std_match(InstReg, Opcodes.OpICall) then
+                reg_read_ctrl.SelOutD <= "11";
+                if CurState = 0 then
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
+                    DataDB <= ProgAB(15 downto 8);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(7 downto 0);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 2 then
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_Z;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRET) then
+                if CurState = 0 then
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                elsif CurState = 2 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                else -- CurState = 3
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRETI) then
+                if CurState = 0 then
+                    NextExecuteOpData.OpA <= alu_SReg;
+                    NextExecuteOpData.OpB(AVR.STATUS_INT) <= '1';
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
+                    NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                elsif CurState = 2 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                else -- CurState = 3
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                end if;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
@@ -953,14 +1132,21 @@ begin
                     and not(std_match(InstReg, Opcodes.OpLDS)
                     or std_match(InstReg, Opcodes.OpPOP))
             then
+                -- Two cycle data read instructions:
+                -- Cycle 0:
+                --   - Setup data bus address and data
+                --   - Halt ProgAB updates
+                -- Cycle 1:
+                --   - Do read cycle
+                --   - Increment to next instruction
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    startDataRd <= '0';
                     LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    startDataRd <= '0';
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
-                elsif CurState = 1 then
                     NextExecuteOpData.writeRegEnD <= '1';
                 end if;
                 if std_match(InstReg, Opcodes.OpLDX) then
@@ -1002,12 +1188,13 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDDY)
                     or std_match(InstReg, Opcodes.OpLDDZ)
-                    or std_match(InstReg, Opcodes.OpPOP)
-            then
+                    or std_match(InstReg, Opcodes.OpPOP) then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    startDataRd <= '0';
                     LoadInstReg <= '0';
+                    
+                elsif CurState = 1 then
+                    startDataRd <= '0';
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
@@ -1033,24 +1220,33 @@ begin
                 NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
                 NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
             elsif std_match(InstReg, Opcodes.OpLDS) then
+                -- Three cycle read.
+                -- Cycle 0:
+                --   - Increment ProgAB to get the memory address
+                --   - Stop loading of instreg
+                -- Cycle 1:
+                --   - Do data read
+                --   - Stop update of progAB
+                -- Cycle 2:
+                --   - Resume incrementing progAB
+                dau_ctrl.SrcSel <= DAU.SRC_PDB;
                 if CurState = 0 then
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
                     dau_ctrl.SrcSel <= DAU.SRC_PDB;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                     startDataRd <= '0';
-                    LoadInstReg <= '0';
-                elsif CurState = 1 then
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
                     LoadInstReg <= '0';
                 end if;
             elsif (std_match(InstReg, Opcodes.OpST)
                     or std_match(InstReg, Opcodes.OpSTY)
                     or std_match(InstReg, Opcodes.OpSTZ))
                     and not(std_match(InstReg, Opcodes.OpSTS)
-                    or std_match(InstReg, Opcodes.OpPUSH))
-            then
+                    or std_match(InstReg, Opcodes.OpPUSH)) then
+                -- Two cycle store instructions
                 reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                 DataDB <= reg_DataOutA;
                 if CurState = 0 then
@@ -1059,12 +1255,14 @@ begin
                     -- Put the address on the Data bus (already connected to double width output)
                     -- Put the data on the Data bus
                     -- Stop the InstReg from incrementing
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
-                    startDataWr <= '0';
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                 elsif CurState = 1 then
                     NextExecuteOpData.writeRegEnD <= '1';
+                    startDataWr <= '0';
                 end if;
+                -- The indexing D width register is written back with
+                -- appropriate increment/decrement etc
                 if std_match(InstReg, Opcodes.OpSTX) then
                     dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
                     reg_read_ctrl.SelOutD <= "01";
@@ -1111,6 +1309,7 @@ begin
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
+                elsif CurState = 1 then
                     startDataWr <= '0';
                 end if;
                 if std_match(InstReg, Opcodes.OpSTDY) then
@@ -1128,18 +1327,18 @@ begin
                     end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTS) then
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                DataDB <= reg_DataOutA;
+                dau_ctrl.SrcSel <= DAU.SRC_PDB;
                 if CurState = 0 then
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
-                    startDataWr <= '0';
+                    iau_ctrl.OffsetSel <= IAU.OFF_ONE;
                     LoadInstReg <= '0';
                 elsif CurState = 1 then
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    startDataWr <= '0';
                     LoadInstReg <= '0';
+                else
+                    -- CurState = 2
                 end if;
             else
                 assert (reset = '0' or now = 0 ns) report "Unknown instruction " & to_string(InstReg);

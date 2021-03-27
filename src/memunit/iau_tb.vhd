@@ -162,16 +162,18 @@ architecture testbench of iau_tb is
     );
     shared variable covBin: CovPType;
     constant srcBins: CovBinType := GenBin(0,IAU.SOURCES-1);
+
+    constant atLeastNum: integer := 1000;
     -- Test combinations of sources, offsets, and values of the offset
     constant BINS: CovMatrix3Type := (
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ZERO)  , Bin3 => GenBin(0)         ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ONE)   , Bin3 => GenBin(1)         ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_BRANCH), Bin3 => signedBin(branch) ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_JUMP)  , Bin3 => signedBin(jump)   ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_PDB)   , Bin3 => unsignedBin(pdb)  ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_Z)     , Bin3 => unsignedBin(z)    ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBLO) , Bin3 => unsignedBin(ddb)  ) &
-        GenCross(AtLeast => 1000,Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBHI) , Bin3 => unsignedBin(ddb)  )
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ZERO)  , Bin3 => GenBin(0)         ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_ONE)   , Bin3 => GenBin(1)         ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_BRANCH), Bin3 => signedBin(branch) ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_JUMP)  , Bin3 => signedBin(jump)   ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_PDB)   , Bin3 => unsignedBin(pdb)  ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_Z)     , Bin3 => unsignedBin(z)    ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBLO) , Bin3 => unsignedBin(ddb)  ) &
+        GenCross(AtLeast => atLeastNum, Bin1 => srcBins, Bin2 => GenBin(IAU.OFF_DDBHI) , Bin3 => unsignedBin(ddb)  )
     );
 begin
     clock_p: process begin
@@ -246,7 +248,7 @@ begin
     end process;
 
     -- computes expected results for test
-    expected_p: process (clk)
+    expected_p_comb: process(all)
         variable addr: integer := 0;
     begin
         -- start with selected source
@@ -266,11 +268,14 @@ begin
         end if;
 
         -- output result and update expected PC
-        expected_address <= std_logic_vector(to_unsigned(expected_pc, AVR.ADDRSIZE));
-        if rising_edge(clk) then
-            expected_pc <= addr;
-        end if;
+        expected_address <= std_logic_vector(to_unsigned(addr, AVR.ADDRSIZE));
+    end process;
 
+    expected_p_sync: process(clk)
+    begin
+        if rising_edge(clk) then
+            expected_pc <= to_integer(unsigned(expected_address));
+        end if;
     end process;
 end architecture testbench;
 

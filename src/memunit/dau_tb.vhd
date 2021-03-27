@@ -37,6 +37,7 @@ architecture testbench of dau_tb is
     component AvrDau
         port(
             clk         : in  std_logic;
+            reset       : in  std_logic;
             SrcSel      : in  DAU.source_t;
             PDB         : in  std_logic_vector(15 downto 0);
             reg         : in  std_logic_vector(15 downto 0);
@@ -50,6 +51,7 @@ architecture testbench of dau_tb is
     -- test bench clcok and done
     constant CLK_PERIOD : time := 1 ms;
     signal clk          : std_logic := '0';
+    signal reset        : std_logic := '1';
     signal done         : boolean := FALSE;
 
     -- dau signals
@@ -62,7 +64,7 @@ architecture testbench of dau_tb is
 
     -- test bench signals
     signal srcValue, offsetValue            : integer := 0;
-    signal expected_stack                   : integer := 0;
+    signal expected_stack                   : integer := 2**16 - 1;
     signal expected_address, expected_update: AVR.addr_t;
 
     -- test bench functions
@@ -173,6 +175,7 @@ begin
 
     UUT: AvrDau port map (
         clk => clk,
+        reset => reset,
         srcSel => srcSel,
         pdb => pdb,
         reg => reg,
@@ -195,6 +198,9 @@ begin
         srcSel <= DAU.SRC_PDB;
         offsetSel <= DAU.OFF_ZERO;
         pdb <= (others => '0');
+        reset <= '0';
+        wait until rising_edge(clk);
+        reset <= '1';
         wait until rising_edge(clk);
 
         for i in tests'LOW to tests'HIGH loop
@@ -225,7 +231,7 @@ begin
         wait;
     end process;
 
-    process (clk)
+    process(all)
         variable addr, addroff: integer := 0;
     begin
         -- only special input is the stack
@@ -260,14 +266,16 @@ begin
             expected_address <= std_logic_vector(to_unsigned(addroff, AVR.ADDRSIZE));
             expected_update <= std_logic_vector(to_unsigned(addr, AVR.ADDRSIZE));
         end if;
+    end process;
 
+    process(clk)
+    begin
         -- if doing a stack access, update stack pointer on clock
         if rising_edge(clk) then
             if srcSel = DAU.SRC_STACK then
-                expected_stack <= addroff;
+                expected_stack <= to_integer(unsigned(expected_update));
             end if;
         end if;
-
     end process;
 end architecture testbench;
 

@@ -96,6 +96,7 @@ use work.MemUnitConstants;
 entity  AvrDau  is
     port(
         clk         : in  std_logic;
+        reset       : in  std_logic;
         SrcSel      : in  DAU.source_t;
         PDB         : in  std_logic_vector(15 downto 0);
         reg         : in  std_logic_vector(15 downto 0);
@@ -131,7 +132,7 @@ architecture  dataflow  of  AvrDau  is
     end component;
 
     -- internal source, the stack pointer
-    signal stack    : AVR.addr_t := (others => '0');
+    signal stack    : AVR.addr_t;
     -- constant offsets
     constant ZERO   : AVR.addr_t := (others => '0');
     constant ONE    : AVR.addr_t := (0 => '1', others => '0');
@@ -191,8 +192,12 @@ begin
 
     -- if doing stack access, update stack pointer on clock
     process (clk) begin
-        if rising_edge(clk) and srcSel = DAU.SRC_STACK then
-            stack <= computed_addr;
+        if rising_edge(clk) then
+            if reset = '0' then
+                stack <= (others => '1');
+            elsif srcSel = DAU.SRC_STACK then
+                stack <= computed_addr;
+            end if;
         end if;
     end process;
 end dataflow;

@@ -175,7 +175,7 @@ begin
         PrePostSel  => MemUnitConstants.MemUnit_PRE,
         Address     => next_address
     );
-    Address <= PC;
+    Address <= next_address;
 
     -- every clock, update PC
     process(clk) begin

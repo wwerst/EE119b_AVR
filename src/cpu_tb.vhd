@@ -48,7 +48,7 @@ architecture testbench of avr_cpu_tb is
     constant CLK_PERIOD : time := 1 ms;
     signal clk          : std_logic := '0';
     signal done         : boolean := FALSE;
-    constant MAX_ERROR_COUNT : integer := 200;
+    constant MAX_ERROR_COUNT : integer := 2;
 
     -- cpu signals
     signal ProgDB  :  std_logic_vector(15 downto 0);   -- program memory data bus
@@ -80,9 +80,9 @@ architecture testbench of avr_cpu_tb is
 begin
     clock_p: process begin
         while not done loop
-            clk <= '0';
-            wait for CLK_PERIOD/2;
             clk <= '1';
+            wait for CLK_PERIOD/2;
+            clk <= '0';
             wait for CLK_PERIOD/2;
         end loop;
         wait;
@@ -110,18 +110,21 @@ begin
         variable l: line;
         variable fileok: boolean;
 
-        variable vProgDB: std_logic_vector(15 downto 0);
-        variable vDataDB: std_logic_vector(7 downto 0);
+        variable vProgDB: std_logic_vector(15 downto 0) := (others => '-');
+        variable vDataDB: std_logic_vector(7 downto 0) := (others => '-');
 
-        variable veProgAB, veDataAB: std_logic_vector(15 downto 0);
-        variable veDataWr, veDataRd: std_logic;
-        variable veDataDB: std_logic_vector(7 downto 0);
+        variable veProgAB, veDataAB: std_logic_vector(15 downto 0) := (others => '-');
+        variable veDataWr, veDataRd: std_logic := '-';
+        variable veDataDB: std_logic_vector(7 downto 0) := (others => '-');
 
         variable progAB_match, dataAB_match, dataRd_match, dataWr_match, dataDB_match: boolean;
     begin
         INT0 <= '0';
         INT1 <= '0';
         Reset <= '0';
+        -- Wait for three cycles with reset,
+        -- and bring out of reset after that.
+        wait until rising_edge(clk);
         wait until rising_edge(clk);
         wait until rising_edge(clk);
         Reset <= '1';
@@ -133,17 +136,23 @@ begin
             if ((l'LENGTH > 0) and (l(1) /= '#'))  then
                 hread(l, veProgAB);
                 hread(l, vProgDB);
-                hread(l, vDataDB);
 
-                read(l, veDataRd);
-                read(l, veDataWr);
-                hread(l, veDataAB);
-                hread(l, veDataDB);
-                asmCodeLine := l;
+                -- Check the progAB to make sure the correct
+                -- address for the currently written progDB is
+                -- being output.
+                -- The result of this test is aggregated into asserts
+                -- later in the testing loop.
+                
 
                 progDB <= vProgDB;
                 dataDB <= vDataDB;
 
+                wait until falling_edge(clk);
+
+                -- Check to make sure that Wr and Rd are always high during
+                -- the first half of all cycles.
+                AffirmIf(dataWr = '1', "DataWr was not 1 while clk was high");
+                AffirmIf(dataRd = '1', "DataRd was not 1 while clk was high");
                 wait until rising_edge(clk);
 
                 -- On clock, cpu puts out:
@@ -174,6 +183,15 @@ begin
                     report "Stopping testing early due to high error count";
                     exit;
                 end if;
+
+                -- Finish reading line for checking on next cycle
+                hread(l, vDataDB);
+
+                read(l, veDataRd);
+                read(l, veDataWr);
+                hread(l, veDataAB);
+                hread(l, veDataDB);
+                asmCodeLine := l;
 
             end if;
         end loop;

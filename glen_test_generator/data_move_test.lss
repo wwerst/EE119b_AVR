@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Thu Mar 25 03:29:33 2021
+AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssembler1\AVRAssembler1.asm Sat Mar 27 06:37:12 2021
 
 [builtin](2): Including file 'C:\Program Files (x86)\Atmel\AVR Studio 5.1\extensions\Atmel\AVRAssembler\2.1.51.17\AvrAssembler/Include\m88def.inc'
                  
@@ -1575,72 +1575,72 @@ AVRASM ver. 2.1.51  C:\Users\Will\Documents\AVRStudio 5.1\AVRAssembler1\AVRAssem
 0002f4 91c0 0000     LDS     r28    ,$0000   ;R 41 0000   set r28 to 65
                  
                  ; push all the registers
-0002f6 935f          PUSH    r21             ;W 0E 0000
-0002f7 939f          PUSH    r25             ;W 3B FFFF
-0002f8 93df          PUSH    r29             ;W 85 FFFE
-0002f9 92df          PUSH    r13             ;W 5B FFFD
-0002fa 93ef          PUSH    r30             ;W 87 FFFC
-0002fb 93ff          PUSH    r31             ;W 13 FFFB
-0002fc 937f          PUSH    r23             ;W 37 FFFA
-0002fd 927f          PUSH    r7              ;W DE FFF9
-0002fe 928f          PUSH    r8              ;W B0 FFF8
-0002ff 925f          PUSH    r5              ;W A0 FFF7
-000300 923f          PUSH    r3              ;W DF FFF6
-000301 92cf          PUSH    r12             ;W 3B FFF5
-000302 921f          PUSH    r1              ;W C5 FFF4
-000303 92ff          PUSH    r15             ;W 61 FFF3
-000304 938f          PUSH    r24             ;W 82 FFF2
-000305 926f          PUSH    r6              ;W 16 FFF1
-000306 92ef          PUSH    r14             ;W DF FFF0
-000307 936f          PUSH    r22             ;W 00 FFEF
-000308 924f          PUSH    r4              ;W 64 FFEE
-000309 934f          PUSH    r20             ;W BA FFED
-00030a 93af          PUSH    r26             ;W DC FFEC
-00030b 92bf          PUSH    r11             ;W 23 FFEB
-00030c 920f          PUSH    r0              ;W A9 FFEA
-00030d 92af          PUSH    r10             ;W A0 FFE9
-00030e 930f          PUSH    r16             ;W 3F FFE8
-00030f 922f          PUSH    r2              ;W 99 FFE7
-000310 931f          PUSH    r17             ;W 9E FFE6
-000311 929f          PUSH    r9              ;W D1 FFE5
-000312 932f          PUSH    r18             ;W A7 FFE4
-000313 933f          PUSH    r19             ;W CE FFE3
-000314 93bf          PUSH    r27             ;W 97 FFE2
-000315 93cf          PUSH    r28             ;W 41 FFE1
+0002f6 935f          PUSH    r21             ;W 0E FFFF
+0002f7 939f          PUSH    r25             ;W 3B FFFE
+0002f8 93df          PUSH    r29             ;W 85 FFFD
+0002f9 92df          PUSH    r13             ;W 5B FFFC
+0002fa 93ef          PUSH    r30             ;W 87 FFFB
+0002fb 93ff          PUSH    r31             ;W 13 FFFA
+0002fc 937f          PUSH    r23             ;W 37 FFF9
+0002fd 927f          PUSH    r7              ;W DE FFF8
+0002fe 928f          PUSH    r8              ;W B0 FFF7
+0002ff 925f          PUSH    r5              ;W A0 FFF6
+000300 923f          PUSH    r3              ;W DF FFF5
+000301 92cf          PUSH    r12             ;W 3B FFF4
+000302 921f          PUSH    r1              ;W C5 FFF3
+000303 92ff          PUSH    r15             ;W 61 FFF2
+000304 938f          PUSH    r24             ;W 82 FFF1
+000305 926f          PUSH    r6              ;W 16 FFF0
+000306 92ef          PUSH    r14             ;W DF FFEF
+000307 936f          PUSH    r22             ;W 00 FFEE
+000308 924f          PUSH    r4              ;W 64 FFED
+000309 934f          PUSH    r20             ;W BA FFEC
+00030a 93af          PUSH    r26             ;W DC FFEB
+00030b 92bf          PUSH    r11             ;W 23 FFEA
+00030c 920f          PUSH    r0              ;W A9 FFE9
+00030d 92af          PUSH    r10             ;W A0 FFE8
+00030e 930f          PUSH    r16             ;W 3F FFE7
+00030f 922f          PUSH    r2              ;W 99 FFE6
+000310 931f          PUSH    r17             ;W 9E FFE5
+000311 929f          PUSH    r9              ;W D1 FFE4
+000312 932f          PUSH    r18             ;W A7 FFE3
+000313 933f          PUSH    r19             ;W CE FFE2
+000314 93bf          PUSH    r27             ;W 97 FFE1
+000315 93cf          PUSH    r28             ;W 41 FFE0
                  
                  ; pop all the registers
-000316 91cf          POP     r28             ;R 41 FFE1
-000317 91bf          POP     r27             ;R 97 FFE2
-000318 913f          POP     r19             ;R CE FFE3
-000319 912f          POP     r18             ;R A7 FFE4
-00031a 909f          POP     r9              ;R D1 FFE5
-00031b 911f          POP     r17             ;R 9E FFE6
-00031c 902f          POP     r2              ;R 99 FFE7
-00031d 910f          POP     r16             ;R 3F FFE8
-00031e 90af          POP     r10             ;R A0 FFE9
-00031f 900f          POP     r0              ;R A9 FFEA
-000320 90bf          POP     r11             ;R 23 FFEB
-000321 91af          POP     r26             ;R DC FFEC
-000322 914f          POP     r20             ;R BA FFED
-000323 904f          POP     r4              ;R 64 FFEE
-000324 916f          POP     r22             ;R 00 FFEF
-000325 90ef          POP     r14             ;R DF FFF0
-000326 906f          POP     r6              ;R 16 FFF1
-000327 918f          POP     r24             ;R 82 FFF2
-000328 90ff          POP     r15             ;R 61 FFF3
-000329 901f          POP     r1              ;R C5 FFF4
-00032a 90cf          POP     r12             ;R 3B FFF5
-00032b 903f          POP     r3              ;R DF FFF6
-00032c 905f          POP     r5              ;R A0 FFF7
-00032d 908f          POP     r8              ;R B0 FFF8
-00032e 907f          POP     r7              ;R DE FFF9
-00032f 917f          POP     r23             ;R 37 FFFA
-000330 91ff          POP     r31             ;R 13 FFFB
-000331 91ef          POP     r30             ;R 87 FFFC
-000332 90df          POP     r13             ;R 5B FFFD
-000333 91df          POP     r29             ;R 85 FFFE
-000334 919f          POP     r25             ;R 3B FFFF
-000335 915f          POP     r21             ;R 0E 0000
+000316 91cf          POP     r28             ;R 41 FFE0
+000317 91bf          POP     r27             ;R 97 FFE1
+000318 913f          POP     r19             ;R CE FFE2
+000319 912f          POP     r18             ;R A7 FFE3
+00031a 909f          POP     r9              ;R D1 FFE4
+00031b 911f          POP     r17             ;R 9E FFE5
+00031c 902f          POP     r2              ;R 99 FFE6
+00031d 910f          POP     r16             ;R 3F FFE7
+00031e 90af          POP     r10             ;R A0 FFE8
+00031f 900f          POP     r0              ;R A9 FFE9
+000320 90bf          POP     r11             ;R 23 FFEA
+000321 91af          POP     r26             ;R DC FFEB
+000322 914f          POP     r20             ;R BA FFEC
+000323 904f          POP     r4              ;R 64 FFED
+000324 916f          POP     r22             ;R 00 FFEE
+000325 90ef          POP     r14             ;R DF FFEF
+000326 906f          POP     r6              ;R 16 FFF0
+000327 918f          POP     r24             ;R 82 FFF1
+000328 90ff          POP     r15             ;R 61 FFF2
+000329 901f          POP     r1              ;R C5 FFF3
+00032a 90cf          POP     r12             ;R 3B FFF4
+00032b 903f          POP     r3              ;R DF FFF5
+00032c 905f          POP     r5              ;R A0 FFF6
+00032d 908f          POP     r8              ;R B0 FFF7
+00032e 907f          POP     r7              ;R DE FFF8
+00032f 917f          POP     r23             ;R 37 FFF9
+000330 91ff          POP     r31             ;R 13 FFFA
+000331 91ef          POP     r30             ;R 87 FFFB
+000332 90df          POP     r13             ;R 5B FFFC
+000333 91df          POP     r29             ;R 85 FFFD
+000334 919f          POP     r25             ;R 3B FFFE
+000335 915f          POP     r21             ;R 0E FFFF
                  
                  ; check all the values are unchanged
 000336 9350 0000     STS     $0000  ,r21     ;W 0E 0000   r21 should be 14
