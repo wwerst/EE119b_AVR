@@ -1,3 +1,5 @@
+### This file is manually modified from generated code from lst2test,
+### to reorder test vectors for forward/backward jumps.
 # ProgAB ProgDB dataDBr read write DataAB DataDBw        AssemblyCode
 0000 0000 ZZ 1 1 XXXX XX             NOP;              [1]
 0001 940C ZZ 1 1 XXXX XX             JMP jmptest1;
