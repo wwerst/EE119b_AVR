@@ -24,7 +24,7 @@ use osvvm.AlertLogPkg.all;
 
 entity avr_cpu_tb is
     generic (
-        test_vector_filename : string := "glen_test_generator/alu_test_part1_tv.txt"
+        test_vector_filename : string := "test_vectors/alu_test_part1_tv.txt"
     );
 end avr_cpu_tb;
 
