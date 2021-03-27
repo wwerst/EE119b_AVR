@@ -150,6 +150,7 @@ architecture dataflow of AVR_CPU is
     component AvrDau is
         port(
             clk         : in  std_logic;
+            reset       : in  std_logic;
             SrcSel      : in  DAU.source_t;
             PDB         : in  std_logic_vector(15 downto 0);
             reg         : in  std_logic_vector(15 downto 0);
@@ -272,6 +273,7 @@ begin
 
     dau_u: AvrDau port map (
         clk       => clock,
+        reset     => reset,
         SrcSel    => dau_ctrl.SrcSel,
         PDB       => ProgDB,
         reg       => reg_DataOutD,
