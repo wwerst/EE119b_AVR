@@ -222,6 +222,8 @@ architecture dataflow of AVR_CPU is
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
 
+    signal SyncReset : std_logic;
+
     constant FlagMaskAll    :  AVR.word_t := "11111111";
     constant FlagMaskNone   :  AVR.word_t := "00000000";
     constant FlagMaskZCNVSH :  AVR.word_t := "00111111";
@@ -314,6 +316,14 @@ begin
         end if;
     end process InstrLatchProc;
 
+
+    SyncResetProc: process(clock)
+    begin
+        if rising_edge(clock) then
+            SyncReset <= reset;
+        end if;
+    end process SyncResetProc;
+
     process(clock) begin
         -- Writes and reads are sent at the falling clock
         -- edge, and then the write signal is cleared at the
@@ -395,9 +405,10 @@ begin
         LoadInstReg <= '1';
         LoadInstPayload <= '0';
 
-        if Reset = '0' then
+        if SyncReset = '0' then
             -- Clear the status register
-            --iau_ctrl.srcSel <= IAU.SRC_ZERO;
+            iau_ctrl.srcSel <= IAU.SRC_ZERO;
+            iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
             NextExecuteOpData.OpA <= (others => '0');
             NextExecuteOpData.OpB <= (others => '1');
             NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
@@ -1007,14 +1018,21 @@ begin
                     and not(std_match(InstReg, Opcodes.OpLDS)
                     or std_match(InstReg, Opcodes.OpPOP))
             then
+                -- Two cycle data read instructions:
+                -- Cycle 0:
+                --   - Setup data bus address and data
+                --   - Halt ProgAB updates
+                -- Cycle 1:
+                --   - Do read cycle
+                --   - Increment to next instruction
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    startDataRd <= '0';
                     LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    startDataRd <= '0';
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
-                elsif CurState = 1 then
                     NextExecuteOpData.writeRegEnD <= '1';
                 end if;
                 if std_match(InstReg, Opcodes.OpLDX) then
@@ -1056,12 +1074,13 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpLDDY)
                     or std_match(InstReg, Opcodes.OpLDDZ)
-                    or std_match(InstReg, Opcodes.OpPOP)
-            then
+                    or std_match(InstReg, Opcodes.OpPOP) then
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    startDataRd <= '0';
                     LoadInstReg <= '0';
+                    
+                elsif CurState = 1 then
+                    startDataRd <= '0';
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
@@ -1087,24 +1106,33 @@ begin
                 NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
                 NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
             elsif std_match(InstReg, Opcodes.OpLDS) then
+                -- Three cycle read.
+                -- Cycle 0:
+                --   - Increment ProgAB to get the memory address
+                --   - Stop loading of instreg
+                -- Cycle 1:
+                --   - Do data read
+                --   - Stop update of progAB
+                -- Cycle 2:
+                --   - Resume incrementing progAB
+                dau_ctrl.SrcSel <= DAU.SRC_PDB;
                 if CurState = 0 then
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
                     dau_ctrl.SrcSel <= DAU.SRC_PDB;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     NextExecuteOpData.OpA <= DataDB;
                     NextExecuteOpData.writeRegEnS <= '1';
                     NextExecuteOpData.writeRegSelS <= InstReg(8 downto 4);
                     startDataRd <= '0';
-                    LoadInstReg <= '0';
-                elsif CurState = 1 then
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
                     LoadInstReg <= '0';
                 end if;
             elsif (std_match(InstReg, Opcodes.OpST)
                     or std_match(InstReg, Opcodes.OpSTY)
                     or std_match(InstReg, Opcodes.OpSTZ))
                     and not(std_match(InstReg, Opcodes.OpSTS)
-                    or std_match(InstReg, Opcodes.OpPUSH))
-            then
+                    or std_match(InstReg, Opcodes.OpPUSH)) then
+                -- Two cycle store instructions
                 reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
                 DataDB <= reg_DataOutA;
                 if CurState = 0 then
@@ -1113,11 +1141,11 @@ begin
                     -- Put the address on the Data bus (already connected to double width output)
                     -- Put the data on the Data bus
                     -- Stop the InstReg from incrementing
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
-                    startDataWr <= '0';
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                 elsif CurState = 1 then
                     NextExecuteOpData.writeRegEnD <= '1';
+                    startDataWr <= '0';
                 end if;
                 -- The indexing D width register is written back with
                 -- appropriate increment/decrement etc
@@ -1167,6 +1195,7 @@ begin
                 if CurState = 0 then
                     iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
                     LoadInstReg <= '0';
+                elsif CurState = 1 then
                     startDataWr <= '0';
                 end if;
                 if std_match(InstReg, Opcodes.OpSTDY) then
@@ -1184,18 +1213,18 @@ begin
                     end if;
                 end if;
             elsif std_match(InstReg, Opcodes.OpSTS) then
+                reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
+                DataDB <= reg_DataOutA;
+                dau_ctrl.SrcSel <= DAU.SRC_PDB;
                 if CurState = 0 then
-                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
-                    startDataWr <= '0';
+                    iau_ctrl.OffsetSel <= IAU.OFF_ONE;
                     LoadInstReg <= '0';
                 elsif CurState = 1 then
-                    dau_ctrl.SrcSel <= DAU.SRC_PDB;
-                    reg_read_ctrl.SelOutA <= InstReg(8 downto 4);
-                    DataDB <= reg_DataOutA;
+                    iau_ctrl.OffsetSel <= IAU.OFF_ZERO;
+                    startDataWr <= '0';
                     LoadInstReg <= '0';
+                else
+                    -- CurState = 2
                 end if;
             else
                 assert (reset = '0' or now = 0 ns) report "Unknown instruction " & to_string(InstReg);
