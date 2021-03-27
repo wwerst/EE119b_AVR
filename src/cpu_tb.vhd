@@ -1,13 +1,21 @@
 ---------------------------------------------------------------------
-
+--
 -- AVR CPU Testbench
-
-
+-- 
+-- This testbench runs test vector files generated from a
+-- modified lst2test script. Each line corresponds to a cycle k,
+-- and contains the progAB and progDB expected just before the
+-- start of the cycle as well as the expected input/output expected
+-- just before the end of the cycle.
+-- 
+--
 -- Entities included are
 --      cpu_tb: the test bench itself
-
+--
 -- Revision History:
-
+--     27 Mar 21  Will Werst        Finish implementing full cpu. See git
+--                                  history for more granular details
+--                                  and revision history.
 ---------------------------------------------------------------------
 
 library ieee;
@@ -134,6 +142,13 @@ begin
             linenum := linenum + 1;
             readline(vectorsf, l);
             if ((l'LENGTH > 0) and (l(1) /= '#'))  then
+                -- We read the test vector file in shifted
+                -- fashion, so that progAB and progDB in the
+                -- text file correspond to the results they
+                -- should generate at end of cycle. However,
+                -- for testing, there is one pipeline stage
+                -- at instruction register reading, so we
+                -- read in shifted fashion.
                 hread(l, veProgAB);
                 hread(l, vProgDB);
 
@@ -155,13 +170,10 @@ begin
                 AffirmIf(dataRd = '1', "DataRd was not 1 while clk was high");
                 wait until rising_edge(clk);
 
-                -- On clock, cpu puts out:
-                -- progAB
-                -- dataAB
-                -- DataWr
-                -- DataRd
-                -- DataDB (inout)
-
+                
+                -- Run all checks first, and then aggregate into
+                -- an assert, with more granular printouts. This
+                -- makes it easier to read error log.
                 progAB_match := nonstd_match(progAB, veProgAB);
                 dataAB_match := nonstd_match(dataAB, veDataAB);
                 dataRd_match := std_match(dataRd, veDataRd);
@@ -179,6 +191,8 @@ begin
                     end if;
                 end if;
                 
+                -- Stop testing early. Useful for interactive debugging so errors
+                -- are near end of waveform file.
                 if error_cnt >= MAX_ERROR_COUNT then
                     report "Stopping testing early due to high error count";
                     exit;

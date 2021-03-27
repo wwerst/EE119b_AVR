@@ -10,7 +10,9 @@
 --      7 May 02  Glen George       Updated comments.
 --     21 Jan 08  Glen George       Updated comments.
 --     22 Feb 21  Eric Chen         Start sketching implementation
---
+--     27 Mar 21  Will Werst        Implement full cpu. See git
+--                                  history for more granular details
+--                                  and revision history.
 ----------------------------------------------------------------------------
 
 
@@ -20,8 +22,8 @@
 --  Inputs:
 --    ProgDB - program memory data bus (16 bits)
 --    Reset  - active low reset signal
---    INT0   - active low interrupt
---    INT1   - active low interrupt
+--    INT0   - active low interrupt. Not used.
+--    INT1   - active low interrupt. Not used.
 --    clock  - the system clock
 --
 --  Outputs:

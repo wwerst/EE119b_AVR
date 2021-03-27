@@ -11,7 +11,8 @@
 --      4/22/02   Glen George		added new instructions
 --      4/22/02   Glen George		updated comments
 --      5/16/02   Glen George		fixed LPM instruction constant
---
+--      24 Mar 21 Eric Chen      Implement mov and store instructions
+--                               Implement all load instructions
 -----------------------------------------------------------------------------
 
 library ieee;
