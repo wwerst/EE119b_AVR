@@ -28,7 +28,12 @@
 --      15 Feb 21   Eric Chen   Use component declarations.
 --                              Do some formatting.
 --                              Write revision history. <flux capacitor joke 🤔>
-
+--      27 Mar 21   Will Werst  Change IAU to be combinational output, to
+--                              match timing diagrams for STS/LDS. This
+--                              could be problematic with glitches on
+--                              address bus if the memory is not designed
+--                              for glitches (signal will stabilize before
+--                              the write/read command is sent).
 ---------------------------------------------------------------------
 
 

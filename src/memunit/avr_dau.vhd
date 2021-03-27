@@ -23,8 +23,9 @@
 --      12 Feb 21   Eric Chen   set up DAU
 --      15 Feb 21   Eric Chen   Use component declarations.
 --                              Do some formatting.
---      22 Feb 21   Eric Chen   Merge register inputs
-
+--      22 Feb 21   Eric Chen   Merge register inputs.
+--      27 Mar 21   Will Werst  Fix stack starting at 0000 instead of
+--                              FFFF. See git history for more details.
 ---------------------------------------------------------------------
 
 
@@ -71,6 +72,7 @@ end package;
 --
 -- Inputs
 --      clk         - to update stack pointer on
+--      reset       - reset state, in particular stack pointer.
 --      SrcSel      - source to use, see DAU package for options
 --      PDB         - program data bus value, to use as source
 --      reg         - register bus that can be used as a source

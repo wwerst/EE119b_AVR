@@ -16,7 +16,8 @@
 --      17 Feb 21   Eric Chen   Add non-random tests
 --      20 Feb 21   Eric Chen   Set larger AtLeast on bins
 --      22 Feb 21   Eric Chen   Merge register inputs
-
+--      27 Mar 21   Will Werst  Fix stack starting at 0000 instead of
+--                              FFFF. See git history for more details.
 ---------------------------------------------------------------------
 
 library ieee;
