@@ -1055,7 +1055,50 @@ begin
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_Z;
                 end if;
-
+            elsif std_match(InstReg, Opcodes.OpRET) then
+                if CurState = 0 then
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                elsif CurState = 2 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                else -- CurState = 3
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                end if;
+            elsif std_match(InstReg, Opcodes.OpRETI) then
+                if CurState = 0 then
+                    NextExecuteOpData.OpA <= alu_SReg;
+                    NextExecuteOpData.OpB(AVR.STATUS_INT) <= '1';
+                    NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
+                    NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBLO;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                elsif CurState = 2 then
+                    LoadInstReg <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_DDBHI;
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_ONE;
+                    startDataRd <= '0';
+                else -- CurState = 3
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                end if;
             -------------------
             -------------------
             -- LOAD/STORE Instructions
