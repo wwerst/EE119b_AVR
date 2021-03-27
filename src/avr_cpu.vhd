@@ -183,9 +183,11 @@ architecture dataflow of AVR_CPU is
 
 
     signal InstReg: std_logic_vector(15 downto 0);
+    signal InstPayload: std_logic_vector(15 downto 0);
     signal ProgDBSync: std_logic_vector(15 downto 0);
 
     signal LoadInstReg: std_logic;
+    signal LoadInstPayload: std_logic;
 
     signal decodeReg16d : integer range 0 to 31;
     signal decodeReg32d : integer range 0 to 31;
@@ -297,18 +299,32 @@ begin
                 InstReg <= (others => '0');
                 ProgDBSync <= (others => '0');
                 CurState <= 0;
-            elsif LoadInstReg then
-                InstReg <= ProgDB;
-                ProgDBSync <= ProgDB;
-                CurState <= 0;
             else
-                CurState <= CurState + 1;
                 ProgDBSync <= ProgDB;
+                if LoadInstReg then
+                    InstReg <= ProgDB;
+                    CurState <= 0;
+                else
+                    CurState <= CurState + 1;
+                end if;
+                if LoadInstPayload then
+                    InstPayload <= ProgDB;
+                end if;
             end if;
         end if;
     end process InstrLatchProc;
 
     process(clock) begin
+        -- Writes and reads are sent at the falling clock
+        -- edge, and then the write signal is cleared at the
+        -- rising edge. Thus, the timing requirement is that
+        -- the data address is computed and output within 1/2
+        -- clock cycle + setup time, and then the write/read occurs
+        -- within the half clock cycle before the 
+        if rising_edge(clock) then
+            DataRd <= '1';
+            DataWr <= '1';
+        end if;
         if falling_edge(clock) then
             DataRd <= startDataRd;
             DataWr <= startDataWr;
@@ -377,6 +393,7 @@ begin
 
         -- Control signal for previous pipeline stage
         LoadInstReg <= '1';
+        LoadInstPayload <= '0';
 
         if Reset = '0' then
             -- Clear the status register
@@ -884,7 +901,7 @@ begin
                 end if;
             -------------------
             -------------------
-            -- Branch
+            -- Conditional Branch
             -------------------
             -------------------
             elsif std_match(InstReg, Opcodes.OpBRBC) then
@@ -897,6 +914,11 @@ begin
                     iau_ctrl.OffsetSel <= IAU.OFF_BRANCH;
                     LoadInstReg <= '0';
                 end if;
+            -------------------
+            -------------------
+            -- Unconditional Branch (Jumps)
+            -------------------
+            -------------------
             elsif std_match(InstReg, Opcodes.OpJMP) then
                 if CurState = 0 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
@@ -918,6 +940,38 @@ begin
                     iau_ctrl.offsetSel <= IAU.OFF_Z;
                     reg_read_ctrl.SelOutD <= "11";
                     LoadInstReg <= '0';
+                end if;
+            -------------------
+            -------------------
+            -- Unconditional Branch (Calls and Returns)
+            -------------------
+            -------------------
+            elsif std_match(InstReg, Opcodes.OpCall) then
+                if CurState = 0 then
+                    -- Steps on Cycle 0 (ProgAB is PC+1):
+                    -- Identify call instruction (implicit by being in this if)
+                    -- Set InstReg to persist
+                    -- Set InstPayload to load on next clock
+                    -- Leave IAU to increment, so next clock will be PC+2
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '1';
+                elsif CurState = 1 then
+                    -- Steps on Cycle 1 (ProgAB is PC+2):
+                    -- Set IAU to hold pc in place
+                    -- Write PC+2[15:8] to stack
+                    -- InstPayload is loaded as target address
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(15 downto 8);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 2 then
+                    -- Steps on Cycle 2 (ProgAB is PC+2):
+                    -- Write PC+2[7:0] to stack
+                    -- Set IAU to update pc to target address
+                else -- CurState = 3
+                    -- NOP while waiting for ProgDB to return the next instruction 
                 end if;
 
             -------------------
@@ -1065,6 +1119,8 @@ begin
                 elsif CurState = 1 then
                     NextExecuteOpData.writeRegEnD <= '1';
                 end if;
+                -- The indexing D width register is written back with
+                -- appropriate increment/decrement etc
                 if std_match(InstReg, Opcodes.OpSTX) then
                     dau_ctrl.OffsetSel <= DAU.OFF_ZERO;
                     reg_read_ctrl.SelOutD <= "01";

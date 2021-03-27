@@ -144,6 +144,10 @@ begin
                 progDB <= vProgDB;
                 dataDB <= vDataDB;
 
+                wait until falling_edge(clk);
+
+                AffirmIf(dataWr = '1', "DataWr was not 1 while clk was high");
+                AffirmIf(dataRd = '1', "DataRd was not 1 while clk was high");
                 wait until rising_edge(clk);
 
                 -- On clock, cpu puts out:
@@ -155,8 +159,8 @@ begin
 
                 progAB_match := nonstd_match(progAB, veProgAB);
                 dataAB_match := nonstd_match(dataAB, veDataAB);
-                dataRd_match := std_match(dataRd, veDataRd);
-                dataWr_match := std_match(dataWr, veDataWr);
+                dataRd_match := (dataRd = veDataRd);
+                dataWr_match := (dataWr = veDataWr);
                 dataDB_match := nonstd_match(dataDB, veDataDB);
                 if not (progAB_match and dataAB_match and dataRd_match and dataWr_match and dataDB_match) then
                     error_cnt := error_cnt + 1;
