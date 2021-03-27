@@ -1008,6 +1008,41 @@ begin
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_PDB;
                 end if;
+            elsif std_match(InstReg, Opcodes.OpRCall) then
+                if CurState = 0 then
+                    -- Steps on Cycle 0 (ProgAB is PC+1):
+                    -- Identify call instruction (implicit by being in this if)
+                    -- Set InstReg to persist
+                    -- Set InstPayload to load on next clock
+                    -- Leave IAU to increment, so next clock will be PC+2
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
+                    DataDB <= ProgAB(15 downto 8);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                elsif CurState = 1 then
+                    -- Steps on Cycle 1 (ProgAB is PC+2):
+                    -- Set IAU to hold pc in place
+                    -- Write PC+2[15:8] to stack
+                    -- InstPayload is loaded as target address
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(7 downto 0);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
+                    
+                elsif CurState = 2 then
+                    -- Steps on Cycle 2 (ProgAB is PC+2):
+                    -- Write PC+2[7:0] to stack
+                    -- Set IAU to update pc to target address
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;                    
+                end if;
 
             -------------------
             -------------------

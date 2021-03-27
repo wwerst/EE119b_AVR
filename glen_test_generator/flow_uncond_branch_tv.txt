@@ -55,16 +55,16 @@ XXXX 00C0 ZZ 1 0 FFFA A3             CALL calltestdone;
 XXXX 00C0 ZZ 1 1 XXXX XX             CALL calltestdone;
 00C0 0000 ZZ 1 1 XXXX XX             calltestdone: NOP;
 00C1 0000 ZZ 1 1 XXXX XX             NOP;              [1]
-00C2 D01D ZZ 1 1 XXXX XX             RCALL rcalltest1;
-XXXX D01D ZZ 1 1 XXXX XX             RCALL rcalltest1;
+00C2 D01D ZZ 1 0 FFF9 00             RCALL rcalltest1;
+XXXX D01D ZZ 1 0 FFF8 C3             RCALL rcalltest1;
 XXXX D01D ZZ 1 1 XXXX XX             RCALL rcalltest1;
 00E0 0000 ZZ 1 1 XXXX XX             NOP;
-00E1 DFEE ZZ 1 1 XXXX XX             RCALL rcalltest2;
-XXXX DFEE ZZ 1 1 XXXX XX             RCALL rcalltest2;
+00E1 DFEE ZZ 1 0 FFF7 00             RCALL rcalltest2;
+XXXX DFEE ZZ 1 0 FFF6 E2             RCALL rcalltest2;
 XXXX DFEE ZZ 1 1 XXXX XX             RCALL rcalltest2;
 00D0 0000 ZZ 1 1 XXXX XX             NOP;
-00D1 D01E ZZ 1 1 XXXX XX             RCALL rcalltestdone;
-XXXX D01E ZZ 1 1 XXXX XX             RCALL rcalltestdone;
+00D1 D01E ZZ 1 0 FFF5 00             RCALL rcalltestdone;
+XXXX D01E ZZ 1 0 FFF4 D2             RCALL rcalltestdone;
 XXXX D01E ZZ 1 1 XXXX XX             RCALL rcalltestdone;
 00F0 0000 ZZ 1 1 XXXX XX             rcalltestdone: NOP;
 00F1 0000 ZZ 1 1 XXXX XX             NOP;              [1]
