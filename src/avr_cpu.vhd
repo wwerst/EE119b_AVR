@@ -934,25 +934,36 @@ begin
             -------------------
             elsif std_match(InstReg, Opcodes.OpJMP) then
                 if CurState = 0 then
+                    -- Load the memory address
+                    
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '1';
+                -- not sure why this takes three cycles
+                elsif CurState = 1 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_PDB;
                     LoadInstReg <= '0';
-                -- not sure why this takes three cycles
-                elsif CurState = 1 then
+                elsif CurState = 2 then
                     iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    LoadInstReg <= '0';
                 end if;
             elsif std_match(InstReg, Opcodes.OpRJMP) then
                 if CurState = 0 then
-                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
+                    -- Increment by 1 here, it will load an
+                    -- irrelevant instruction, but simplifies
+                    -- the generation of pc+k+1 on next cycle.
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
                     LoadInstReg <= '0';
+                elsif CurState = 1 then
+                    iau_ctrl.offsetSel <= IAU.OFF_JUMP;
                 end if;
             elsif std_match(InstReg, Opcodes.OpIJMP) then
+                reg_read_ctrl.SelOutD <= "11";
                 if CurState = 0 then
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    LoadInstReg <= '0';
+                elsif CurState = 1 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_Z;
-                    reg_read_ctrl.SelOutD <= "11";
-                    LoadInstReg <= '0';
                 end if;
             -------------------
             -------------------
