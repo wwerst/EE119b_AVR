@@ -40,8 +40,8 @@ XXXX 9409 ZZ 1 1 XXXX XX             IJMP;
 0090 0000 ZZ 1 1 XXXX XX             NOP;
 0091 0000 ZZ 1 1 XXXX XX             NOP;              [1]
 0092 940E ZZ 1 1 XXXX XX             CALL calltest1;
-0093 00B0 ZZ 1 1 XXXX XX             CALL calltest1;
-XXXX 00B0 ZZ 1 1 XXXX XX             CALL calltest1;
+0093 00B0 ZZ 1 0 FFFF 00             CALL calltest1;
+XXXX 00B0 ZZ 1 0 FFFE 94             CALL calltest1;
 XXXX 00B0 ZZ 1 1 XXXX XX             CALL calltest1;
 00A0 0000 ZZ 1 1 XXXX XX             NOP;
 00A1 940E ZZ 1 1 XXXX XX             CALL calltestdone;

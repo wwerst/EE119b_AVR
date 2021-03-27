@@ -264,7 +264,7 @@ begin
         SrcSel    => iau_ctrl.srcSel,
         branch    => iau_branch,
         jump      => iau_jump,
-        PDB       => ProgDB,
+        PDB       => InstPayload,
         DDB       => DataDB,
         Z         => reg_DataOutD,
         OffsetSel => iau_ctrl.offsetSel,
@@ -356,7 +356,7 @@ begin
     decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
     dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
     iau_branch <= InstReg(9 downto 3);
-    iau_jump <= InstReg(11 downto 0);
+    iau_jump <= InstPayload(11 downto 0);
 
     -- Combinational logic that calculates the following:
     --   iau_ctrl: Controls what the next address that is fetched is.
@@ -405,7 +405,7 @@ begin
 
         -- Control signal for previous pipeline stage
         LoadInstReg <= '1';
-        LoadInstPayload <= '0';
+        LoadInstPayload <= '1';
 
         if SyncReset = '0' then
             -- Clear the status register
@@ -937,12 +937,12 @@ begin
                     -- Load the memory address
                     
                     LoadInstReg <= '0';
-                    LoadInstPayload <= '1';
                 -- not sure why this takes three cycles
                 elsif CurState = 1 then
                     iau_ctrl.srcSel <= IAU.SRC_ZERO;
                     iau_ctrl.offsetSel <= IAU.OFF_PDB;
                     LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
                 elsif CurState = 2 then
                     iau_ctrl.offsetSel <= IAU.OFF_ZERO;
                 end if;
@@ -953,6 +953,7 @@ begin
                     -- the generation of pc+k+1 on next cycle.
                     iau_ctrl.offsetSel <= IAU.OFF_ONE;
                     LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
                 elsif CurState = 1 then
                     iau_ctrl.offsetSel <= IAU.OFF_JUMP;
                 end if;
@@ -978,14 +979,15 @@ begin
                     -- Set InstPayload to load on next clock
                     -- Leave IAU to increment, so next clock will be PC+2
                     LoadInstReg <= '0';
-                    LoadInstPayload <= '1';
                 elsif CurState = 1 then
                     -- Steps on Cycle 1 (ProgAB is PC+2):
                     -- Set IAU to hold pc in place
                     -- Write PC+2[15:8] to stack
                     -- InstPayload is loaded as target address
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
-                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_ONE;
                     DataDB <= ProgAB(15 downto 8);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
@@ -994,8 +996,17 @@ begin
                     -- Steps on Cycle 2 (ProgAB is PC+2):
                     -- Write PC+2[7:0] to stack
                     -- Set IAU to update pc to target address
+                    LoadInstReg <= '0';
+                    LoadInstPayload <= '0';
+                    iau_ctrl.srcSel <= IAU.SRC_PC;
+                    iau_ctrl.offsetSel <= IAU.OFF_ZERO;
+                    DataDB <= ProgAB(7 downto 0);
+                    dau_ctrl.SrcSel <= DAU.SRC_STACK;
+                    dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
+                    startDataWr <= '0';
                 else -- CurState = 3
-                    -- NOP while waiting for ProgDB to return the next instruction 
+                    iau_ctrl.srcSel <= IAU.SRC_ZERO;
+                    iau_ctrl.offsetSel <= IAU.OFF_PDB;
                 end if;
 
             -------------------
