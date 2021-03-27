@@ -192,8 +192,8 @@ architecture dataflow of AVR_CPU is
     signal LoadInstReg: std_logic;
     signal LoadInstPayload: std_logic;
 
-    signal decodeReg16d : integer range 0 to 31;
-    signal decodeReg32d : integer range 0 to 31;
+    signal decodeReg16d : AVR.reg_s_sel_t;
+    signal decodeReg32d : AVR.reg_s_sel_t;
 
     signal startDataRd, startDataWr: std_logic;
 
@@ -354,8 +354,8 @@ begin
     end process;
 
 
-    decodeReg16d <= to_integer(unsigned(InstReg(7 downto 4))) + 16;
-    decodeReg32d <= to_integer(unsigned(InstReg(8 downto 4)));
+    decodeReg16d <= "1" & InstReg(7 downto 4);
+    decodeReg32d <= InstReg(8 downto 4);
     dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
     iau_branch <= InstReg(9 downto 3);
     iau_jump <= InstPayload(11 downto 0);
@@ -1218,7 +1218,7 @@ begin
             elsif std_match(InstReg, Opcodes.OpLDI) then
                 -- Pass immediate through ALU into write unit
                 NextExecuteOpData.writeRegEnS <= '1';
-                NextExecuteOpData.writeRegSelS <= std_logic_vector(to_unsigned(decodeReg16d, 5));
+                NextExecuteOpData.writeRegSelS <= decodeReg16d;
                 NextExecuteOpData.OpA(7 downto 4) <= InstReg(11 downto 8);
                 NextExecuteOpData.OpA(3 downto 0) <= InstReg(3 downto 0);
             elsif std_match(InstReg, Opcodes.OpLDS) then
