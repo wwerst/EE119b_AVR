@@ -50,7 +50,6 @@ returns due to routing delays and the minimum amount of setup/hold time needed f
 # The relevant files for testing are located at:
 
 - .github/* : Contains the Github Actions config file for script. Also documents setup for new computer, since Github Actions runs tests from blank install every time.
-- preprocessed_asm/* : Contains post processed files for glen's output format for alu asm files (ASSERT macro converted to comment format)
 - src/* : Contains all of the vhdl code for design.
 - test_programs/* : Contains the fullprogram.asm file.
 - xilinx_implementation/* : Contains files and artifacts from xilinx implementation of design.
