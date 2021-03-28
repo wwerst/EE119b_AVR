@@ -19,6 +19,7 @@
 --      14 Feb 21   Will Werst  Create new interface
 --      15 Feb 21   Eric Chen   Set up ALU op constants
 --      15 Feb 21   Will Werst  Fix ALU op constants
+--      27 Mar 21  Will Werst   Added multiply (see git history for more details)
 ---------------------------------------------------------------------
 
 
@@ -193,7 +194,7 @@ begin
     cincmd <= aluopselect(3 downto 2);
     -- only matters if using shifter.
     scmd <= aluopselect(4 downto 2);
-
+    -- only matters if using multiplier.
     mulcmd <= aluopselect(4);
 
     -- firstly, everything needs to get sent through a ALU

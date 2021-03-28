@@ -25,6 +25,7 @@
 --     27 Jan 21  Glen George       Updated comments.
 --     29 Jan 21  Glen George       Fixed a number of wordsize bugs.
 --     29 Jan 21  Glen George       Fixed overflow signal in adder.
+--     27 Mar 21  Will Werst        Added multiply (see git history for more details)
 --
 ----------------------------------------------------------------------------
 
@@ -319,10 +320,9 @@ end  structural;
 --    MulResultSel - If 1 then result is high word, else the result is low word.
 --
 --  Outputs:
---    MulResult -  word of result
---    MulResultH - High word of result
---    Cout       - carry out for multiplication. Equal to high bit of result.
---
+--    MulResult - word of result
+--    Cout      - carry out for multiplication. Equal to high bit of result.
+--    Zero      - special zero flag that checks both words simultaneously for zero.
 
 library ieee;
 use ieee.std_logic_1164.all;
@@ -347,7 +347,7 @@ entity  Multiplier  is
 end  Multiplier;
 
 
-architecture dataflow  of  Multiplier  is
+architecture dataflow_xilinx  of  Multiplier  is
     signal UnsignedOpA : unsigned(wordsize - 1 downto 0);
     signal UnsignedOpB : unsigned(wordsize - 1 downto 0);
     signal UnsignedMulResult : unsigned(2*wordsize - 1 downto 0);
@@ -374,7 +374,7 @@ begin
     Zero <= '1' when SLVMulResult = (SLVMulResult'range => '0') else
             '0';
 
-end dataflow;
+end dataflow_xilinx;
 
 
 --

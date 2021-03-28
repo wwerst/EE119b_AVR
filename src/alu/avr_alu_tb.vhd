@@ -12,7 +12,8 @@
 --      6  Feb 21   Will Werst  Initial implementation
 --      15 Feb 21   Will Werst  Add more testing for results
 --      23 Feb 21   Will Werst  Finish status register and flag mask testing
---      
+--      25 Mar 21  Will Werst   Reduce number of random ALU tests
+--      27 Mar 21  Will Werst   Added multiply (see git history for more details)
 ---------------------------------------------------------------------
 
 

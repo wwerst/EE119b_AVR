@@ -168,8 +168,8 @@ begin
 
 
     -- get the selected source and offset addresses
-    SelSrcAddr  <=  AddrSrc((SrcSel + 1) * wordsize - 1 downto SrcSel * wordsize);
-    SelOffAddr  <=  AddrOff((OffsetSel + 1) * wordsize - 1 downto OffsetSel * wordsize);
+    SelSrcAddr  <=  AddrSrc((SrcSel * wordsize) + wordsize - 1 downto SrcSel * wordsize);
+    SelOffAddr  <=  AddrOff((OffsetSel * wordsize) + wordsize - 1 downto OffsetSel * wordsize);
 
 
     -- adder for doing increment/decrement

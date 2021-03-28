@@ -28,7 +28,12 @@
 --      15 Feb 21   Eric Chen   Use component declarations.
 --                              Do some formatting.
 --                              Write revision history. <flux capacitor joke 🤔>
-
+--      27 Mar 21   Will Werst  Change IAU to be combinational output, to
+--                              match timing diagrams for STS/LDS. This
+--                              could be problematic with glitches on
+--                              address bus if the memory is not designed
+--                              for glitches (signal will stabilize before
+--                              the write/read command is sent).
 ---------------------------------------------------------------------
 
 
@@ -148,8 +153,8 @@ architecture  dataflow  of  AvrIau  is
     signal next_address: AVR.addr_t;
 begin
     -- sign extend branch and jump offsets
-    branch_ext  <= (branch'RANGE => branch, others => branch(branch'HIGH));
-    jump_ext    <= (jump'RANGE => jump, others => jump(jump'HIGH));
+    branch_ext  <= (branch_ext'HIGH - branch'HIGH - 1 downto 0 => branch(branch'HIGH)) & branch;
+    jump_ext    <= (jump_ext'HIGH - jump'HIGH - 1 downto 0 => jump(jump'HIGH)) & jump;
     -- concatenate sources and offsets
     sources     <= (pc & ZERO);   -- pc for relative movements, ZERO for absolute movements
     offsets     <= (    -- One of these offsets is selected by the Mau
@@ -173,7 +178,8 @@ begin
         IncDecSel   => MemUnitConstants.MemUnit_INC,
         IncDecBit   => 0,
         PrePostSel  => MemUnitConstants.MemUnit_PRE,
-        Address     => next_address
+        Address     => next_address,
+        AddrSrcOut  => open
     );
     Address <= next_address;
 

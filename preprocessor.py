@@ -73,9 +73,9 @@ class ASMFileReader(object):
 
 
 def main():
-    reader = ASMFileReader('tests/alu_test_part1.asm', 'glen_output_asm')
+    reader = ASMFileReader('tests/alu_test_part1.asm', 'preprocessed_asm')
     reader.convert_file()
-    reader = ASMFileReader('tests/alu_test_part2.asm', 'glen_output_asm')
+    reader = ASMFileReader('tests/alu_test_part2.asm', 'preprocessed_asm')
     reader.convert_file()
 
 
