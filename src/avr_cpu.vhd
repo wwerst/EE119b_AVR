@@ -357,17 +357,6 @@ begin
     -- within the half clock cycle before the rising edge of clock.
     DataRd <= startDataRd or clock;
     DataWr <= startDataWr or clock;
-    --process(clock) begin
-        
-    --    if rising_edge(clock) then
-    --        DataRd <= '1';
-    --        DataWr <= '1';
-    --    end if;
-    --    if falling_edge(clock) then
-    --        DataRd <= startDataRd;
-    --        DataWr <= startDataWr;
-    --    end if;
-    --end process;
 
     RegReadDelayProc: process(clock)
     begin
