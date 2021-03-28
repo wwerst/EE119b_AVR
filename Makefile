@@ -3,7 +3,9 @@ STACK_SIZE = $(shell ulimit -s)
 
 .PHONY: all lst2test cpu_test_vector_files import alu_tests iau_tests dau_tests reg_tests
 
-.PHONY: cpu_tests_all cpu_alu_tests cpu_data_move_tests cpu_flow_skip_tests cpu_flow_cond_branch_tests cpu_flow_uncond_branch_tests clean
+.PHONY: cpu_tests_all cpu_alu_tests cpu_data_move_tests cpu_flow_skip_tests cpu_flow_cond_branch_tests
+
+.PHONY: cpu_flow_uncond_branch_tests continuous_tests clean
 
 all:
 	sleep 1
@@ -65,6 +67,9 @@ cpu_flow_cond_branch_tests: import cpu_test_vector_files
 cpu_flow_uncond_branch_tests: import cpu_test_vector_files
 	ghdl -m --std=08 --workdir=work avr_cpu_tb
 	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/flow_uncond_branch_tv.txt"
+
+continuous_tests:
+	fswatch -m poll_monitor -0 -o src/* | xargs -0 -n1 bash -c "clear && echo '*****************Running Tests***************************' && make cpu_tests_all"
 
 clean:
 	rm -r work/*.cf || true
