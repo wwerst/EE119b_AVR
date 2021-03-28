@@ -147,8 +147,11 @@ begin
         INT0 <= '0';
         INT1 <= '0';
         Reset <= '0';
-        -- Wait for three cycles with reset,
+        -- Wait for six cycles with reset,
         -- and bring out of reset after that.
+        wait until rising_edge(clk);
+        wait until rising_edge(clk);
+        wait until rising_edge(clk);
         wait until rising_edge(clk);
         wait until rising_edge(clk);
         wait until rising_edge(clk);

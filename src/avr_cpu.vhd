@@ -226,6 +226,7 @@ architecture dataflow of AVR_CPU is
         ALUFlagMask    : AVR.word_t;
         writeRegEnS    : std_logic;
         writeRegSelS   : AVR.reg_s_sel_t;
+        dataD          : AVR.addr_t;
         writeRegEnD    : std_logic;
         writeRegSelD   : AVR.reg_d_sel_t;
     end record;
@@ -240,6 +241,12 @@ architecture dataflow of AVR_CPU is
         writeRegEnD    : std_logic;
         writeRegSelD   : AVR.reg_d_sel_t;
     end record;
+
+    signal decodeDataLocks : std_logic_vector(10 downto 0);
+    signal executeDataLocks : std_logic_vector(10 downto 0);
+    signal writeDataLocks : std_logic_vector(10 downto 0);
+    signal decodeExecuteHazards : std_logic_vector(10 downto 0);
+    signal decodeWriteHazards : std_logic_vector(10 downto 0);
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
 
@@ -332,6 +339,10 @@ begin
                 InstReg <= (others => '0');
                 ProgDBSync <= (others => '0');
                 CurState <= 0;
+            elsif DecodeDataHazardPresent = '1' then
+                -- Do nothing to apply backpressure
+                -- when the pipeline is stalled.
+                null;
             else
                 ProgDBSync <= ProgDB;
                 if LoadInstReg = '1' then
@@ -361,8 +372,10 @@ begin
     -- the data address is computed and output within 1/2
     -- clock cycle + setup time, and then the write/read occurs
     -- within the half clock cycle before the rising edge of clock.
-    DataRd <= startDataRd or clock;
-    DataWr <= startDataWr or clock;
+    -- The DecodeDataHazardPresent signal is also or'ed to
+    -- apply backpressure when the pipeline is stalled.
+    DataRd <= startDataRd or clock or DecodeDataHazardPresent;
+    DataWr <= startDataWr or clock or DecodeDataHazardPresent;
 
     RegReadDelayProc: process(clock)
     begin
@@ -402,6 +415,7 @@ begin
                         ProgABBuf,
                         ProgDBSync,
                         DataDB,
+                        dau_update,
                         InstReg,
                         CurState,
                         reg_DataOutA,
@@ -449,11 +463,14 @@ begin
         NextExecuteOpData.ALUFlagMask <= FlagMaskNone;
         NextExecuteOpData.writeRegEnS <= '0';
         NextExecuteOpData.writeRegSelS <= (others => '0');
+        NextExecuteOpData.dataD <= dau_update;
         NextExecuteOpData.writeRegEnD <= '0';
         NextExecuteOpData.writeRegSelD <= (others => '0');
         DataDB <= (others => 'Z');
         startDataWr <= '1';
         startDataRd <= '1';
+
+        decodeDataLocks <= (others => '1');
 
 
         -- Control signal for previous pipeline stage
@@ -1411,22 +1428,46 @@ begin
     -----------------
     -----------------
 
-    DecodeDataHazardPresent <= '0';
+    decodeExecuteHazards <= decodeDataLocks and executeDataLocks;
+    decodeWriteHazards <= decodeDataLocks and writeDataLocks;
 
-    Decode2ExecuteReg: process(all)
+    DataHazardCheckProc: process(decodeExecuteHazards, decodeWriteHazards)
     begin
-        if TRUE then
-            if DecodeDataHazardPresent = '0' then
-                CurExecuteOpData <= NextExecuteOpData;
-            else
+        if not std_match(decodeExecuteHazards, "00000000000") then
+            DecodeDataHazardPresent <= '1';
+        elsif not std_match(decodeWriteHazards, "00000000000") then
+            DecodeDataHazardPresent <= '1';
+        else
+            DecodeDataHazardPresent <= '0';
+        end if;
+    end process;
+
+    Decode2ExecuteReg: process(clock)
+    begin
+        if rising_edge(clock) then
+            if DecodeDataHazardPresent = '1' or reset = '0' then
+                -- Bubble the pipeline, so no resource locks
+                executeDataLocks <= (others => '0');
                 --CurExecuteOpData <= ExecuteOpBubble;
+                -- Put a bubble in the pipeline
+                CurExecuteOpData.OpA <= (others => '0');
+                CurExecuteOpData.OpB <= (others => '0');
+                CurExecuteOpData.ALUOpCode <= ALUOp.ADD_Op;
+                CurExecuteOpData.ALUFlagMask <= FlagMaskNone;
+                CurExecuteOpData.writeRegEnS <= '0';
+                CurExecuteOpData.writeRegSelS <= (others => '0');
+                CurExecuteOpData.dataD <= dau_update;
+                CurExecuteOpData.writeRegEnD <= '0';
+                CurExecuteOpData.writeRegSelD <= (others => '0');
+            else
+                executeDataLocks <= decodeDataLocks;
+                CurExecuteOpData <= NextExecuteOpData;
             end if;
         end if;
     end process Decode2ExecuteReg;
 
     -- Connects with ALU and does ALU ops
     ExecuteProc: process(alu_Result,
-                         dau_update,
                          reset,
                          CurExecuteOpData)
     begin
@@ -1434,7 +1475,7 @@ begin
         NextWriteOpData.writeRegEnS <= '0';
         NextWriteOpData.writeRegSelS <= (others => '0');
 
-        NextWriteOpData.dataD <= dau_update; -- TODO proper pipelineing
+        NextWriteOpData.dataD <= CurExecuteOpData.dataD; -- TODO proper pipelineing
         NextWriteOpData.writeRegEnD <= '0';
         NextWriteOpData.writeRegSelD <= (others => '0');
         if reset = '0' then
@@ -1453,8 +1494,14 @@ begin
     -----------------
     -----------------
 
-    -- This could be registered later
-    CurWriteOpData <= NextWriteOpData;
+    Execute2WriteReg: process(clock)
+    begin
+        if rising_edge(clock) then
+            writeDataLocks <= executeDataLocks;
+            CurWriteOpData <= NextWriteOpData;
+        end if;
+    end process Execute2WriteReg;
+
 
     -- Connects with Register write interface and writes data
     WriteProc: process(CurWriteOpData)
