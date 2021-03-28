@@ -242,7 +242,8 @@ architecture dataflow of AVR_CPU is
         writeRegSelD   : AVR.reg_d_sel_t;
     end record;
 
-    signal decodeDataLocks : std_logic_vector(39 downto 0);
+    signal decodeDataReadLocks : std_logic_vector(39 downto 0);
+    signal decodeDataWriteLocks : std_logic_vector(39 downto 0);
     signal executeDataLocks : std_logic_vector(39 downto 0);
     signal writeDataLocks : std_logic_vector(31 downto 0);
     signal decodeExecuteHazards : std_logic_vector(39 downto 0);
@@ -1468,33 +1469,34 @@ begin
         -- write as identical for locking, and keep lock throughout
         -- pipeline. This does create false dependencies, but it is
         -- simple and probably good enough for low pipeline depth here.
+        decodeDataReadLocks <= (others => '0');
+        decodeDataWriteLocks <= (others => '0');
         for i in 0 to 31 loop
             -- Assign register i lock flag
             reg_slv := std_logic_vector(to_unsigned(i, 5));
             if std_match(reg_slv, reg_read_ctrl.SelOutA) then
-                decodeDataLocks(i) <= '1';
+                decodeDataReadLocks(i) <= '1';
             elsif std_match(reg_slv, reg_read_ctrl.SelOutB) then
-                decodeDataLocks(i) <= '1';
+                decodeDataReadLocks(i) <= '1';
             elsif std_match(reg_slv, "11" & reg_read_ctrl.SelOutD & "-") then
-                decodeDataLocks(i) <= '1';
-            elsif NextExecuteOpData.writeRegEnS = '1' and std_match(reg_slv, NextExecuteOpData.writeRegSelS) then
-                decodeDataLocks(i) <= '1';
+                decodeDataReadLocks(i) <= '1';
+            end if;
+            if NextExecuteOpData.writeRegEnS = '1' and std_match(reg_slv, NextExecuteOpData.writeRegSelS) then
+                decodeDataWriteLocks(i) <= '1';
             elsif NextExecuteOpData.writeRegEnD = '1' and std_match(reg_slv, "11" & NextExecuteOpData.writeRegSelD & "-") then
-                decodeDataLocks(i) <= '1';
-            else
-                decodeDataLocks(i) <= '0';
+                decodeDataWriteLocks(i) <= '1';
             end if;
         end loop;
 
         if DecodeUsedSreg = '1' then
-            decodeDataLocks(39 downto 32) <= (others => '1');
+            decodeDataReadLocks(39 downto 32) <= (others => '1');
         else
-            decodeDataLocks(39 downto 32) <= NextExecuteOpData.ALUFlagMask;
+            decodeDataWriteLocks(39 downto 32) <= NextExecuteOpData.ALUFlagMask;
         end if;
     end process DataHazardComputeProc;
 
-    decodeExecuteHazards <= decodeDataLocks and executeDataLocks;
-    decodeWriteHazards <= decodeDataLocks(31 downto 0) and writeDataLocks;
+    decodeExecuteHazards <= decodeDataReadLocks and executeDataLocks;
+    decodeWriteHazards <= decodeDataReadLocks(31 downto 0) and writeDataLocks;
 
     DataHazardCheckProc: process(decodeExecuteHazards, decodeWriteHazards)
     begin
@@ -1525,7 +1527,7 @@ begin
                 CurExecuteOpData.writeRegEnD <= '0';
                 CurExecuteOpData.writeRegSelD <= (others => '0');
             else
-                executeDataLocks <= decodeDataLocks;
+                executeDataLocks <= decodeDataWriteLocks;
                 CurExecuteOpData <= NextExecuteOpData;
             end if;
         end if;
