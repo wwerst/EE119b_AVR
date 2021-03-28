@@ -163,7 +163,7 @@ architecture dataflow of AVR_CPU is
         );
     end component;
     signal dau_array_off   : std_logic_vector(5 downto 0);
-    signal dau_Update      : AVR.addr_t;
+    signal dau_update      : AVR.addr_t;
     type dau_ctrl_t is record
         SrcSel      : DAU.source_t;
         OffsetSel   : DAU.offset_t;
@@ -349,22 +349,25 @@ begin
         end if;
     end process SyncResetProc;
 
-    process(clock) begin
-        -- Writes and reads are sent at the falling clock
-        -- edge, and then the write signal is cleared at the
-        -- rising edge. Thus, the timing requirement is that
-        -- the data address is computed and output within 1/2
-        -- clock cycle + setup time, and then the write/read occurs
-        -- within the half clock cycle before the 
-        if rising_edge(clock) then
-            DataRd <= '1';
-            DataWr <= '1';
-        end if;
-        if falling_edge(clock) then
-            DataRd <= startDataRd;
-            DataWr <= startDataWr;
-        end if;
-    end process;
+    -- Writes and reads are sent at the falling clock
+    -- edge, and then the write signal is cleared at the
+    -- rising edge. Thus, the timing requirement is that
+    -- the data address is computed and output within 1/2
+    -- clock cycle + setup time, and then the write/read occurs
+    -- within the half clock cycle before the rising edge of clock.
+    DataRd <= startDataRd or clock;
+    DataWr <= startDataWr or clock;
+    --process(clock) begin
+        
+    --    if rising_edge(clock) then
+    --        DataRd <= '1';
+    --        DataWr <= '1';
+    --    end if;
+    --    if falling_edge(clock) then
+    --        DataRd <= startDataRd;
+    --        DataWr <= startDataWr;
+    --    end if;
+    --end process;
 
     RegReadDelayProc: process(clock)
     begin
@@ -373,6 +376,10 @@ begin
             reg_DataOutB_delay <= reg_DataOutB;
         end if;
     end process;
+
+    dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
+    iau_branch <= InstReg(9 downto 3);
+    iau_jump <= InstPayload(11 downto 0);
 
     -- Common register decodings used in decode logic
     decodeReg16d <= "1" & InstReg(7 downto 4);
@@ -388,9 +395,7 @@ begin
     decodeBitIndexB <= to_integer(unsigned(InstReg(2 downto 0)));
     decodeBitIndexS <= to_integer(unsigned(InstReg(6 downto 4)));
 
-    dau_array_off <= InstReg(13) & InstReg(11 downto 10) & InstReg(2 downto 0);
-    iau_branch <= InstReg(9 downto 3);
-    iau_jump <= InstPayload(11 downto 0);
+    
 
     -- Combinational logic that calculates the following:
     --   iau_ctrl: Controls what the next address that is fetched is.
@@ -398,7 +403,26 @@ begin
     --   reg_read_ctrl: Controls what is being read from register unit.
     --   ExecuteOpData: The op that is passed to execute stage.
     --   
-    DecodeProc: process(all)
+    DecodeProc: process(SyncReset,
+                        ProgABBuf,
+                        ProgDBSync,
+                        InstReg,
+                        CurState,
+                        reg_DataOutA,
+                        reg_DataOutB,
+                        reg_DataOutD,
+                        reg_DataOutA_delay,
+                        reg_DataOutB_delay,
+                        alu_SReg,
+                        decodeReg16d,
+                        decodeReg32d,
+                        decodeReg32r,
+                        decodeDRegLow,
+                        decodeDRegHigh,
+                        decodeWordConstant,
+                        decodeASDIWConstant,
+                        decodeBitIndexB,
+                        decodeBitIndexS)
         variable tmp_rd  : std_logic_vector(4 downto 0);
         variable tmp_rr  : std_logic_vector(4 downto 0);
     begin
@@ -1377,8 +1401,10 @@ begin
                 else
                     -- CurState = 2
                 end if;
+            --synthesis translate_off
             else
                 assert (reset = '0' or now = 0 ns) report "Unknown instruction ";
+            --synthesis translate_on
             end if;
         end if;
     end process DecodeProc;
@@ -1393,7 +1419,10 @@ begin
     CurExecuteOpData <= NextExecuteOpData;
 
     -- Connects with ALU and does ALU ops
-    ExecuteProc: process(all)
+    ExecuteProc: process(alu_Result,
+                         dau_update,
+                         reset,
+                         CurExecuteOpData)
     begin
         NextWriteOpData.dataS <= alu_Result;
         NextWriteOpData.writeRegEnS <= '0';
@@ -1422,7 +1451,7 @@ begin
     CurWriteOpData <= NextWriteOpData;
 
     -- Connects with Register write interface and writes data
-    WriteProc: process(all)
+    WriteProc: process(CurWriteOpData)
     begin
         reg_write_ctrl.EnableInS <= CurWriteOpData.writeRegEnS;
         reg_write_ctrl.SelInS <= CurWriteOpData.writeRegSelS;

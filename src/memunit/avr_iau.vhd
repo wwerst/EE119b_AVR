@@ -178,7 +178,8 @@ begin
         IncDecSel   => MemUnitConstants.MemUnit_INC,
         IncDecBit   => 0,
         PrePostSel  => MemUnitConstants.MemUnit_PRE,
-        Address     => next_address
+        Address     => next_address,
+        AddrSrcOut  => open
     );
     Address <= next_address;
 

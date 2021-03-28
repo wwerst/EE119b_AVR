@@ -40,16 +40,16 @@ use ieee.std_logic_1164.all;
 package DAU is
 
     -- sources constants
-    constant SOURCES: natural := 3;
-    subtype source_t is natural range SOURCES-1 downto 0;
+    constant SOURCES: integer := 3;
+    subtype source_t is integer range SOURCES-1 downto 0;
 
     constant SRC_PDB: source_t := 0;
     constant SRC_STACK: source_t := 1;
     constant SRC_REG: source_t := 2;
 
     -- offsets constants
-    constant OFFSETS: natural := 4;
-    subtype offset_t is natural range OFFSETS-1 downto 0;
+    constant OFFSETS: integer := 4;
+    subtype offset_t is integer range OFFSETS-1 downto 0;
 
     constant OFF_ZERO: offset_t := 0;
     constant OFF_ONE: offset_t := 1;
@@ -137,15 +137,18 @@ architecture  dataflow  of  AvrDau  is
     signal stack    : AVR.addr_t;
     -- constant offsets
     constant ZERO   : AVR.addr_t := (others => '0');
-    constant ONE    : AVR.addr_t := (0 => '1', others => '0');
+    constant ONE    : AVR.addr_t := "0000000000000001"; --(0 => '1', others => '0');
     constant NEGONE : AVR.addr_t := (others => '1');
+
+    constant AVR_ADDRSIZE: integer := 16;
+    constant DAU_SOURCES: integer := 3;
 
     signal array_ext                    : AVR.addr_t; -- zero extended array offset
     -- signals to generate the update address
     signal source_addr, computed_addr   : AVR.addr_t;
 
     -- concatenated sources and offsets
-    signal sources: std_logic_vector(DAU.SOURCES*AVR.ADDRSIZE - 1 downto 0);
+    signal sources: std_logic_vector(AVR_ADDRSIZE*DAU_SOURCES - 1 downto 0);
     signal offsets: std_logic_vector(DAU.OFFSETS*AVR.ADDRSIZE - 1 downto 0);
 
 begin
@@ -162,10 +165,10 @@ begin
     -- store source address into a signal.
     -- Is also done by the MemUnit internally, so ideally this gets optimized out,
     -- but may be asking too much
-    source_addr <= sources((srcSel+1)*AVR.ADDRSIZE-1 downto srcSel*AVR.ADDRSIZE);
+    source_addr <= sources((SrcSel*AVR_ADDRSIZE) + 15 downto SrcSel*AVR_ADDRSIZE);
 
     MU: MemUnit generic map (
-        srcCnt => DAU.SOURCES, offsetCnt => DAU.OFFSETS
+        srcCnt => DAU_SOURCES, offsetCnt => DAU.OFFSETS
     ) port map (
         AddrSrc => sources,
         SrcSel      => SrcSel,
@@ -174,7 +177,8 @@ begin
         IncDecSel   => MemUnitConstants.MemUnit_INC,
         IncDecBit   => 0,
         PrePostSel  => MemUnitConstants.MemUnit_PRE,
-        Address     => computed_addr
+        Address     => computed_addr,
+        AddrSrcOut  => open
     );
 
     -- only output the computed update address if doing an increment or decrement
