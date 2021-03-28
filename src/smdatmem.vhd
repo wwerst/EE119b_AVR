@@ -20,6 +20,7 @@
 --     17 Jan 18  Glen George       Write current data value instead of
 --                                  previous value when address bus changes
 --                                  while WE is active.
+--     28 Mar 21  Will Werst        Add memory checking, shift data address.
 --
 ----------------------------------------------------------------------------
 
@@ -200,7 +201,7 @@ begin
             if RAMbits0100(memory_index) /= ExpectedRAMbits0100(memory_index) then
                 test_failure := TRUE;
                 assert FALSE
-                    report "Data mismatch at " & to_hex(slv_memory_index)
+                    report "Data mismatch ERROR at " & to_hex(slv_memory_index)
                     severity ERROR;
             end if;
         end loop;

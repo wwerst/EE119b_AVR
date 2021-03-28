@@ -77,6 +77,7 @@ architecture dataflow of AVR_CPU is
             DDB         : in  std_logic_vector(7 downto 0);
             Z           : in  AVR.addr_t;
             OffsetSel   : in  IAU.offset_t;
+            BackPress   : in  std_logic;
             Address     : out AVR.addr_t
         );
     end component;
@@ -158,6 +159,7 @@ architecture dataflow of AVR_CPU is
             reg         : in  std_logic_vector(15 downto 0);
             OffsetSel   : in  DAU.offset_t;
             array_off   : in  std_logic_vector(5 downto 0);
+            BackPress   : in  std_logic;
             Address     : out AVR.addr_t;
             Update      : out AVR.addr_t
         );
@@ -195,6 +197,8 @@ architecture dataflow of AVR_CPU is
     signal decodeReg16d : AVR.reg_s_sel_t;
     signal decodeReg32d : AVR.reg_s_sel_t;
     signal decodeReg32r : AVR.reg_s_sel_t;
+
+    signal DecodeDataHazardPresent : std_logic;
 
     -- Decode signal for double register's
     -- corresponding low and high single reg address
@@ -289,6 +293,7 @@ begin
         DDB       => DataDB,
         Z         => reg_DataOutD,
         OffsetSel => iau_ctrl.offsetSel,
+        BackPress => DecodeDataHazardPresent,
         Address   => ProgABBuf
     );
 
@@ -302,6 +307,7 @@ begin
         reg       => reg_DataOutD,
         OffsetSel => dau_ctrl.OffsetSel,
         array_off => dau_array_off,
+        BackPress => DecodeDataHazardPresent,
         Address   => DataAB,
         Update    => dau_update
     );
@@ -1405,8 +1411,18 @@ begin
     -----------------
     -----------------
 
-    -- This could be registered later
-    CurExecuteOpData <= NextExecuteOpData;
+    DecodeDataHazardPresent <= '0';
+
+    Decode2ExecuteReg: process(all)
+    begin
+        if TRUE then
+            if DecodeDataHazardPresent = '0' then
+                CurExecuteOpData <= NextExecuteOpData;
+            else
+                --CurExecuteOpData <= ExecuteOpBubble;
+            end if;
+        end if;
+    end process Decode2ExecuteReg;
 
     -- Connects with ALU and does ALU ops
     ExecuteProc: process(alu_Result,

@@ -15,6 +15,7 @@
 --                                  updated commenting.
 --     21 Jan 08  Glen George       Updated commenting.
 --     17 Jan 18  Glen George       Updated commenting.
+--     28 Mar 21  Will Werst        Add signal for when final address reached.
 --
 ----------------------------------------------------------------------------
 
