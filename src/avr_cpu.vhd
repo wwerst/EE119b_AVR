@@ -395,6 +395,7 @@ begin
     DecodeProc: process(SyncReset,
                         ProgABBuf,
                         ProgDBSync,
+                        DataDB,
                         InstReg,
                         CurState,
                         reg_DataOutA,
