@@ -150,7 +150,7 @@ architecture  dataflow  of  AvrDau  is
 
 begin
     -- zero extend the unsigned offset
-    array_ext   <= (array_off'RANGE => array_off, others => '0');
+    array_ext   <= (array_ext'HIGH - array_off'HIGH - 1 downto 0 => '0') & array_off;
     -- sources and offsets
     sources     <= (reg & stack& pdb);
     offsets <= (

@@ -241,6 +241,11 @@ architecture dataflow of AVR_CPU is
 
     signal SyncReset : std_logic;
 
+    -- Used to read signal internally.
+    -- Note, could make external signal a buffer,
+    -- but this changes interface.
+    signal ProgABBuf : std_logic_vector(15 downto 0);
+
     constant FlagMaskAll    :  AVR.word_t := "11111111";
     constant FlagMaskNone   :  AVR.word_t := "00000000";
     constant FlagMaskZCNVSH :  AVR.word_t := "00111111";
@@ -284,8 +289,10 @@ begin
         DDB       => DataDB,
         Z         => reg_DataOutD,
         OffsetSel => iau_ctrl.offsetSel,
-        Address   => ProgAB
+        Address   => ProgABBuf
     );
+
+    ProgAB <= ProgABBuf;
 
     dau_u: AvrDau port map (
         clk       => clock,
@@ -321,13 +328,13 @@ begin
                 CurState <= 0;
             else
                 ProgDBSync <= ProgDB;
-                if LoadInstReg then
+                if LoadInstReg = '1' then
                     InstReg <= ProgDB;
                     CurState <= 0;
                 else
                     CurState <= CurState + 1;
                 end if;
-                if LoadInstPayload then
+                if LoadInstPayload = '1' then
                     InstPayload <= ProgDB;
                 end if;
             end if;
@@ -1019,7 +1026,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ONE;
-                    DataDB <= ProgAB(15 downto 8);
+                    DataDB <= ProgABBuf(15 downto 8);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1031,7 +1038,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    DataDB <= ProgAB(7 downto 0);
+                    DataDB <= ProgABBuf(7 downto 0);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1045,7 +1052,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ONE;
-                    DataDB <= ProgAB(15 downto 8);
+                    DataDB <= ProgABBuf(15 downto 8);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1054,7 +1061,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    DataDB <= ProgAB(7 downto 0);
+                    DataDB <= ProgABBuf(7 downto 0);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1069,7 +1076,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ONE;
-                    DataDB <= ProgAB(15 downto 8);
+                    DataDB <= ProgABBuf(15 downto 8);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1078,7 +1085,7 @@ begin
                     LoadInstPayload <= '0';
                     iau_ctrl.srcSel <= IAU.SRC_PC;
                     iau_ctrl.offsetSel <= IAU.OFF_ZERO;
-                    DataDB <= ProgAB(7 downto 0);
+                    DataDB <= ProgABBuf(7 downto 0);
                     dau_ctrl.SrcSel <= DAU.SRC_STACK;
                     dau_ctrl.OffsetSel <= DAU.OFF_NEGONE;
                     startDataWr <= '0';
@@ -1371,7 +1378,7 @@ begin
                     -- CurState = 2
                 end if;
             else
-                assert (reset = '0' or now = 0 ns) report "Unknown instruction " & to_string(InstReg);
+                assert (reset = '0' or now = 0 ns) report "Unknown instruction ";
             end if;
         end if;
     end process DecodeProc;

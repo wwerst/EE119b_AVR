@@ -153,8 +153,8 @@ architecture  dataflow  of  AvrIau  is
     signal next_address: AVR.addr_t;
 begin
     -- sign extend branch and jump offsets
-    branch_ext  <= (branch'RANGE => branch, others => branch(branch'HIGH));
-    jump_ext    <= (jump'RANGE => jump, others => jump(jump'HIGH));
+    branch_ext  <= (branch_ext'HIGH - branch'HIGH - 1 downto 0 => branch(branch'HIGH)) & branch;
+    jump_ext    <= (jump_ext'HIGH - jump'HIGH - 1 downto 0 => jump(jump'HIGH)) & jump;
     -- concatenate sources and offsets
     sources     <= (pc & ZERO);   -- pc for relative movements, ZERO for absolute movements
     offsets     <= (    -- One of these offsets is selected by the Mau
