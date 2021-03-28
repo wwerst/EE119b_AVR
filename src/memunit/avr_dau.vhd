@@ -140,6 +140,8 @@ architecture  dataflow  of  AvrDau  is
     constant ONE    : AVR.addr_t := "0000000000000001"; --(0 => '1', others => '0');
     constant NEGONE : AVR.addr_t := (others => '1');
 
+    -- Xilinx ISE 14.7 has issues with external package constants being used
+    -- in array indexing, so we have to hardcode them here...
     constant AVR_ADDRSIZE: integer := 16;
     constant DAU_SOURCES: integer := 3;
 

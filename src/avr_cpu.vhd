@@ -213,7 +213,7 @@ architecture dataflow of AVR_CPU is
 
     -- state machine
     subtype decode_state_t is integer range 0 to 3;
-    signal CurState, NextState: decode_state_t;
+    signal CurState: decode_state_t;
 
     type execute_op_data_t is record
         OpA            : AVR.word_t;
