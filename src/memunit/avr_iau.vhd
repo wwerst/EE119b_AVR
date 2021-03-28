@@ -34,6 +34,7 @@
 --                              address bus if the memory is not designed
 --                              for glitches (signal will stabilize before
 --                              the write/read command is sent).
+--      27 Mar 21   Will Werst  Add backpressure signal for pipelining
 ---------------------------------------------------------------------
 
 

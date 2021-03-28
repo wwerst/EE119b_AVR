@@ -13,6 +13,7 @@
 --     27 Mar 21  Will Werst        Implement full cpu. See git
 --                                  history for more granular details
 --                                  and revision history.
+--     27 Mar 21  Will Werst        Pipeline cpu.
 ----------------------------------------------------------------------------
 
 

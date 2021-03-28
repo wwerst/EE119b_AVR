@@ -11,9 +11,7 @@
 --      cpu_programfull_tb: the test bench itself
 --
 -- Revision History:
---     27 Mar 21  Will Werst        Finish implementing full cpu. See git
---                                  history for more granular details
---                                  and revision history.
+--     27 Mar 21  Will Werst        Create testbench for pipelined cpu
 ---------------------------------------------------------------------
 
 library ieee;
