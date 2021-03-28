@@ -18,6 +18,7 @@
 --      22 Feb 21   Eric Chen   Merge register inputs
 --      27 Mar 21   Will Werst  Fix stack starting at 0000 instead of
 --                              FFFF. See git history for more details.
+--      27 Mar 21   Will Werst  Add backpressure signal for pipelining
 ---------------------------------------------------------------------
 
 library ieee;
@@ -44,6 +45,7 @@ architecture testbench of dau_tb is
             reg         : in  std_logic_vector(15 downto 0);
             OffsetSel   : in  DAU.offset_t;
             array_off   : in  std_logic_vector(5 downto 0);
+            BackPress   : in   std_logic;
             Address     : out AVR.addr_t;
             Update      : out AVR.addr_t
         );
@@ -61,6 +63,7 @@ architecture testbench of dau_tb is
     signal reg              : std_logic_vector(15 downto 0);
     signal OffsetSel        : DAU.offset_t;
     signal array_off        : std_logic_vector(5 downto 0);
+    signal BackPress        : std_logic := '0';
     signal address, update  : AVR.addr_t;
 
     -- test bench signals
@@ -182,6 +185,7 @@ begin
         reg => reg,
         offsetSel => offsetSel,
         array_off => array_off,
+        BackPress => BackPress,
         address => address,
         update => update
     );
