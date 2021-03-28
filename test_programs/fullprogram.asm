@@ -148,15 +148,58 @@ section_1:
     
     ASR     r17
     LSR     r15
-
+    LDI     r31,    $FF
 section_2:
+    ADD     r0,     r1
+    ADC     r2,     r3
+    AND     r4,     r5
+    ASR     r6
+    COM     r7
+    CPC     r8,     r9
+    DEC     r10
+    CPI     r21,    $AF
+    EOR     r12,    r13
+    INC     r14
+    LSR     r15
+    MUL     r16,    r17
+    NEG     r18
+    OR      r19,    r20
+    ROR     r21
+    SBC     r22,    r23
+    SBCI    r24,    $32
+    SUB     r25,    r26
+    SWAP    r27
+
+    ADD     r15,    r8 
+    ADC     r16,    r10
+    AND     r18,    r11
+    ASR     r19 
+    COM     r21  
+    CPC     r1,     r9
+    DEC     r3 
+    CPI     r25,    $AF
+    EOR     r12,    r13
+    INC     r14 
+    LSR     r0
+    MUL     r2,     r17
+    NEG     r4      
+    OR      r6,     r20
+    ROR     r24  
+    SBC     r22,    r23
+    SBCI    r17,    $32
+    SUB     r25,    r26
+    SWAP    r27 
+
+    DEC     r31
+    BRBC    SREG_Z, section_2
+
 
 section_3:
-
+    NOP
 section_4:
-
+    NOP
 section_5:
-
+    NOP
 
 dump_regs:
     ; Load registers into data memory

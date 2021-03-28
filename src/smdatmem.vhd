@@ -75,14 +75,14 @@ architecture  RAM  of  DATA_MEMORY  is
     signal  RAMbitsFF80  :  RAMtype  := (others => (others => 'X'));
 
     signal  ExpectedRAMbits0100 : RAMtype := (
-        X"2c", X"03", X"6b", X"70",  
-        X"40", X"50", X"40", X"70",  
-        X"80", X"31", X"01", X"2f",  
-        X"7b", X"31", X"31", X"28",  
-        X"61", X"3c", X"20", X"01",  
-        X"2b", X"03", X"22", X"32",  
-        X"42", X"52", X"1a", X"01",  
-        X"82", X"92", X"2f", X"01",  
+        X"32", X"4b", X"af", X"71",  
+        X"c0", X"50", X"3f", X"8f",  
+        X"80", X"31", X"02", X"2f",  
+        X"7b", X"31", X"2f", X"ff",  
+        X"e0", X"3c", X"20", X"1f",  
+        X"2b", X"55", X"c2", X"32",  
+        X"cd", X"16", X"1a", X"01",  
+        X"82", X"92", X"2f", X"00",  
         X"00", X"00", X"ef", X"23",  
         X"2e", X"2f", X"7b", X"27",  
         X"20", X"03", X"20", X"6f",  

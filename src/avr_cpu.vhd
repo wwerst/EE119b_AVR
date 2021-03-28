@@ -242,11 +242,13 @@ architecture dataflow of AVR_CPU is
         writeRegSelD   : AVR.reg_d_sel_t;
     end record;
 
-    signal decodeDataLocks : std_logic_vector(10 downto 0);
-    signal executeDataLocks : std_logic_vector(10 downto 0);
-    signal writeDataLocks : std_logic_vector(10 downto 0);
-    signal decodeExecuteHazards : std_logic_vector(10 downto 0);
-    signal decodeWriteHazards : std_logic_vector(10 downto 0);
+    signal decodeDataLocks : std_logic_vector(39 downto 0);
+    signal executeDataLocks : std_logic_vector(39 downto 0);
+    signal writeDataLocks : std_logic_vector(31 downto 0);
+    signal decodeExecuteHazards : std_logic_vector(39 downto 0);
+    signal decodeWriteHazards : std_logic_vector(31 downto 0);
+
+    signal DecodeUsedSreg : std_logic;
 
     signal CurWriteOpData, NextWriteOpData : write_op_data_t;
 
@@ -450,9 +452,9 @@ begin
         iau_ctrl.OffsetSel <= IAU.OFF_ONE; -- Increment address by one
         dau_ctrl.SrcSel <= DAU.SRC_REG; -- Keep dau address the same
         dau_ctrl.OffsetSel <= DAU.OFF_ZERO; -- Leave dau address unchanged
-        reg_read_ctrl.SelOutA <= (others => '0');
-        reg_read_ctrl.SelOutB <= (others => '0');
-        reg_read_ctrl.SelOutD <= (others => '0');
+        reg_read_ctrl.SelOutA <= (others => 'U');
+        reg_read_ctrl.SelOutB <= (others => 'U');
+        reg_read_ctrl.SelOutD <= (others => 'U');
 
         -- Default to executing a pass-through of OpA to result
         -- Done by adding OpA to OpB = 0, then making sure flags don't change.
@@ -470,7 +472,7 @@ begin
         startDataWr <= '1';
         startDataRd <= '1';
 
-        decodeDataLocks <= (others => '1');
+        DecodeUsedSreg <= '0';
 
 
         -- Control signal for previous pipeline stage
@@ -492,11 +494,13 @@ begin
                 null;
             elsif std_match(InstReg, Opcodes.OpBCLR) then
                 NextExecuteOpData.OpA <= alu_SReg;
+                DecodeUsedSreg <= '1';
                 NextExecuteOpData.OpB(decodeBitIndexS) <= '1';
                 NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BCLR_Op;
             elsif std_match(InstReg, Opcodes.OpBSET) then
                 NextExecuteOpData.OpA <= alu_SReg;
+                DecodeUsedSreg <= '1';
                 NextExecuteOpData.OpB(decodeBitIndexS) <= '1';
                 NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
                 NextExecuteOpData.ALUOpCode <= ALUOp.BSET_Op;
@@ -553,6 +557,7 @@ begin
                     -- Set to 0 by default statements above, but be explicit about it:
                     NextExecuteOpData.OpB <= (others => '0');
                     NextExecuteOpData.ALUOpCode <= ALUOp.ADC_Op;
+                    DecodeUsedSreg <= '1';
                     if alu_SReg(AVR.STATUS_ZERO) = '0' then
                         -- If the low register was not zero, the result is not zero,
                         -- so leave zero flag unset.
@@ -595,7 +600,7 @@ begin
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= tmp_rd;
             elsif std_match(Instreg, Opcodes.OpBLD) then
-                -- 
+                DecodeUsedSreg <= '1';
                 tmp_rd := decodeReg32d;
                 reg_read_ctrl.SelOutA <= tmp_rd;
                 NextExecuteOpData.OpA <= reg_DataOutA;
@@ -754,6 +759,7 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= reg_DataOutB;
                 NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                DecodeUsedSreg <= '1';
                 -- Implement special behavior for zero flag for SBC
                 -- If the previous result is zero, then update flag
                 -- Otherwise, don't update, therefore leaving flag at 0.
@@ -770,6 +776,7 @@ begin
                 NextExecuteOpData.OpA <= reg_DataOutA;
                 NextExecuteOpData.OpB <= decodeWordConstant;
                 NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                DecodeUsedSreg <= '1';
                 -- Implement special behavior for zero flag for SBC
                 -- If the previous result is zero, then update flag
                 -- Otherwise, don't update, therefore leaving flag at 0.
@@ -808,6 +815,7 @@ begin
                     -- Set to 0 by default statements above, but be explicit about it:
                     NextExecuteOpData.OpB <= (others => '0');
                     NextExecuteOpData.ALUOpCode <= ALUOp.SBC_Op;
+                    DecodeUsedSreg <= '1';
                     if alu_SReg(AVR.STATUS_ZERO) = '0' then
                         -- If the low register was not zero, the result is not zero,
                         -- so leave zero flag unset.
@@ -987,6 +995,7 @@ begin
             -------------------
             -------------------
             elsif std_match(InstReg, Opcodes.OpBRBC) then
+                DecodeUsedSreg <= '1';
                 -- If the bit is cleared, then take branch.
                 -- Otherwise, keep default which is to just go to next
                 -- instruction.
@@ -995,6 +1004,7 @@ begin
                     LoadInstReg <= '0';
                 end if;
             elsif std_match(InstReg, Opcodes.OpBRBS) then
+                DecodeUsedSreg <= '1';
                 -- If the bit is set, then take branch.
                 -- Otherwise, keep default which is to just go to next
                 -- instruction.
@@ -1152,6 +1162,7 @@ begin
                 end if;
             elsif std_match(InstReg, Opcodes.OpRETI) then
                 if CurState = 0 then
+                    DecodeUsedSreg <= '1';
                     NextExecuteOpData.OpA <= alu_SReg;
                     NextExecuteOpData.OpB(AVR.STATUS_INT) <= '1';
                     NextExecuteOpData.ALUFlagMask <= FlagMaskAll;
@@ -1181,6 +1192,7 @@ begin
             -------------------
             elsif std_match(InstReg, Opcodes.OpIN) then
                 -- Fixed IN Rd, $3F  ; Copies status register to Rd
+                DecodeUsedSreg <= '1';
                 NextExecuteOpData.writeRegEnS <= '1';
                 NextExecuteOpData.writeRegSelS <= decodeReg32d;
                 NextExecuteOpData.OpA <= alu_SReg;
@@ -1428,14 +1440,67 @@ begin
     -----------------
     -----------------
 
+    DataHazardComputeProc: process(NextExecuteOpData,
+                                   reg_read_ctrl,
+                                   DecodeUsedSreg)
+        variable reg_slv: std_logic_vector(4 downto 0);
+    begin
+        -- This cpu is an in-order pipelined cpu.
+        -- Therefore, we only need to worry about write-after-read
+        -- data hazards. Read-after-write and write-after-write
+        -- only occur in out-of-order cpus.
+
+        -- Sources of write-after-read hazards:
+        --  Registers (Write stage)
+        --  Status register (Execute stage)
+        --  
+        --  Both registers and status registers are used in
+        --  decode stage, with no resource use passed on
+        --  to this logic right now. Need to change that.
+        --  CurExecuteOpData, or another record in parallel,
+        --  should include registers read from and status register
+        --  read from in decode stage. For registers, can just use
+        --  the reg_read_ctrl record. For status register, need to
+        --  add something to facilitate this.
+        --
+        -- Then, we construct a DataLocks record by one-hot encoding
+        -- all of the resources. For simplicity, we treat read and
+        -- write as identical for locking, and keep lock throughout
+        -- pipeline. This does create false dependencies, but it is
+        -- simple and probably good enough for low pipeline depth here.
+        for i in 0 to 31 loop
+            -- Assign register i lock flag
+            reg_slv := std_logic_vector(to_unsigned(i, 5));
+            if std_match(reg_slv, reg_read_ctrl.SelOutA) then
+                decodeDataLocks(i) <= '1';
+            elsif std_match(reg_slv, reg_read_ctrl.SelOutB) then
+                decodeDataLocks(i) <= '1';
+            elsif std_match(reg_slv, "11" & reg_read_ctrl.SelOutD & "-") then
+                decodeDataLocks(i) <= '1';
+            elsif NextExecuteOpData.writeRegEnS = '1' and std_match(reg_slv, NextExecuteOpData.writeRegSelS) then
+                decodeDataLocks(i) <= '1';
+            elsif NextExecuteOpData.writeRegEnD = '1' and std_match(reg_slv, "11" & NextExecuteOpData.writeRegSelD & "-") then
+                decodeDataLocks(i) <= '1';
+            else
+                decodeDataLocks(i) <= '0';
+            end if;
+        end loop;
+
+        if DecodeUsedSreg = '1' then
+            decodeDataLocks(39 downto 32) <= (others => '1');
+        else
+            decodeDataLocks(39 downto 32) <= NextExecuteOpData.ALUFlagMask;
+        end if;
+    end process DataHazardComputeProc;
+
     decodeExecuteHazards <= decodeDataLocks and executeDataLocks;
-    decodeWriteHazards <= decodeDataLocks and writeDataLocks;
+    decodeWriteHazards <= decodeDataLocks(31 downto 0) and writeDataLocks;
 
     DataHazardCheckProc: process(decodeExecuteHazards, decodeWriteHazards)
     begin
-        if not std_match(decodeExecuteHazards, "00000000000") then
+        if decodeExecuteHazards /= (decodeExecuteHazards'range => '0') then
             DecodeDataHazardPresent <= '1';
-        elsif not std_match(decodeWriteHazards, "00000000000") then
+        elsif decodeWriteHazards /= (decodeWriteHazards'range => '0') then
             DecodeDataHazardPresent <= '1';
         else
             DecodeDataHazardPresent <= '0';
@@ -1497,7 +1562,7 @@ begin
     Execute2WriteReg: process(clock)
     begin
         if rising_edge(clock) then
-            writeDataLocks <= executeDataLocks;
+            writeDataLocks <= executeDataLocks(31 downto 0);
             CurWriteOpData <= NextWriteOpData;
         end if;
     end process Execute2WriteReg;
