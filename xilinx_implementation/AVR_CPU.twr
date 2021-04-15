@@ -37,717 +37,861 @@ INFO:Timing:3389 - This architecture does not support 'Discrete Jitter' and
 Timing constraint: TS_clock = PERIOD TIMEGRP "clock" 25 ns HIGH 50%;
 For more information, see Period Analysis in the Timing Closure User Guide (UG612).
 
- 105333649 paths analyzed, 1923 endpoints analyzed, 0 failing endpoints
- 0 timing errors detected. (0 setup errors, 0 hold errors, 0 component switching limit errors)
- Minimum period is  24.919ns.
+ 91373473 paths analyzed, 2278 endpoints analyzed, 126 failing endpoints
+ 126 timing errors detected. (126 setup errors, 0 hold errors, 0 component switching limit errors)
+ Minimum period is  27.839ns.
 --------------------------------------------------------------------------------
 
-Paths for end point reg_u/RegArrayMap/Registers_22_6_BRB2 (SLICE_X29Y40.BY), 581432 paths
+Paths for end point InstReg_4 (V3.ICE), 1612494 paths
 --------------------------------------------------------------------------------
-Slack (setup path):     0.081ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_22_6_BRB2 (FF)
+Slack (setup path):     -2.839ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_4 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.806ns (Levels of Logic = 12)
-  Clock Path Skew:      -0.113ns (0.075 - 0.188)
+  Data Path Delay:      27.839ns (Levels of Logic = 17)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_22_6_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_4
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Registers_1_6_BRB1
-                                                       reg_u/RegArrayMap/Mmux_RegA_8_f5_6
-    SLICE_X35Y34.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_8_f57
-    SLICE_X35Y34.FX      Tinbfx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P14   Tmult                 4.808   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X25Y42.F3      net (fanout=3)        1.914   alu_u/alu_c/Mul1/UnsignedMulResult<14>
-    SLICE_X25Y42.X       Tif5x                 1.025   reg_u/RegArrayMap/Registers_10_6_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.BY      net (fanout=31)       1.421   alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.CLK     Tdick                 0.361   reg_u/RegArrayMap/Registers_22_4_BRB2
-                                                       reg_u/RegArrayMap/Registers_22_6_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    V3.ICE               net (fanout=16)       1.877   InstReg_not0001
+    V3.ICLK1             Tioiceck              0.737   ProgDB<4>
+                                                       InstReg_4
     -------------------------------------------------  ---------------------------
-    Total                                     24.806ns (13.042ns logic, 11.764ns route)
-                                                       (52.6% logic, 47.4% route)
+    Total                                     27.839ns (12.208ns logic, 15.631ns route)
+                                                       (43.9% logic, 56.1% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.081ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_22_6_BRB2 (FF)
+Slack (setup path):     -2.744ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_4 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.806ns (Levels of Logic = 12)
-  Clock Path Skew:      -0.113ns (0.075 - 0.188)
+  Data Path Delay:      27.744ns (Levels of Logic = 17)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_22_6_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_4
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P14   Tmult                 4.808   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X25Y42.F3      net (fanout=3)        1.914   alu_u/alu_c/Mul1/UnsignedMulResult<14>
-    SLICE_X25Y42.X       Tif5x                 1.025   reg_u/RegArrayMap/Registers_10_6_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.BY      net (fanout=31)       1.421   alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.CLK     Tdick                 0.361   reg_u/RegArrayMap/Registers_22_4_BRB2
-                                                       reg_u/RegArrayMap/Registers_22_6_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X48Y34.G3      net (fanout=26)       1.479   N2
+    SLICE_X48Y34.Y       Tilo                  0.759   NextExecuteOpData_ALUFlagMask<1>19
+                                                       reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.G4      net (fanout=4)        0.517   reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    V3.ICE               net (fanout=16)       1.877   InstReg_not0001
+    V3.ICLK1             Tioiceck              0.737   ProgDB<4>
+                                                       InstReg_4
     -------------------------------------------------  ---------------------------
-    Total                                     24.806ns (13.042ns logic, 11.764ns route)
-                                                       (52.6% logic, 47.4% route)
+    Total                                     27.744ns (12.208ns logic, 15.536ns route)
+                                                       (44.0% logic, 56.0% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.154ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               reg_read_ctrl_SelOutA<4>131_FRB (FF)
-  Destination:          reg_u/RegArrayMap/Registers_22_6_BRB2 (FF)
+Slack (setup path):     -2.678ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_4 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.740ns (Levels of Logic = 14)
-  Clock Path Skew:      -0.106ns (0.075 - 0.181)
+  Data Path Delay:      27.678ns (Levels of Logic = 16)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: reg_read_ctrl_SelOutA<4>131_FRB to reg_u/RegArrayMap/Registers_22_6_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_4
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    SLICE_X35Y24.XQ      Tcko                  0.591   reg_read_ctrl_SelOutA<4>131_FRB
-                                                       reg_read_ctrl_SelOutA<4>131_FRB
-    SLICE_X34Y26.G1      net (fanout=7)        0.502   reg_read_ctrl_SelOutA<4>131_FRB
-    SLICE_X34Y26.Y       Tilo                  0.759   N505
-                                                       reg_read_ctrl_SelOutA<4>14215
-    SLICE_X31Y35.G4      net (fanout=3)        0.856   reg_read_ctrl_SelOutA<4>14215
-    SLICE_X31Y35.Y       Tilo                  0.704   reg_u/RegArrayMap/Registers_28_0_BRB1
-                                                       reg_read_ctrl_SelOutA<0>147
-    SLICE_X31Y34.F4      net (fanout=3)        0.065   N2
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P14   Tmult                 4.808   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X25Y42.F3      net (fanout=3)        1.914   alu_u/alu_c/Mul1/UnsignedMulResult<14>
-    SLICE_X25Y42.X       Tif5x                 1.025   reg_u/RegArrayMap/Registers_10_6_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.BY      net (fanout=31)       1.421   alu_u/alu_c/Mmux_Result_2_f5_5_dup_bwd_dup_bwd
-    SLICE_X29Y40.CLK     Tdick                 0.361   reg_u/RegArrayMap/Registers_22_4_BRB2
-                                                       reg_u/RegArrayMap/Registers_22_6_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X65Y34.F4      net (fanout=2)        0.934   N2981
+    SLICE_X65Y34.X       Tilo                  0.704   decodeDataReadLocks<8>
+                                                       decodeDataReadLocks_8_mux00021
+    SLICE_X68Y33.F2      net (fanout=2)        0.660   decodeDataReadLocks<8>
+    SLICE_X68Y33.X       Tilo                  0.759   N1421
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>_SW0
+    SLICE_X70Y32.F3      net (fanout=1)        0.349   N1421
+    SLICE_X70Y32.COUT    Topcyf                1.162   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    V3.ICE               net (fanout=16)       1.877   InstReg_not0001
+    V3.ICLK1             Tioiceck              0.737   ProgDB<4>
+                                                       InstReg_4
     -------------------------------------------------  ---------------------------
-    Total                                     24.740ns (14.588ns logic, 10.152ns route)
-                                                       (59.0% logic, 41.0% route)
+    Total                                     27.678ns (12.078ns logic, 15.600ns route)
+                                                       (43.6% logic, 56.4% route)
 
 --------------------------------------------------------------------------------
 
-Paths for end point reg_u/RegArrayMap/Registers_23_1_BRB2 (SLICE_X28Y49.BX), 201160 paths
+Paths for end point InstReg_7 (U5.ICE), 1612494 paths
 --------------------------------------------------------------------------------
-Slack (setup path):     0.230ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_23_1_BRB2 (FF)
+Slack (setup path):     -2.699ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_7 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.661ns (Levels of Logic = 12)
-  Clock Path Skew:      -0.109ns (0.079 - 0.188)
+  Data Path Delay:      27.699ns (Levels of Logic = 17)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_23_1_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_7
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Registers_1_6_BRB1
-                                                       reg_u/RegArrayMap/Mmux_RegA_8_f5_6
-    SLICE_X35Y34.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_8_f57
-    SLICE_X35Y34.FX      Tinbfx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P9    Tmult                 4.525   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X24Y50.F1      net (fanout=2)        1.800   alu_u/alu_c/Mul1/UnsignedMulResult<9>
-    SLICE_X24Y50.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_1_BRB2
-                                                       alu_u/alu_c/Mmux_Result_31
-                                                       alu_u/alu_c/Mmux_Result_2_f5_0
-    SLICE_X28Y49.BX      net (fanout=33)       1.547   alu_Result<1>
-    SLICE_X28Y49.CLK     Tdick                 0.360   reg_u/RegArrayMap/Registers_23_1_BRB2
-                                                       reg_u/RegArrayMap/Registers_23_1_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    U5.ICE               net (fanout=16)       1.737   InstReg_not0001
+    U5.ICLK1             Tioiceck              0.737   ProgDB<7>
+                                                       InstReg_7
     -------------------------------------------------  ---------------------------
-    Total                                     24.661ns (12.885ns logic, 11.776ns route)
-                                                       (52.2% logic, 47.8% route)
+    Total                                     27.699ns (12.208ns logic, 15.491ns route)
+                                                       (44.1% logic, 55.9% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.230ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_23_1_BRB2 (FF)
+Slack (setup path):     -2.604ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_7 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.661ns (Levels of Logic = 12)
-  Clock Path Skew:      -0.109ns (0.079 - 0.188)
+  Data Path Delay:      27.604ns (Levels of Logic = 17)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_23_1_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_7
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P9    Tmult                 4.525   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X24Y50.F1      net (fanout=2)        1.800   alu_u/alu_c/Mul1/UnsignedMulResult<9>
-    SLICE_X24Y50.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_1_BRB2
-                                                       alu_u/alu_c/Mmux_Result_31
-                                                       alu_u/alu_c/Mmux_Result_2_f5_0
-    SLICE_X28Y49.BX      net (fanout=33)       1.547   alu_Result<1>
-    SLICE_X28Y49.CLK     Tdick                 0.360   reg_u/RegArrayMap/Registers_23_1_BRB2
-                                                       reg_u/RegArrayMap/Registers_23_1_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X48Y34.G3      net (fanout=26)       1.479   N2
+    SLICE_X48Y34.Y       Tilo                  0.759   NextExecuteOpData_ALUFlagMask<1>19
+                                                       reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.G4      net (fanout=4)        0.517   reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    U5.ICE               net (fanout=16)       1.737   InstReg_not0001
+    U5.ICLK1             Tioiceck              0.737   ProgDB<7>
+                                                       InstReg_7
     -------------------------------------------------  ---------------------------
-    Total                                     24.661ns (12.885ns logic, 11.776ns route)
-                                                       (52.2% logic, 47.8% route)
+    Total                                     27.604ns (12.208ns logic, 15.396ns route)
+                                                       (44.2% logic, 55.8% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.303ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               reg_read_ctrl_SelOutA<4>131_FRB (FF)
-  Destination:          reg_u/RegArrayMap/Registers_23_1_BRB2 (FF)
+Slack (setup path):     -2.538ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_7 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.595ns (Levels of Logic = 14)
-  Clock Path Skew:      -0.102ns (0.079 - 0.181)
+  Data Path Delay:      27.538ns (Levels of Logic = 16)
+  Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: reg_read_ctrl_SelOutA<4>131_FRB to reg_u/RegArrayMap/Registers_23_1_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_7
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    SLICE_X35Y24.XQ      Tcko                  0.591   reg_read_ctrl_SelOutA<4>131_FRB
-                                                       reg_read_ctrl_SelOutA<4>131_FRB
-    SLICE_X34Y26.G1      net (fanout=7)        0.502   reg_read_ctrl_SelOutA<4>131_FRB
-    SLICE_X34Y26.Y       Tilo                  0.759   N505
-                                                       reg_read_ctrl_SelOutA<4>14215
-    SLICE_X31Y35.G4      net (fanout=3)        0.856   reg_read_ctrl_SelOutA<4>14215
-    SLICE_X31Y35.Y       Tilo                  0.704   reg_u/RegArrayMap/Registers_28_0_BRB1
-                                                       reg_read_ctrl_SelOutA<0>147
-    SLICE_X31Y34.F4      net (fanout=3)        0.065   N2
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P9    Tmult                 4.525   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X24Y50.F1      net (fanout=2)        1.800   alu_u/alu_c/Mul1/UnsignedMulResult<9>
-    SLICE_X24Y50.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_1_BRB2
-                                                       alu_u/alu_c/Mmux_Result_31
-                                                       alu_u/alu_c/Mmux_Result_2_f5_0
-    SLICE_X28Y49.BX      net (fanout=33)       1.547   alu_Result<1>
-    SLICE_X28Y49.CLK     Tdick                 0.360   reg_u/RegArrayMap/Registers_23_1_BRB2
-                                                       reg_u/RegArrayMap/Registers_23_1_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X65Y34.F4      net (fanout=2)        0.934   N2981
+    SLICE_X65Y34.X       Tilo                  0.704   decodeDataReadLocks<8>
+                                                       decodeDataReadLocks_8_mux00021
+    SLICE_X68Y33.F2      net (fanout=2)        0.660   decodeDataReadLocks<8>
+    SLICE_X68Y33.X       Tilo                  0.759   N1421
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>_SW0
+    SLICE_X70Y32.F3      net (fanout=1)        0.349   N1421
+    SLICE_X70Y32.COUT    Topcyf                1.162   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    U5.ICE               net (fanout=16)       1.737   InstReg_not0001
+    U5.ICLK1             Tioiceck              0.737   ProgDB<7>
+                                                       InstReg_7
     -------------------------------------------------  ---------------------------
-    Total                                     24.595ns (14.431ns logic, 10.164ns route)
-                                                       (58.7% logic, 41.3% route)
+    Total                                     27.538ns (12.078ns logic, 15.460ns route)
+                                                       (43.9% logic, 56.1% route)
 
 --------------------------------------------------------------------------------
 
-Paths for end point reg_u/RegArrayMap/Registers_8_7_BRB2 (SLICE_X28Y38.BY), 662562 paths
+Paths for end point InstReg_11 (T11.ICE), 1612494 paths
 --------------------------------------------------------------------------------
-Slack (setup path):     0.240ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_8_7_BRB2 (FF)
+Slack (setup path):     -2.385ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_11 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.651ns (Levels of Logic = 13)
-  Clock Path Skew:      -0.109ns (0.079 - 0.188)
+  Data Path Delay:      27.380ns (Levels of Logic = 17)
+  Clock Path Skew:      -0.005ns (0.212 - 0.217)
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_8_7_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_11
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y35.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Registers_1_6_BRB1
-                                                       reg_u/RegArrayMap/Mmux_RegA_8_f5_6
-    SLICE_X35Y34.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_8_f57
-    SLICE_X35Y34.FX      Tinbfx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P7    Tmult                 4.344   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X23Y45.G1      net (fanout=5)        1.341   alu_u/alu_c/Mul1/UnsignedMulResult<7>
-    SLICE_X23Y45.Y       Tilo                  0.704   reg_u/RegArrayMap/Registers_10_7_BRB0
-                                                       alu_u/alu_c/Mul1/MulResult<7>1_SW11111
-    SLICE_X24Y41.F3      net (fanout=1)        0.561   alu_u/alu_c/Mul1/MulResult<7>1_SW1111
-    SLICE_X24Y41.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_7_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.BY      net (fanout=31)       0.890   alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.CLK     Tdick                 0.382   reg_u/RegArrayMap/Registers_8_7_BRB2
-                                                       reg_u/RegArrayMap/Registers_8_7_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    T11.ICE              net (fanout=16)       1.418   InstReg_not0001
+    T11.ICLK1            Tioiceck              0.737   ProgDB<11>
+                                                       InstReg_11
     -------------------------------------------------  ---------------------------
-    Total                                     24.651ns (13.430ns logic, 11.221ns route)
-                                                       (54.5% logic, 45.5% route)
+    Total                                     27.380ns (12.208ns logic, 15.172ns route)
+                                                       (44.6% logic, 55.4% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.240ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_8_7_BRB2 (FF)
+Slack (setup path):     -2.290ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_11 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.651ns (Levels of Logic = 13)
-  Clock Path Skew:      -0.109ns (0.079 - 0.188)
+  Data Path Delay:      27.285ns (Levels of Logic = 17)
+  Clock Path Skew:      -0.005ns (0.212 - 0.217)
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_8_7_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_11
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P7    Tmult                 4.344   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X23Y45.G1      net (fanout=5)        1.341   alu_u/alu_c/Mul1/UnsignedMulResult<7>
-    SLICE_X23Y45.Y       Tilo                  0.704   reg_u/RegArrayMap/Registers_10_7_BRB0
-                                                       alu_u/alu_c/Mul1/MulResult<7>1_SW11111
-    SLICE_X24Y41.F3      net (fanout=1)        0.561   alu_u/alu_c/Mul1/MulResult<7>1_SW1111
-    SLICE_X24Y41.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_7_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.BY      net (fanout=31)       0.890   alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.CLK     Tdick                 0.382   reg_u/RegArrayMap/Registers_8_7_BRB2
-                                                       reg_u/RegArrayMap/Registers_8_7_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X48Y34.G3      net (fanout=26)       1.479   N2
+    SLICE_X48Y34.Y       Tilo                  0.759   NextExecuteOpData_ALUFlagMask<1>19
+                                                       reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.G4      net (fanout=4)        0.517   reg_read_ctrl_SelOutA<0>_REPLICA_22
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X70Y36.F1      net (fanout=2)        1.080   N2981
+    SLICE_X70Y36.X       Tilo                  0.759   writeDataLocks<0>
+                                                       decodeDataReadLocks_0_mux00001
+    SLICE_X71Y37.F3      net (fanout=2)        0.371   decodeDataReadLocks<0>
+    SLICE_X71Y37.X       Tilo                  0.704   writeDataLocks<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>_SW0
+    SLICE_X70Y31.F4      net (fanout=1)        0.523   N138
+    SLICE_X70Y31.COUT    Topcyf                1.162   writeDataLocks<17>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<0>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<1>
+    SLICE_X70Y32.COUT    Tbyp                  0.130   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    T11.ICE              net (fanout=16)       1.418   InstReg_not0001
+    T11.ICLK1            Tioiceck              0.737   ProgDB<11>
+                                                       InstReg_11
     -------------------------------------------------  ---------------------------
-    Total                                     24.651ns (13.430ns logic, 11.221ns route)
-                                                       (54.5% logic, 45.5% route)
+    Total                                     27.285ns (12.208ns logic, 15.077ns route)
+                                                       (44.7% logic, 55.3% route)
 
 --------------------------------------------------------------------------------
-Slack (setup path):     0.292ns (requirement - (data path - clock path skew + uncertainty))
-  Source:               InstReg_5 (FF)
-  Destination:          reg_u/RegArrayMap/Registers_8_7_BRB2 (FF)
+Slack (setup path):     -2.224ns (requirement - (data path - clock path skew + uncertainty))
+  Source:               InstReg_13 (FF)
+  Destination:          InstReg_11 (FF)
   Requirement:          25.000ns
-  Data Path Delay:      24.599ns (Levels of Logic = 13)
-  Clock Path Skew:      -0.109ns (0.079 - 0.188)
+  Data Path Delay:      27.219ns (Levels of Logic = 16)
+  Clock Path Skew:      -0.005ns (0.212 - 0.217)
   Source Clock:         clock_IBUF rising at 0.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Maximum Data Path: InstReg_5 to reg_u/RegArrayMap/Registers_8_7_BRB2
+  Maximum Data Path: InstReg_13 to InstReg_11
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    U8.IQ1               Tiockiq               0.508   ProgDB<5>
-                                                       InstReg_5
-    SLICE_X31Y34.F2      net (fanout=9)        3.035   InstReg<5>
-    SLICE_X31Y34.X       Tilo                  0.704   reg_u/RegArrayMap/Registers_25_2_BRB1
-                                                       reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.BX      net (fanout=64)       2.153   reg_read_ctrl_SelOutA<1>
-    SLICE_X35Y34.F5      Tbxf5                 0.589   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_7_f5_22
-    SLICE_X35Y34.FXINA   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_7_f523
-    SLICE_X35Y34.FX      Tinafx                0.463   reg_u/RegArrayMap/Mmux_RegA_7_f523
-                                                       reg_u/RegArrayMap/Mmux_RegA_6_f6_6
-    SLICE_X34Y35.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_6_f67
-    SLICE_X34Y35.FX      Tinbfx                0.364   reg_u/RegArrayMap/Mmux_RegA_7_f522
-                                                       reg_u/RegArrayMap/Mmux_RegA_4_f7_6
-    SLICE_X35Y33.FXINB   net (fanout=1)        0.000   reg_u/RegArrayMap/Mmux_RegA_4_f77
-    SLICE_X35Y33.Y       Tif6y                 0.521   reg_DataOutA_delay<7>
-                                                       reg_u/RegArrayMap/Mmux_RegA_2_f8_6
-    SLICE_X30Y34.F2      net (fanout=4)        0.699   reg_DataOutA<7>
-    SLICE_X30Y34.F5      Tif5                  1.033   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_4
-                                                       Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.FXINA   net (fanout=1)        0.000   Mmux_reg_DataOutA_mux0000_3_f5
-    SLICE_X30Y34.Y       Tif6y                 0.409   reg_DataOutA_mux0000
-                                                       Mmux_reg_DataOutA_mux0000_2_f6
-    SLICE_X28Y34.G2      net (fanout=8)        0.423   reg_DataOutA_mux0000
-    SLICE_X28Y34.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_18_5_BRB1
-                                                       NextExecuteOpData_OpB_6_mux001414
-    SLICE_X29Y33.BX      net (fanout=5)        0.528   N266
-    SLICE_X29Y33.X       Tbxx                  0.739   reg_u/RegArrayMap/Registers_28_4_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014133_SW1
-    SLICE_X28Y33.G4      net (fanout=1)        0.086   N468
-    SLICE_X28Y33.Y       Tilo                  0.759   reg_u/RegArrayMap/Registers_28_6_BRB1
-                                                       NextExecuteOpData_OpB_6_mux0014175
-    MULT18X18_X0Y5.B6    net (fanout=2)        1.505   NextExecuteOpData_OpB<6>
-    MULT18X18_X0Y5.P7    Tmult                 4.344   alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-                                                       alu_u/alu_c/Mul1/Mmult_UnsignedMulResult
-    SLICE_X19Y40.F1      net (fanout=5)        1.214   alu_u/alu_c/Mul1/UnsignedMulResult<7>
-    SLICE_X19Y40.X       Tilo                  0.704   alu_u/status_c/RegOut_3_BRB4
-                                                       alu_u/alu_c/Mul1/MulResult<7>1_SW011
-    SLICE_X24Y41.F2      net (fanout=1)        0.636   alu_u/alu_c/Mul1/MulResult<7>1_SW01
-    SLICE_X24Y41.X       Tif5x                 1.152   reg_u/RegArrayMap/Registers_10_7_BRB2
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd_G
-                                                       alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.BY      net (fanout=31)       0.890   alu_u/alu_c/Mmux_Result_2_f5_6_dup_bwd_dup_bwd_dup_bwd_dup_bwd
-    SLICE_X28Y38.CLK     Tdick                 0.382   reg_u/RegArrayMap/Registers_8_7_BRB2
-                                                       reg_u/RegArrayMap/Registers_8_7_BRB2
+    U8.IQ1               Tiockiq               0.508   ProgDB<13>
+                                                       InstReg_13
+    SLICE_X55Y0.F4       net (fanout=49)       1.968   InstReg<13>
+    SLICE_X55Y0.X        Tilo                  0.704   N2701
+                                                       iau_ctrl_offsetSel_and006115_SW1
+    SLICE_X48Y11.F2      net (fanout=3)        0.991   N2701
+    SLICE_X48Y11.X       Tilo                  0.759   N272
+                                                       iau_ctrl_offsetSel_and000711
+    SLICE_X52Y12.F2      net (fanout=26)       0.688   N272
+    SLICE_X52Y12.X       Tilo                  0.759   N316
+                                                       reg_read_ctrl_SelOutB<1>1211
+    SLICE_X50Y21.G1      net (fanout=13)       1.003   N316
+    SLICE_X50Y21.X       Tif5x                 1.152   N398
+                                                       reg_read_ctrl_SelOutA<0>114_SW0_F
+                                                       reg_read_ctrl_SelOutA<0>114_SW0
+    SLICE_X50Y24.F3      net (fanout=1)        0.273   N398
+    SLICE_X50Y24.X       Tilo                  0.759   reg_read_ctrl_SelOutA<0>134
+                                                       reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.G4      net (fanout=2)        1.441   reg_read_ctrl_SelOutA<0>134
+    SLICE_X25Y37.Y       Tilo                  0.704   reg_read_ctrl_SelOutA<0>
+                                                       reg_read_ctrl_SelOutA<0>154
+    SLICE_X36Y32.G3      net (fanout=26)       0.891   N2
+    SLICE_X36Y32.Y       Tilo                  0.759   N3021
+                                                       reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.G2      net (fanout=44)       1.200   reg_read_ctrl_SelOutA<2>
+    SLICE_X50Y37.Y       Tilo                  0.759   executeDataLocks<1>
+                                                       decodeDataReadLocks_0_mux00001_SW0_SW0
+    SLICE_X65Y34.F4      net (fanout=2)        0.934   N2981
+    SLICE_X65Y34.X       Tilo                  0.704   decodeDataReadLocks<8>
+                                                       decodeDataReadLocks_8_mux00021
+    SLICE_X68Y33.F2      net (fanout=2)        0.660   decodeDataReadLocks<8>
+    SLICE_X68Y33.X       Tilo                  0.759   N1421
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>_SW0
+    SLICE_X70Y32.F3      net (fanout=1)        0.349   N1421
+    SLICE_X70Y32.COUT    Topcyf                1.162   writeDataLocks<14>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_lut<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<2>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<3>
+    SLICE_X70Y33.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<4>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<5>
+    SLICE_X70Y34.COUT    Tbyp                  0.130   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<6>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.CIN     net (fanout=1)        0.000   Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<7>
+    SLICE_X70Y35.COUT    Tbyp                  0.130   writeDataLocks<27>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<8>
+                                                       Mcompar_DecodeDataHazardPresent_cmp_ne0000_cy<9>
+    SLICE_X58Y34.G2      net (fanout=12)       1.651   DecodeDataHazardPresent3
+    SLICE_X58Y34.Y       Tilo                  0.759   DecodeDataHazardPresent41_REPLICA_50
+                                                       DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.F4       net (fanout=1)        1.674   DecodeDataHazardPresent41_REPLICA_50
+    SLICE_X39Y8.X        Tilo                  0.704   InstReg_not0001
+                                                       InstReg_not00011
+    T11.ICE              net (fanout=16)       1.418   InstReg_not0001
+    T11.ICLK1            Tioiceck              0.737   ProgDB<11>
+                                                       InstReg_11
     -------------------------------------------------  ---------------------------
-    Total                                     24.599ns (13.430ns logic, 11.169ns route)
-                                                       (54.6% logic, 45.4% route)
+    Total                                     27.219ns (12.078ns logic, 15.141ns route)
+                                                       (44.4% logic, 55.6% route)
 
 --------------------------------------------------------------------------------
 
 Hold Paths: TS_clock = PERIOD TIMEGRP "clock" 25 ns HIGH 50%;
 --------------------------------------------------------------------------------
 
-Paths for end point alu_u/status_c/RegOut_7_BRB1 (SLICE_X15Y34.F1), 1 path
+Paths for end point CurWriteOpData.writeRegSelS_4 (SLICE_X54Y36.BY), 1 path
 --------------------------------------------------------------------------------
-Slack (hold path):      1.387ns (requirement - (clock path skew + uncertainty - data path))
-  Source:               alu_u/status_c/RegOut_7_BRB1 (FF)
-  Destination:          alu_u/status_c/RegOut_7_BRB1 (FF)
+Slack (hold path):      1.004ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               CurExecuteOpData.writeRegSelS_4 (FF)
+  Destination:          CurWriteOpData.writeRegSelS_4 (FF)
   Requirement:          0.000ns
-  Data Path Delay:      1.387ns (Levels of Logic = 1)
+  Data Path Delay:      1.004ns (Levels of Logic = 0)
   Clock Path Skew:      0.000ns
   Source Clock:         clock_IBUF rising at 25.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Minimum Data Path: alu_u/status_c/RegOut_7_BRB1 to alu_u/status_c/RegOut_7_BRB1
+  Minimum Data Path: CurExecuteOpData.writeRegSelS_4 to CurWriteOpData.writeRegSelS_4
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    SLICE_X15Y34.XQ      Tcko                  0.473   alu_u/status_c/RegOut_7_BRB1
-                                                       alu_u/status_c/RegOut_7_BRB1
-    SLICE_X15Y34.F1      net (fanout=1)        0.398   alu_u/status_c/RegOut_7_BRB1
-    SLICE_X15Y34.CLK     Tckf        (-Th)    -0.516   alu_u/status_c/RegOut_7_BRB1
-                                                       alu_u/status_c/RegOut_or0000<7>1
-                                                       alu_u/status_c/RegOut_7_BRB1
+    SLICE_X55Y36.XQ      Tcko                  0.473   CurExecuteOpData.writeRegSelS_4
+                                                       CurExecuteOpData.writeRegSelS_4
+    SLICE_X54Y36.BY      net (fanout=1)        0.379   CurExecuteOpData.writeRegSelS_4
+    SLICE_X54Y36.CLK     Tckdi       (-Th)    -0.152   CurWriteOpData.writeRegSelS_4
+                                                       CurWriteOpData.writeRegSelS_4
     -------------------------------------------------  ---------------------------
-    Total                                      1.387ns (0.989ns logic, 0.398ns route)
-                                                       (71.3% logic, 28.7% route)
+    Total                                      1.004ns (0.625ns logic, 0.379ns route)
+                                                       (62.3% logic, 37.7% route)
 
 --------------------------------------------------------------------------------
 
-Paths for end point CurState_0 (SLICE_X30Y10.BY), 1 path
+Paths for end point writeDataLocks_8 (SLICE_X75Y35.BY), 1 path
 --------------------------------------------------------------------------------
-Slack (hold path):      1.533ns (requirement - (clock path skew + uncertainty - data path))
-  Source:               CurState_0 (FF)
-  Destination:          CurState_0 (FF)
+Slack (hold path):      1.185ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               executeDataLocks_8 (FF)
+  Destination:          writeDataLocks_8 (FF)
   Requirement:          0.000ns
-  Data Path Delay:      1.533ns (Levels of Logic = 0)
-  Clock Path Skew:      0.000ns
+  Data Path Delay:      1.182ns (Levels of Logic = 0)
+  Clock Path Skew:      -0.003ns (0.079 - 0.082)
   Source Clock:         clock_IBUF rising at 25.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Minimum Data Path: CurState_0 to CurState_0
+  Minimum Data Path: executeDataLocks_8 to writeDataLocks_8
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    SLICE_X30Y10.YQ      Tcko                  0.522   CurState<0>
-                                                       CurState_0
-    SLICE_X30Y10.BY      net (fanout=30)       0.859   CurState<0>
-    SLICE_X30Y10.CLK     Tckdi       (-Th)    -0.152   CurState<0>
-                                                       CurState_0
+    SLICE_X77Y40.XQ      Tcko                  0.473   executeDataLocks<8>
+                                                       executeDataLocks_8
+    SLICE_X75Y35.BY      net (fanout=2)        0.574   executeDataLocks<8>
+    SLICE_X75Y35.CLK     Tckdi       (-Th)    -0.135   writeDataLocks<7>
+                                                       writeDataLocks_8
     -------------------------------------------------  ---------------------------
-    Total                                      1.533ns (0.674ns logic, 0.859ns route)
-                                                       (44.0% logic, 56.0% route)
+    Total                                      1.182ns (0.608ns logic, 0.574ns route)
+                                                       (51.4% logic, 48.6% route)
 
 --------------------------------------------------------------------------------
 
-Paths for end point alu_u/status_c/RegOut_7_BRB0 (SLICE_X32Y18.F3), 1 path
+Paths for end point CurWriteOpData.writeRegSelS_0 (SLICE_X58Y40.BY), 1 path
 --------------------------------------------------------------------------------
-Slack (hold path):      1.635ns (requirement - (clock path skew + uncertainty - data path))
-  Source:               NextExecuteOpData_OpB_4_mux001431_FRB (FF)
-  Destination:          alu_u/status_c/RegOut_7_BRB0 (FF)
+Slack (hold path):      1.196ns (requirement - (clock path skew + uncertainty - data path))
+  Source:               CurExecuteOpData.writeRegSelS_0 (FF)
+  Destination:          CurWriteOpData.writeRegSelS_0 (FF)
   Requirement:          0.000ns
-  Data Path Delay:      1.634ns (Levels of Logic = 1)
-  Clock Path Skew:      -0.001ns (0.030 - 0.031)
+  Data Path Delay:      1.208ns (Levels of Logic = 0)
+  Clock Path Skew:      0.012ns (0.024 - 0.012)
   Source Clock:         clock_IBUF rising at 25.000ns
   Destination Clock:    clock_IBUF rising at 25.000ns
   Clock Uncertainty:    0.000ns
 
-  Minimum Data Path: NextExecuteOpData_OpB_4_mux001431_FRB to alu_u/status_c/RegOut_7_BRB0
+  Minimum Data Path: CurExecuteOpData.writeRegSelS_0 to CurWriteOpData.writeRegSelS_0
     Location             Delay type         Delay(ns)  Physical Resource
                                                        Logical Resource(s)
     -------------------------------------------------  -------------------
-    SLICE_X35Y13.YQ      Tcko                  0.470   NextExecuteOpData_OpB_4_mux001431_FRB
-                                                       NextExecuteOpData_OpB_4_mux001431_FRB
-    SLICE_X32Y18.F3      net (fanout=33)       0.604   NextExecuteOpData_OpB_4_mux001431_FRB
-    SLICE_X32Y18.CLK     Tckf        (-Th)    -0.560   alu_u/status_c/RegOut_7_BRB0
-                                                       NextExecuteOpData_ALUFlagMask<7>
-                                                       alu_u/status_c/RegOut_7_BRB0
+    SLICE_X63Y41.XQ      Tcko                  0.473   CurExecuteOpData.writeRegSelS_0
+                                                       CurExecuteOpData.writeRegSelS_0
+    SLICE_X58Y40.BY      net (fanout=1)        0.583   CurExecuteOpData.writeRegSelS_0
+    SLICE_X58Y40.CLK     Tckdi       (-Th)    -0.152   CurWriteOpData.writeRegSelS_0
+                                                       CurWriteOpData.writeRegSelS_0
     -------------------------------------------------  ---------------------------
-    Total                                      1.634ns (1.030ns logic, 0.604ns route)
-                                                       (63.0% logic, 37.0% route)
+    Total                                      1.208ns (0.625ns logic, 0.583ns route)
+                                                       (51.7% logic, 48.3% route)
 
 --------------------------------------------------------------------------------
 
 Component Switching Limit Checks: TS_clock = PERIOD TIMEGRP "clock" 25 ns HIGH 50%;
 --------------------------------------------------------------------------------
-Slack: 21.808ns (period - (min low pulse limit / (low pulse / period)))
+Slack: 20.833ns (period - min period limit)
+  Period: 25.000ns
+  Min period limit: 4.167ns (239.981MHz) (Tmsper_B)
+  Physical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Logical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Location pin: MULT18X18_X0Y5.CLK
+  Clock network: clock_IBUF
+--------------------------------------------------------------------------------
+Slack: 20.834ns (period - (min low pulse limit / (low pulse / period)))
   Period: 25.000ns
   Low pulse: 12.500ns
-  Low pulse limit: 1.596ns (Trpw)
-  Physical resource: ProgDB<10>/SR
-  Logical resource: InstReg_10/SR
-  Location pin: U9.SR
-  Clock network: Reset_IBUF
+  Low pulse limit: 2.083ns (Tmspwl_B)
+  Physical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Logical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Location pin: MULT18X18_X0Y5.CLK
+  Clock network: clock_IBUF
 --------------------------------------------------------------------------------
-Slack: 21.808ns (period - (min high pulse limit / (high pulse / period)))
+Slack: 20.834ns (period - (min high pulse limit / (high pulse / period)))
   Period: 25.000ns
   High pulse: 12.500ns
-  High pulse limit: 1.596ns (Trpw)
-  Physical resource: ProgDB<10>/SR
-  Logical resource: InstReg_10/SR
-  Location pin: U9.SR
-  Clock network: Reset_IBUF
---------------------------------------------------------------------------------
-Slack: 21.808ns (period - (min low pulse limit / (low pulse / period)))
-  Period: 25.000ns
-  Low pulse: 12.500ns
-  Low pulse limit: 1.596ns (Trpw)
-  Physical resource: ProgDB<11>/SR
-  Logical resource: InstReg_11/SR
-  Location pin: V11.SR
-  Clock network: Reset_IBUF
+  High pulse limit: 2.083ns (Tmspwh_B)
+  Physical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Logical resource: alu_u/alu_c/Mul1/Mmult_UnsignedMulResult/CLK
+  Location pin: MULT18X18_X0Y5.CLK
+  Clock network: clock_IBUF
 --------------------------------------------------------------------------------
 
 
-All constraints were met.
+1 constraint not met.
 
 
 Data Sheet report:
@@ -759,25 +903,25 @@ Clock to Setup on destination clock clock
                | Src:Rise| Src:Fall| Src:Rise| Src:Fall|
 Source Clock   |Dest:Rise|Dest:Rise|Dest:Fall|Dest:Fall|
 ---------------+---------+---------+---------+---------+
-clock          |   24.919|         |         |         |
+clock          |   27.839|         |         |         |
 ---------------+---------+---------+---------+---------+
 
 
 Timing summary:
 ---------------
 
-Timing errors: 0  Score: 0  (Setup/Max: 0, Hold: 0)
+Timing errors: 126  Score: 93130  (Setup/Max: 93130, Hold: 0)
 
-Constraints cover 105333649 paths, 0 nets, and 7265 connections
+Constraints cover 91373473 paths, 0 nets, and 8229 connections
 
 Design statistics:
-   Minimum period:  24.919ns{1}   (Maximum frequency:  40.130MHz)
+   Minimum period:  27.839ns{1}   (Maximum frequency:  35.921MHz)
 
 
 ------------------------------------Footnotes-----------------------------------
 1)  The minimum period statistic assumes all single cycle delays.
 
-Analysis completed Sat Mar 27 19:32:57 2021 
+Analysis completed Sun Mar 28 09:55:23 2021 
 --------------------------------------------------------------------------------
 
 Trace Settings:

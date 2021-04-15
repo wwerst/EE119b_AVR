@@ -19,6 +19,7 @@
 --      20 Feb 21   Eric Chen   Set larger AtLeast on bins
 --      27 Mar 21   Will Werst  Fix stack starting at 0000 instead of
 --                              FFFF. See git history for more details.
+--      27 Mar 21   Will Werst  Add backpressure signal for pipelining
 ---------------------------------------------------------------------
 
 
@@ -48,6 +49,7 @@ architecture testbench of iau_tb is
             DDB         : in  std_logic_vector(7 downto 0);
             Z           : in  AVR.addr_t;
             OffsetSel   : in  IAU.offset_t;
+            BackPress   : in   std_logic;
             Address     : out AVR.addr_t
         );
     end component;
@@ -66,6 +68,7 @@ architecture testbench of iau_tb is
     signal DDB          : std_logic_vector(7 downto 0);
     signal Z            : AVR.addr_t;
     signal OffsetSel    : IAU.offset_t;
+    signal BackPress    : std_logic := '0';
     signal address      : AVR.addr_t;
 
     -- test bench signals, expected values
@@ -198,6 +201,7 @@ begin
         ddb => ddb,
         z => z,
         offsetSel => offsetSel,
+        BackPress => BackPress,
         address => address
     );
 

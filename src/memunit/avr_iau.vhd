@@ -34,6 +34,7 @@
 --                              address bus if the memory is not designed
 --                              for glitches (signal will stabilize before
 --                              the write/read command is sent).
+--      27 Mar 21   Will Werst  Add backpressure signal for pipelining
 ---------------------------------------------------------------------
 
 
@@ -87,6 +88,8 @@ end package;
 --      DDB     - 8 bit unsigned value
 --      Z       - 16 bit unsigned value
 --      OffsetSel- offset id, from IAU package
+--      BackPress - Prevents state updates on clock if 1.
+--                  Used for pipelining backpressure.
 --
 -- Outputs:
 --      Address - the current program counter
@@ -111,6 +114,7 @@ entity  AvrIau  is
         DDB         : in  std_logic_vector(7 downto 0);
         Z           : in  AVR.addr_t;
         OffsetSel   : in  IAU.offset_t;
+        BackPress   : in   std_logic;
         Address     : out AVR.addr_t
     );
 
@@ -190,7 +194,11 @@ begin
                 -- Reset to address 0
                 pc <= (others => '0');
             else
-                pc <= next_address;
+                if BackPress = '0' then
+                    pc <= next_address;
+                else
+                    pc <= pc;
+                end if;
             end if;
         end if;
     end process;

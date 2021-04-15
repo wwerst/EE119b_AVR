@@ -26,6 +26,7 @@
 --      22 Feb 21   Eric Chen   Merge register inputs.
 --      27 Mar 21   Will Werst  Fix stack starting at 0000 instead of
 --                              FFFF. See git history for more details.
+--      27 Mar 21   Will Werst  Add backpressure signal for pipelining
 ---------------------------------------------------------------------
 
 
@@ -78,6 +79,8 @@ end package;
 --      reg         - register bus that can be used as a source
 --      OffsetSel   - offset to use, see DAU package for options
 --      array_off   - 6 bit unsigned offset for array addressing
+--      BackPress   - Prevents state updates on clock if 1.
+--                    Used for pipelining backpressure.
 --
 -- Outputs
 --      address     - address to access memory at
@@ -104,6 +107,7 @@ entity  AvrDau  is
         reg         : in  std_logic_vector(15 downto 0);
         OffsetSel   : in  DAU.offset_t;
         array_off   : in  std_logic_vector(5 downto 0);
+        BackPress   : in   std_logic;
         Address     : out AVR.addr_t;
         Update      : out AVR.addr_t
     );
@@ -204,7 +208,11 @@ begin
             if reset = '0' then
                 stack <= (others => '1');
             elsif srcSel = DAU.SRC_STACK then
-                stack <= computed_addr;
+                if BackPress = '0' then
+                    stack <= computed_addr;
+                else
+                    stack <= stack;
+                end if;
             end if;
         end if;
     end process;

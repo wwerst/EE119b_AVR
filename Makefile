@@ -44,32 +44,15 @@ reg_tests: import
 	ghdl -m --std=08 --workdir=work avr_reg_tb
 	ghdl -r --std=08 --workdir=work avr_reg_tb --max-stack-alloc=$(STACK_SIZE) --vcd=avr_reg_tb.vcd
 
-cpu_tests_all: cpu_alu_tests cpu_data_move_tests cpu_flow_skip_tests cpu_flow_cond_branch_tests cpu_flow_uncond_branch_tests
+cpu_tests_all: cpu_fullprogram_tests
 	sleep 1
 
-cpu_alu_tests: import cpu_test_vector_files
-	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/alu_test_part1_tv.txt"
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/alu_test_part2_tv.txt"
-
-cpu_data_move_tests: import cpu_test_vector_files
-	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/data_move_test_tv.txt"
-
-cpu_flow_skip_tests: import cpu_test_vector_files
-	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/flow_skip_tv.txt"
-
-cpu_flow_cond_branch_tests: import cpu_test_vector_files
-	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/flow_cond_branch_tv.txt"
-
-cpu_flow_uncond_branch_tests: import cpu_test_vector_files
-	ghdl -m --std=08 --workdir=work avr_cpu_tb
-	ghdl -r --std=08 --workdir=work avr_cpu_tb --ieee-asserts=disable-at-0 --wave=avr_cpu_tb.ghw --vcd=avr_cpu_tb.vcd -gtest_vector_filename="test_vectors/flow_uncond_branch_tv.txt"
+cpu_fullprogram_tests: import
+	ghdl -m --ieee=synopsys --std=08 --workdir=work cpu_programfull_tb 
+	ghdl -r --ieee=synopsys --std=08 --workdir=work cpu_programfull_tb  --ieee-asserts=disable --wave=fullprogram_tb.ghw --vcd=fullprogram_tb.vcd
 
 continuous_tests:
-	fswatch -m poll_monitor -0 -o src/* | xargs -0 -n1 bash -c "clear && echo '*****************Running Tests***************************' && make cpu_tests_all"
+	fswatch -m poll_monitor -0 -o src/* | xargs -0 -n1 bash -c "clear && echo '*****************Running Tests***************************' && make cpu_fullprogram_tests"
 
 clean:
 	rm -r work/*.cf || true
