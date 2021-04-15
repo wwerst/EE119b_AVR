@@ -454,9 +454,9 @@ begin
         iau_ctrl.OffsetSel <= IAU.OFF_ONE; -- Increment address by one
         dau_ctrl.SrcSel <= DAU.SRC_REG; -- Keep dau address the same
         dau_ctrl.OffsetSel <= DAU.OFF_ZERO; -- Leave dau address unchanged
-        reg_read_ctrl.SelOutA <= (others => 'U');
-        reg_read_ctrl.SelOutB <= (others => 'U');
-        reg_read_ctrl.SelOutD <= (others => 'U');
+        reg_read_ctrl.SelOutA <= (others => 'X');
+        reg_read_ctrl.SelOutB <= (others => 'X');
+        reg_read_ctrl.SelOutD <= (others => 'X');
 
         -- Default to executing a pass-through of OpA to result
         -- Done by adding OpA to OpB = 0, then making sure flags don't change.
